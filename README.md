@@ -1,14 +1,28 @@
-# Monorepo APIs for Peakee
+# Blinders
+
+Monorepo, microservice back-end project named Blinders for Peakee - a language learning platform.
+
+This project is a monorepo microservice back-end written in Golang and Python. It's using Terraform for setup provisioning, all the services are hosted on AWS, the main AWS service used is AWS lambda.
 
 ## Setup
 
+### Python
+
+-   [x] Monorepo structure
+-   [x] Setup linter and formatter
+-   [ ] Testing setup
+-   [ ] AWS lambda function
+-   [ ] Terraform deployment
+-   [ ] CI Github Actions
+-   [ ] CD Github Actions
+
+### Golang
+
 -   [ ] Monorepo structure
--   [ ] Go lambda function
--   [ ] Python lambda function
--   [ ] Setup linter and formatter for Go
--   [ ] Setup linter and formatter for Python
--   [ ] Testing setup for Go
--   [ ] Testing setup for Python
+-   [ ] Setup linter and formatter
+-   [ ] Testing setup
+-   [ ] AWS lambda function
+-   [ ] Terraform deployment
 -   [ ] CI Github Actions
 -   [ ] CD Github Actions
 
@@ -25,23 +39,26 @@
 Use python 3.10 as base version of python, recommend to use local python environment using `conda`
 
 ```shell
-conda create --prefix ./.venv/ python==3.10
+conda create --prefix ./.venv/ python==3.10 # Initialize repo virtual environment
+conda activate ./.venv # Activate venv
 ```
 
-Install pinned pip
+We're using [poetry](https://python-poetry.org/) package manager for rich of dependencies management features
 
 ```shell
-pip install -r pip-requirements.txt
+pip install poetry
 ```
 
-Install shared development dependencies
+Install packages
 
 ```shell
-pip install -r dev-requirements.txt
+poetry install
 ```
 
 ## References
 
--   Setup Python monorepo [tweag.io/blog/2023-04-04-python-monorepo-1/](https://www.tweag.io/blog/2023-04-04-python-monorepo-1/) [tweag.io/blog/2023-07-13-python-monorepo-2/](https://www.tweag.io/blog/2023-07-13-python-monorepo-2/)
--   Use pyproject.toml [peps.python.org/pep-0518/](https://peps.python.org/pep-0518/)
+-   Setup Python monorepo [tweag.io/blog/2023-04-04-python-monorepo-1](https://www.tweag.io/blog/2023-04-04-python-monorepo-1/) [tweag.io/blog/2023-07-13-python-monorepo-2](https://www.tweag.io/blog/2023-07-13-python-monorepo-2/) [](medium.com/opendoor-labs/our-python-monorepo-d34028f2b6fa)
+-   Use pyproject.toml [peps.python.org/pep-0518](https://peps.python.org/pep-0518/)
+-   Poetry - python package manager [python-poetry.org](https://python-poetry.org/docs/)
+-   Python namespace [packaging.python.org/en/latest/guides/packaging-namespace-packages](https://packaging.python.org/en/latest/guides/packaging-namespace-packages/)
 -   Awesome monorepo [https://github.com/korfuri/awesome-monorepo](https://github.com/korfuri/awesome-monorepo)
