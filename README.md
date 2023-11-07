@@ -2,15 +2,15 @@
 
 ## Setup
 
-[ ] Monorepo structure
-[ ] Go lambda function
-[ ] Python lambda function
-[ ] Setup linter and formatter for Go
-[ ] Setup linter and formatter for Python
-[ ] Testing setup for Go
-[ ] Testing setup for Python
-[ ] CI Github Actions
-[ ] CD Github Actions
+-   [ ] Monorepo structure
+-   [ ] Go lambda function
+-   [ ] Python lambda function
+-   [ ] Setup linter and formatter for Go
+-   [ ] Setup linter and formatter for Python
+-   [ ] Testing setup for Go
+-   [ ] Testing setup for Python
+-   [ ] CI Github Actions
+-   [ ] CD Github Actions
 
 ## Python development setup
 
