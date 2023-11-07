@@ -14,11 +14,11 @@
 
 ## Python development setup
 
-### Description
+### Tools
 
-Code formatter: [Black](https://github.com/psf/black)
-Code linter: [Flake8](https://flake8.pycqa.org/en/latest/user/index.html) [isort](https://github.com/PyCQA/isort), and [pylint](https://pypi.org/project/pylint/) for just checking public artifacts are documented or not
-Type checking: [Pyright](https://github.com/microsoft/pyright#static-type-checker-for-python)
+-   Code formatter: [Black](https://github.com/psf/black)
+-   Code linter: [Flake8](https://flake8.pycqa.org/en/latest/user/index.html) [isort](https://github.com/PyCQA/isort), and [pylint](https://pypi.org/project/pylint/) for just checking public artifacts are documented or not
+-   Type checking: [Pyright](https://github.com/microsoft/pyright#static-type-checker-for-python)
 
 ### Setup steps
 
