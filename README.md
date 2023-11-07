@@ -42,5 +42,6 @@ pip install -r dev-requirements.txt
 
 ## References
 
-Setup Python monorepo [tweag.io/blog/2023-04-04-python-monorepo-1/](https://www.tweag.io/blog/2023-04-04-python-monorepo-1/)
+Setup Python monorepo [tweag.io/blog/2023-04-04-python-monorepo-1/](https://www.tweag.io/blog/2023-04-04-python-monorepo-1/) [tweag.io/blog/2023-07-13-python-monorepo-2/](https://www.tweag.io/blog/2023-07-13-python-monorepo-2/)
 Use pyproject.toml [peps.python.org/pep-0518/](https://peps.python.org/pep-0518/)
+Awesome monorepo [https://github.com/korfuri/awesome-monorepo](https://github.com/korfuri/awesome-monorepo)
