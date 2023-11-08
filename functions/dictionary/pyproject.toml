@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "peakee-dictionary"
+name = "blinders-dictionary-aws-lambda"
 version = "0.1.0"
 description = ""
 authors = ["Tan Le <tanlethanh8266@gmail.com>"]
@@ -7,6 +7,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
+blinders-dictionary-core = { path = "../../packages/dictionary", develop = true }
 
 
 [build-system]

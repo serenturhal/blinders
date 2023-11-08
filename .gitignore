@@ -2,3 +2,4 @@
 
 # python gitignore
 .venv
+**/__pycache__

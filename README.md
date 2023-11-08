@@ -55,10 +55,17 @@ Install packages
 poetry install
 ```
 
+If not using `poetry`
+
+```shell
+pip install -e .
+```
+
 ## References
 
 -   Setup Python monorepo [tweag.io/blog/2023-04-04-python-monorepo-1](https://www.tweag.io/blog/2023-04-04-python-monorepo-1/) [tweag.io/blog/2023-07-13-python-monorepo-2](https://www.tweag.io/blog/2023-07-13-python-monorepo-2/) [](medium.com/opendoor-labs/our-python-monorepo-d34028f2b6fa)
 -   Use pyproject.toml [peps.python.org/pep-0518](https://peps.python.org/pep-0518/)
 -   Poetry - python package manager [python-poetry.org](https://python-poetry.org/docs/)
 -   Python namespace [packaging.python.org/en/latest/guides/packaging-namespace-packages](https://packaging.python.org/en/latest/guides/packaging-namespace-packages/)
+-   Python editable mode for development [pip.pypa.io/en/stable/topics/local-project-installs](https://pip.pypa.io/en/stable/topics/local-project-installs/)
 -   Awesome monorepo [https://github.com/korfuri/awesome-monorepo](https://github.com/korfuri/awesome-monorepo)
