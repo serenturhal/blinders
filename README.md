@@ -10,9 +10,9 @@ This project is a monorepo microservice back-end written in Golang and Python. I
 
 -   [x] Monorepo structure
 -   [x] Setup linter and formatter
--   [ ] Testing setup
--   [ ] AWS lambda function
--   [ ] Terraform deployment
+-   [x] Testing setup
+-   [x] AWS lambda function
+-   [x] Terraform deployment
 -   [ ] CI Github Actions
 -   [ ] CD Github Actions
 
@@ -43,7 +43,7 @@ conda create --prefix ./.venv/ python==3.10 # Initialize repo virtual environmen
 conda activate ./.venv # Activate venv
 ```
 
-We're using [poetry](https://python-poetry.org/) package manager for rich of dependencies management features
+We're using [poetry](https://python-poetry.org/) package manager because of rich dependencies management features
 
 ```shell
 pip install poetry
