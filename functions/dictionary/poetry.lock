@@ -2,7 +2,7 @@
 
 [[package]]
 name = "blinders-dictionary-core"
-version = "0.1.1"
+version = "0.1.0"
 description = ""
 optional = false
 python-versions = "^3.10"
