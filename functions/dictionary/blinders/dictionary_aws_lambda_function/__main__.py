@@ -1,6 +1,6 @@
-from blinders.dictionary_core import handle_dictionary
 import sys
 
+from blinders.dictionary_core import handle_dictionary
 
 if __name__ == "__main__":
     print(sys.path)

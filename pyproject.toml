@@ -25,12 +25,12 @@ target-version = ['py38']
 [tool.pylint."messages control"]
 ignore = ["setup.py", "__init__.py"]
 disable = "all"
-enable = [
-    "empty-docstring",
-    "missing-class-docstring",
-    "missing-function-docstring",
-    "missing-module-docstring",
-]
+# enable = [
+#     "empty-docstring",
+#     "missing-class-docstring",
+#     "missing-function-docstring",
+#     "missing-module-docstring",
+# ]
 
 [tool.isort]
 profile = "black"
