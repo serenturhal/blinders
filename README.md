@@ -68,4 +68,5 @@ pip install -e .
 -   Poetry - python package manager [python-poetry.org](https://python-poetry.org/docs/)
 -   Python namespace [packaging.python.org/en/latest/guides/packaging-namespace-packages](https://packaging.python.org/en/latest/guides/packaging-namespace-packages/)
 -   Python editable mode for development [pip.pypa.io/en/stable/topics/local-project-installs](https://pip.pypa.io/en/stable/topics/local-project-installs/)
--   Awesome monorepo [https://github.com/korfuri/awesome-monorepo](https://github.com/korfuri/awesome-monorepo)
+-   Building lambda with Poetry [chariotsolutions.com/blog/post/building-lambdas-with-poetry/](https://chariotsolutions.com/blog/post/building-lambdas-with-poetry/)
+-   Awesome monorepo [github.com/korfuri/awesome-monorepo](https://github.com/korfuri/awesome-monorepo)

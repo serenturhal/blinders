@@ -4,3 +4,16 @@
 .venv
 **/__pycache__
 **/.pytest_cache
+**/dist
+**/package
+**/lambda_bundle.zip
+
+**/.DS_Store
+
+# terraform gitignore
+# Local .terraform directories
+**/.terraform*
+
+# .tfstate files
+**/*.tfstate
+**/*.tfstate.*
