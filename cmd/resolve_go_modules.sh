@@ -4,7 +4,6 @@
 
 echo "Resolving modules in $(pwd)"
 
-PATHS=$(find . -mindepth 2 -type f -name go.mod -execdir printf '{"workdir":"%s"},'  "$PWD" \;)
-# PATHS=$(find . -mindepth 2 -type f -name go.mod -printf '{"workdir":"%h"},')
+PATHS=$(find . -mindepth 2 -type f -name go.mod -printf '{"workdir":"%h"},')
 
 echo "::set-output name=matrix::{\"include\":[${PATHS%?}]}"
