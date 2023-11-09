@@ -1,3 +1,9 @@
 go 1.21.3
 
-use ./functions/suggestion
+use (
+	./functions/collecting
+	./functions/flashcard
+	./functions/suggestion
+	./functions/translation
+	./packages/suggestion
+)

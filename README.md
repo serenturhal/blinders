@@ -18,7 +18,7 @@ This project is a monorepo microservice back-end written in Golang and Python. I
 
 ### Golang
 
--   [ ] Monorepo structure
+-   [x] Monorepo structure
 -   [ ] Setup linter and formatter
 -   [ ] Testing setup
 -   [ ] AWS lambda function
@@ -70,3 +70,4 @@ pip install -e .
 -   Python editable mode for development [pip.pypa.io/en/stable/topics/local-project-installs](https://pip.pypa.io/en/stable/topics/local-project-installs/)
 -   Building lambda with Poetry [chariotsolutions.com/blog/post/building-lambdas-with-poetry/](https://chariotsolutions.com/blog/post/building-lambdas-with-poetry/)
 -   Awesome monorepo [github.com/korfuri/awesome-monorepo](https://github.com/korfuri/awesome-monorepo)
+-   Effective Go [go.dev/doc/effective_go](https://go.dev/doc/effective_go)
