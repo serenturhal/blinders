@@ -36,7 +36,7 @@ This project is a monorepo microservice back-end written in Golang and Python. I
 
 ### Setup steps
 
-Use python 3.10 as base version of python, recommend to use local python environment using `conda`
+Use python 3.10 as base version of python, recommend to use local python environment using [conda](https://www.anaconda.com/)
 
 ```shell
 conda create --prefix ./.venv/ python==3.10 # Initialize repo virtual environment
@@ -61,13 +61,23 @@ If not using `poetry`
 pip install -e .
 ```
 
+## Go development setup
+
+-   Using [golangci-lint](https://golangci-lint.run/) to manage all linter, formatter and setup ci, detail configs in `golangci.yml`
+
 ## References
 
--   Setup Python monorepo [tweag.io/blog/2023-04-04-python-monorepo-1](https://www.tweag.io/blog/2023-04-04-python-monorepo-1/) [tweag.io/blog/2023-07-13-python-monorepo-2](https://www.tweag.io/blog/2023-07-13-python-monorepo-2/) [](medium.com/opendoor-labs/our-python-monorepo-d34028f2b6fa)
+-   Awesome monorepo [github.com/korfuri/awesome-monorepo](https://github.com/korfuri/awesome-monorepo)
+
+-   Setup Python monorepo
+    -   [tweag.io/blog/2023-04-04-python-monorepo-1](https://www.tweag.io/blog/2023-04-04-python-monorepo-1/)
+    -   [tweag.io/blog/2023-07-13-python-monorepo-2](https://www.tweag.io/blog/2023-07-13-python-monorepo-2/)
+    -   [medium.com/opendoor-labs/our-python-monorepo-d34028f2b6fa](medium.com/opendoor-labs/our-python-monorepo-d34028f2b6fa)
 -   Use pyproject.toml [peps.python.org/pep-0518](https://peps.python.org/pep-0518/)
 -   Poetry - python package manager [python-poetry.org](https://python-poetry.org/docs/)
 -   Python namespace [packaging.python.org/en/latest/guides/packaging-namespace-packages](https://packaging.python.org/en/latest/guides/packaging-namespace-packages/)
 -   Python editable mode for development [pip.pypa.io/en/stable/topics/local-project-installs](https://pip.pypa.io/en/stable/topics/local-project-installs/)
 -   Building lambda with Poetry [chariotsolutions.com/blog/post/building-lambdas-with-poetry/](https://chariotsolutions.com/blog/post/building-lambdas-with-poetry/)
--   Awesome monorepo [github.com/korfuri/awesome-monorepo](https://github.com/korfuri/awesome-monorepo)
+
 -   Effective Go [go.dev/doc/effective_go](https://go.dev/doc/effective_go)
+-   Go setup formatter and linter [medium.com/cp-massive-programming/golang-automate-formatting-and-linting-via-pre-commit-c43740065c2e](https://medium.com/cp-massive-programming/golang-automate-formatting-and-linting-via-pre-commit-c43740065c2e)
