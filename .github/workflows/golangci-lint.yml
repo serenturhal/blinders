@@ -1,13 +1,16 @@
-name: golangci-lint
-on: [push, pull_request]
+name: Go Lint CI
+on:
+    push:
+        branches: [main, dev]
+    pull_request:
 jobs:
     resolve-modules:
-        name: Resolve Modules
+        name: Resolve Go Modules
         runs-on: ubuntu-latest
         outputs:
             matrix: ${{ steps.set-matrix.outputs.matrix }}
         steps:
-            - name: Checkout Sources
+            - name: Checkout Sources and Resolve Go Modules
               uses: actions/checkout@v2
             - id: set-matrix
               run: ./cmd/resolve_go_modules.sh
@@ -24,7 +27,7 @@ jobs:
                   go-version: "1.21"
                   cache: false
             - uses: actions/checkout@v3
-            - name: golangci-lint
+            - name: Linting
               uses: golangci/golangci-lint-action@v3
               with:
                   version: "v1.54"
