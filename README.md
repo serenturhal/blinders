@@ -13,17 +13,17 @@ This project is a monorepo microservice back-end written in Golang and Python. I
 -   [x] Testing setup
 -   [x] AWS lambda function
 -   [x] Terraform deployment
--   [ ] CI Github Actions
+-   [x] CI Github Actions
 -   [ ] CD Github Actions
 
 ### Golang
 
 -   [x] Monorepo structure
--   [ ] Setup linter and formatter
+-   [x] Setup linter and formatter
 -   [ ] Testing setup
 -   [ ] AWS lambda function
 -   [ ] Terraform deployment
--   [ ] CI Github Actions
+-   [x] CI Github Actions
 -   [ ] CD Github Actions
 
 ## Python development setup
@@ -68,7 +68,6 @@ pip install -e .
 ## References
 
 -   Awesome monorepo [github.com/korfuri/awesome-monorepo](https://github.com/korfuri/awesome-monorepo)
-
 -   Setup Python monorepo
     -   [tweag.io/blog/2023-04-04-python-monorepo-1](https://www.tweag.io/blog/2023-04-04-python-monorepo-1/)
     -   [tweag.io/blog/2023-07-13-python-monorepo-2](https://www.tweag.io/blog/2023-07-13-python-monorepo-2/)
@@ -78,6 +77,5 @@ pip install -e .
 -   Python namespace [packaging.python.org/en/latest/guides/packaging-namespace-packages](https://packaging.python.org/en/latest/guides/packaging-namespace-packages/)
 -   Python editable mode for development [pip.pypa.io/en/stable/topics/local-project-installs](https://pip.pypa.io/en/stable/topics/local-project-installs/)
 -   Building lambda with Poetry [chariotsolutions.com/blog/post/building-lambdas-with-poetry/](https://chariotsolutions.com/blog/post/building-lambdas-with-poetry/)
-
 -   Effective Go [go.dev/doc/effective_go](https://go.dev/doc/effective_go)
 -   Go setup formatter and linter [medium.com/cp-massive-programming/golang-automate-formatting-and-linting-via-pre-commit-c43740065c2e](https://medium.com/cp-massive-programming/golang-automate-formatting-and-linting-via-pre-commit-c43740065c2e)

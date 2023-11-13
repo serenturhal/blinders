@@ -6,7 +6,7 @@ on:
 jobs:
     resolve-modules:
         name: Resolve Go Modules
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-20.04
         outputs:
             matrix: ${{ steps.set-matrix.outputs.matrix }}
         steps:
@@ -17,7 +17,7 @@ jobs:
     golangci:
         name: Linter
         needs: resolve-modules
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-20.04
         strategy:
             matrix: ${{ fromJson(needs.resolve-modules.outputs.matrix) }}
         steps:

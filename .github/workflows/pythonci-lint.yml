@@ -4,9 +4,18 @@ on:
         branches: [main, dev]
     pull_request:
 jobs:
-    example:
-        name: Example
-        runs-on: ubuntu-latest
+    default:
+        runs-on: ubuntu-20.04
         steps:
-            - name: Checkout
-              uses: actions/checkout@v2
+            - uses: actions/checkout@v2
+            - name: Setup Python
+              uses: actions/setup-python@v4
+              with:
+                  python-version: "3.10"
+                  architecture: "x64"
+            - name: Checking python
+              run: python --version
+            - name: Install development dependencies
+              run: pip install poetry && poetry config virtualenvs.create false && poetry install --no-root
+            - name: Linting
+              run: ./cmd/check_pylint.sh
