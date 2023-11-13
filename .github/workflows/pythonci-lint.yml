@@ -1,0 +1,12 @@
+name: Python Lint CI
+on:
+    push:
+        branches: [main, dev]
+    pull_request:
+jobs:
+    example:
+        name: Example
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
