@@ -4,28 +4,6 @@ Monorepo, microservice back-end project named Blinders for Peakee - a language l
 
 This project is a monorepo microservice back-end written in Golang and Python. It's using Terraform for setup provisioning, all the services are hosted on AWS, the main AWS service used is AWS lambda.
 
-## Setup
-
-### Python
-
--   [x] Monorepo structure
--   [x] Setup linter and formatter
--   [x] Testing setup
--   [x] AWS lambda function
--   [x] Terraform deployment
--   [x] CI Github Actions
--   [ ] CD Github Actions
-
-### Golang
-
--   [x] Monorepo structure
--   [x] Setup linter and formatter
--   [ ] Testing setup
--   [ ] AWS lambda function
--   [ ] Terraform deployment
--   [x] CI Github Actions
--   [ ] CD Github Actions
-
 ## Python development setup
 
 ### Tools
@@ -63,7 +41,35 @@ pip install -e .
 
 ## Go development setup
 
--   Using [golangci-lint](https://golangci-lint.run/) to manage all linter, formatter and setup ci, detail configs in `golangci.yml`
+Using [golangci-lint](https://golangci-lint.run/) to manage all linter, formatter and setup ci, detail configs in `golangci.yml`. You should config `golangci-lint` in your code editor to pass all the linters
+
+## Setup list
+
+#### AWS - Terraform
+
+-   [x] Setup API gateway
+-   [x] Domain name
+-   [x] Python lambda
+-   [ ] Go lambda
+-   [ ] CD Github Actions
+
+#### Python
+
+-   [x] Monorepo structure
+-   [x] Setup linter and formatter
+-   [x] Testing setup
+-   [x] AWS lambda function
+-   [x] Lint CI Github Actions
+-   [ ] Test CI Github Actions
+
+#### Golang
+
+-   [x] Monorepo structure
+-   [x] Setup linter and formatter
+-   [x] Testing setup
+-   [ ] AWS lambda function
+-   [x] Lint CI Github Actions
+-   [ ] Test CI Github Actions
 
 ## References
 
@@ -79,3 +85,5 @@ pip install -e .
 -   Building lambda with Poetry [chariotsolutions.com/blog/post/building-lambdas-with-poetry/](https://chariotsolutions.com/blog/post/building-lambdas-with-poetry/)
 -   Effective Go [go.dev/doc/effective_go](https://go.dev/doc/effective_go)
 -   Go setup formatter and linter [medium.com/cp-massive-programming/golang-automate-formatting-and-linting-via-pre-commit-c43740065c2e](https://medium.com/cp-massive-programming/golang-automate-formatting-and-linting-via-pre-commit-c43740065c2e)
+-   Terraform custom domain [antonputra.com/amazon/aws-api-gateway-custom-domain](https://antonputra.com/amazon/aws-api-gateway-custom-domain/#create-custom-domain-using-terraform-route53)
+-   Terraform best practice [terraform-best-practices.com/](https://www.terraform-best-practices.com/)
