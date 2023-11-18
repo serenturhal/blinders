@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -25,21 +26,25 @@ var translator translation.Translator
 
 func init() {
 	translator = translation.YandexTranslator{ApiKey: os.Getenv("YANDEX_API_KEY")}
-	fmt.Println(translator, "<-- translator")
 }
 
 func HandleRequest(_ context.Context, event events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
-	fmt.Println(event, "<-- event")
-	translated, err := translator.TranslateEnToVi("hello")
+	text, ok := event.QueryStringParameters["text"]
+	if !ok {
+		text = ""
+	}
+
+	translated, err := translator.TranslateEnToVi(text)
 	if err != nil {
+		log.Println("error translating: ", err)
 		return events.APIGatewayV2HTTPResponse{
 			StatusCode: 400,
-			Body:       err.Error(),
-		}, err
+			Body:       fmt.Sprintf("cannot translate \"%s\"", text),
+		}, nil
 	}
 
 	res := TranslateResponse{
-		Text:       "hello",
+		Text:       text,
 		Translated: translated,
 		Languages:  "en-vi",
 	}
