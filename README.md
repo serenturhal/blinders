@@ -50,7 +50,7 @@ Using [golangci-lint](https://golangci-lint.run/) to manage all linter, formatte
 -   [x] Setup API gateway
 -   [x] Domain name
 -   [x] Python lambda
--   [ ] Go lambda
+-   [x] Go lambda
 -   [ ] CD Github Actions
 
 #### Python
@@ -67,7 +67,7 @@ Using [golangci-lint](https://golangci-lint.run/) to manage all linter, formatte
 -   [x] Monorepo structure
 -   [x] Setup linter and formatter
 -   [x] Testing setup
--   [ ] AWS lambda function
+-   [x] AWS lambda function
 -   [x] Lint CI Github Actions
 -   [ ] Test CI Github Actions
 
