@@ -36,4 +36,8 @@ resource "aws_lambda_function" "blinders_translation" {
   source_code_hash = data.archive_file.translation.output_base64sha256
 
   runtime = "go1.x"
+
+  environment {
+    variables = local.envs
+  }
 }
