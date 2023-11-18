@@ -6,4 +6,5 @@ use (
 	./functions/suggestion
 	./functions/translation
 	./packages/suggestion
+	./packages/translation
 )
