@@ -14,8 +14,13 @@ var translator Translator
 func init() {
 	cwd, _ := os.Getwd()
 	fmt.Println("test", cwd)
-	godotenv.Load("../../.env.test")
-	translator = YandexTranslator{apiKey: os.Getenv("YANDEX_API_KEY")}
+
+	err := godotenv.Load("../../.env.test")
+	if err != nil {
+		fmt.Println("Error loading .env.test file")
+	}
+
+	translator = YandexTranslator{ApiKey: os.Getenv("YANDEX_API_KEY")}
 }
 
 func TestTranslateWord(t *testing.T) {
@@ -28,7 +33,7 @@ func TestTranslateWord(t *testing.T) {
 		t.Error(err)
 	}
 
-	if strings.ToLower(result) != strings.ToLower(expectedResult) {
+	if !strings.EqualFold(result, expectedResult) {
 		t.Errorf("received = \"%s\", expect \"%s\"", result, expectedResult)
 	}
 }
@@ -43,7 +48,7 @@ func TestTranslateSentence(t *testing.T) {
 		t.Error(err)
 	}
 
-	if strings.ToLower(result) != strings.ToLower(expectedResult) {
+	if !strings.EqualFold(result, expectedResult) {
 		t.Errorf("received = \"%s\", expect \"%s\"", result, expectedResult)
 	}
 }

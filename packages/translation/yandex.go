@@ -11,11 +11,11 @@ import (
 const api_template = "https://translate.yandex.net/api/v1.5/tr.json/translate?lang=%s&format=%s&text=%s&key=%s"
 
 type YandexTranslator struct {
-	apiKey string
+	ApiKey string
 }
 
 func (t YandexTranslator) TranslateEnToVi(text string) (string, error) {
-	url := fmt.Sprintf(api_template, "en-vi", "plain", url.QueryEscape(text), t.apiKey)
+	url := fmt.Sprintf(api_template, "en-vi", "plain", url.QueryEscape(text), t.ApiKey)
 
 	res, err := http.Get(url)
 	if err != nil {
