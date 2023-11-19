@@ -1,8 +1,6 @@
 # Blinders
 
-Monorepo, microservice back-end project named Blinders for Peakee - a language learning platform.
-
-This project is a monorepo microservice back-end written in Golang and Python. It's using Terraform for setup provisioning, all the services are hosted on AWS, the main AWS service used is AWS lambda.
+Monorepo, a microservices backend project named Blinders for a language learning platform. Almost use Golang and Python. and Terraform for provisioning, all the services are hosted on AWS.
 
 ## Python development setup
 
@@ -14,7 +12,7 @@ This project is a monorepo microservice back-end written in Golang and Python. I
 
 ### Setup steps
 
-Use python 3.10 as base version of python, recommend to use local python environment using [conda](https://www.anaconda.com/)
+Use Python 3.10 as the base version of Python, recommend to use a local Python environment using [conda](https://www.anaconda.com/)
 
 ```shell
 conda create --prefix ./.venv/ python==3.10 # Initialize repo virtual environment
@@ -59,8 +57,8 @@ Using [golangci-lint](https://golangci-lint.run/) to manage all linter, formatte
 -   [x] Setup linter and formatter
 -   [x] Testing setup
 -   [x] AWS lambda function
--   [x] Lint CI Github Actions
--   [ ] Test CI Github Actions
+-   [x] Lint CI GitHub Actions
+-   [ ] Test CI GitHub Actions
 
 #### Golang
 
@@ -68,8 +66,8 @@ Using [golangci-lint](https://golangci-lint.run/) to manage all linter, formatte
 -   [x] Setup linter and formatter
 -   [x] Testing setup
 -   [x] AWS lambda function
--   [x] Lint CI Github Actions
--   [ ] Test CI Github Actions
+-   [x] Lint CI GitHub Actions
+-   [ ] Test CI GitHub Actions
 
 ## References
 
