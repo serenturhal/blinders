@@ -9,4 +9,5 @@ use (
 	./packages/authentication
 	./packages/suggestion
 	./packages/translation
+	./services/authentication
 )
