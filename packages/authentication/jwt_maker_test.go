@@ -1,8 +1,6 @@
-package token_test
+package authentication
 
 import (
-	"blinders/packages/authentication/models"
-	"blinders/packages/authentication/token"
 	"math/rand"
 	"strconv"
 	"testing"
@@ -11,8 +9,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func randomUser() *models.User {
-	return &models.User{
+func randomUser() *User {
+	return &User{
 		Email: strconv.FormatInt(int64(rand.Intn(1000)), 10),
 		ID:    strconv.FormatInt(int64(rand.Intn(1000)), 10),
 	}
@@ -25,7 +23,7 @@ func TestJWT(t *testing.T) {
 		Secret        string        // secret that passed in construct
 		Duration      time.Duration // token duration
 		Sleep         time.Duration // time sleep before verify token
-		User          *models.User  // expect user claim
+		User          *User         // expect user claim
 		VerifyToken   string        // token using to test verify, if empty, use the generated token
 		ExpectedError error         // error expected for testcase
 	}{
@@ -40,7 +38,7 @@ func TestJWT(t *testing.T) {
 			Name:          "empty secret",
 			Duration:      time.Second,
 			User:          randomUser(),
-			ExpectedError: token.ErrEmptySecret,
+			ExpectedError: ErrEmptySecret,
 		},
 		{
 			Name:          "invalid token",
@@ -48,7 +46,7 @@ func TestJWT(t *testing.T) {
 			Duration:      time.Second,
 			User:          randomUser(),
 			VerifyToken:   "invalid token",
-			ExpectedError: token.ErrInvalidToken,
+			ExpectedError: ErrInvalidToken,
 		},
 	}
 
@@ -56,11 +54,11 @@ func TestJWT(t *testing.T) {
 		tc := testcases[index]
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
-			opts := token.JwtOptions{
+			opts := JwtOptions{
 				SecretKey:     tc.Secret,
 				TokenDuration: tc.Duration,
 			}
-			manager, err := token.NewJWTManager(opts)
+			manager, err := NewJWTManager(opts)
 			// If there is error, then error must equal to expected error
 			if err != nil {
 				assert.Equal(t, tc.ExpectedError, err)
@@ -93,11 +91,11 @@ func TestJWT(t *testing.T) {
 
 func TestExpiredToken(t *testing.T) {
 	t.Parallel()
-	opts := token.JwtOptions{
+	opts := JwtOptions{
 		SecretKey:     "sample",
 		TokenDuration: time.Second,
 	}
-	manager, err := token.NewJWTManager(opts)
+	manager, err := NewJWTManager(opts)
 	assert.Nil(t, err)
 	assert.NotNil(t, manager)
 	user := randomUser()

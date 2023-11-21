@@ -1,13 +1,13 @@
 package authentication
 
 import (
-	"blinders/packages/authentication/models"
-	"blinders/packages/authentication/token"
 	"os"
 	"time"
 )
 
-var Manager token.Maker
+// Public function to outter scope of package
+
+var Manager Maker
 
 func init() {
 	if Manager == nil {
@@ -15,7 +15,7 @@ func init() {
 		durationString := os.Getenv("JWT_DURATION")
 		tokenDuration, err := time.ParseDuration(durationString)
 		if err != nil {
-			Manager, err = token.NewJWTManager(token.JwtOptions{
+			Manager, err = NewJWTManager(JwtOptions{
 				SecretKey: secretKey,
 			})
 			if err != nil {
@@ -23,7 +23,7 @@ func init() {
 			}
 			return
 		}
-		Manager, err = token.NewJWTManager(token.JwtOptions{
+		Manager, err = NewJWTManager(JwtOptions{
 			SecretKey:     secretKey,
 			TokenDuration: tokenDuration,
 		})
@@ -35,7 +35,7 @@ func init() {
 
 // Generate jwtToken from userID and userEmail
 func GenerateTokenForUser(userID string, userEmail string) (string, error) {
-	user := &models.User{
+	user := &User{
 		ID:    userID,
 		Email: userEmail,
 	}

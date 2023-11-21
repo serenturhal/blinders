@@ -1,4 +1,4 @@
-package models
+package authentication
 
 // User type in Authenticate scope, maybe use User type in common package
 type User struct {

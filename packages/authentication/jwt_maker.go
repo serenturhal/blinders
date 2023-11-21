@@ -1,7 +1,6 @@
-package token
+package authentication
 
 import (
-	"blinders/packages/authentication/models"
 	"errors"
 	"time"
 
@@ -47,7 +46,7 @@ func NewJWTManager(opts JwtOptions) (Maker, error) {
 	}, nil
 }
 
-func (m *JWTManager) Generate(user *models.User) (string, error) {
+func (m *JWTManager) Generate(user *User) (string, error) {
 	claims := &Payload{
 		UserID: user.ID,
 		Email:  user.Email,
@@ -60,7 +59,7 @@ func (m *JWTManager) Generate(user *models.User) (string, error) {
 	return ss, err
 }
 
-func (m *JWTManager) Verify(token string) (*models.User, error) {
+func (m *JWTManager) Verify(token string) (*User, error) {
 	jwtToken, err := jwt.ParseWithClaims(
 		token,
 		&Payload{},
@@ -81,7 +80,7 @@ func (m *JWTManager) Verify(token string) (*models.User, error) {
 	if !ok {
 		return nil, ErrInvalidClaims
 	}
-	return &models.User{
+	return &User{
 		ID:    claims.UserID,
 		Email: claims.Email,
 	}, nil
