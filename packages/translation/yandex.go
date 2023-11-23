@@ -14,8 +14,8 @@ type YandexTranslator struct {
 	ApiKey string
 }
 
-func (t YandexTranslator) TranslateEnToVi(text string) (string, error) {
-	url := fmt.Sprintf(api_template, "en-vi", "plain", url.QueryEscape(text), t.ApiKey)
+func (t YandexTranslator) Translate(text string, langs Languages) (string, error) {
+	url := fmt.Sprintf(api_template, string(langs), "plain", url.QueryEscape(text), t.ApiKey)
 
 	res, err := http.Get(url)
 	if err != nil {

@@ -31,10 +31,18 @@ func init() {
 func HandleRequest(_ context.Context, event events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
 	text, ok := event.QueryStringParameters["text"]
 	if !ok {
-		text = ""
+		return events.APIGatewayV2HTTPResponse{
+			StatusCode: 400,
+			Body:       "required text param",
+		}, nil
 	}
 
-	translated, err := translator.TranslateEnToVi(text)
+	langs, ok := event.QueryStringParameters["languages"]
+	if !ok {
+		langs = "en-vi"
+	}
+
+	translated, err := translator.Translate(text, translation.Languages(langs))
 	if err != nil {
 		log.Println("error translating: ", err)
 		return events.APIGatewayV2HTTPResponse{
@@ -46,7 +54,7 @@ func HandleRequest(_ context.Context, event events.APIGatewayV2HTTPRequest) (eve
 	res := TranslateResponse{
 		Text:       text,
 		Translated: translated,
-		Languages:  "en-vi",
+		Languages:  langs,
 	}
 
 	resInBytes, _ := json.Marshal(res)
