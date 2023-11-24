@@ -1,13 +1,12 @@
 go 1.21.3
 
 use (
-	./functions/authentication
 	./functions/collecting
 	./functions/flashcard
 	./functions/suggestion
 	./functions/translation
 	./packages/authentication
+	./packages/common
 	./packages/suggestion
 	./packages/translation
-	./services/authentication
 )
