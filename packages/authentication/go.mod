@@ -1,10 +1,9 @@
-module blinders/packages/authentication
+module blinders/packages/auth
 
 go 1.21.3
 
 require (
 	firebase.google.com/go/v4 v4.12.1
-	github.com/golang-jwt/jwt/v5 v5.1.0
 	github.com/stretchr/testify v1.8.4
 )
 
