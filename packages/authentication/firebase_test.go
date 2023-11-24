@@ -14,6 +14,7 @@ import (
 
 	firebase "firebase.google.com/go/v4"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/api/option"
 )
 
 const (
@@ -29,7 +30,7 @@ func TestFirebaseSuccess(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
-	app, err := firebase.NewApp(ctx, nil)
+	app, err := firebase.NewApp(ctx, nil, option.WithCredentialsFile(CredentialsPath))
 	assert.Nil(t, err)
 	assert.NotNil(t, app)
 
@@ -59,7 +60,7 @@ func TestFirebaseWithInvalidUser(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
-	app, err := firebase.NewApp(ctx, nil)
+	app, err := firebase.NewApp(ctx, nil, option.WithCredentialsFile(CredentialsPath))
 	assert.Nil(t, err)
 	assert.NotNil(t, app)
 
@@ -81,7 +82,7 @@ func TestFirebaseWithInvalidUser(t *testing.T) {
 
 func GetUserIDToken(user *common.User) (string, error) {
 	ctx := context.Background()
-	app, err := firebase.NewApp(ctx, nil)
+	app, err := firebase.NewApp(ctx, nil, option.WithCredentialsFile(CredentialsPath))
 	if err != nil {
 		return "", err
 	}
