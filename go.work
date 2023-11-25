@@ -5,6 +5,8 @@ use (
 	./functions/flashcard
 	./functions/suggestion
 	./functions/translation
+	./packages/authentication
+	./packages/common
 	./packages/suggestion
 	./packages/translation
 )
