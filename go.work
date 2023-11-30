@@ -3,10 +3,12 @@ go 1.21.3
 use (
 	./functions/collecting
 	./functions/flashcard
-	./functions/suggestion
+	./functions/suggestion/chatsuggestion
+	./functions/suggestion/textSuggestion
 	./functions/translation
 	./packages/authentication
 	./packages/common
+	./packages/message
 	./packages/suggestion
 	./packages/translation
 )
