@@ -1,3 +1,1 @@
-# Suggestion AWS lambda function
-
-Golang, GPT
+# Text Suggestion AWS lambda function
