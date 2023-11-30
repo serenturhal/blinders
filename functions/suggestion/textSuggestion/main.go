@@ -3,6 +3,7 @@ package main
 import (
 	"blinders/packages/suggestion"
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 
@@ -38,7 +39,42 @@ func HandleRequest(ctx context.Context, event events.APIGatewayProxyRequest) (ev
 	for key, value := range event.Headers {
 		fmt.Printf("\t%s: %s\n", key, value)
 	}
-	event.Body
+
+	suggestionRequest := new(SuggestionPayload)
+
+	if err := json.Unmarshal([]byte(event.Body), suggestionRequest); err != nil {
+		return APIGatewayProxyResponseWithJSON(400, map[string]any{
+			"error": fmt.Sprintf("functions: cannot unmarshal struct from json, err: (%s)", err.Error()),
+		})
+	}
+
+	suggestion, err := suggester.TextCompletion(ctx, suggestionRequest.Text)
+	if err != nil {
+		return APIGatewayProxyResponseWithJSON(400, map[string]any{
+			"error": fmt.Sprintf("functions: cannot get suggestions, err: (%s)", err.Error()),
+		})
+	}
+	return APIGatewayProxyResponseWithJSON(200, map[string]any{
+		"suggestions": suggestion,
+	})
+}
+
+func APIGatewayProxyResponseWithJSON(code int, v any) (events.APIGatewayProxyResponse, error) {
+	var (
+		defaultResponse = events.APIGatewayProxyResponse{
+			StatusCode: code,
+		}
+		err error
+	)
+
+	bodyByte, err := json.Marshal(v)
+	if err != nil {
+		defaultResponse.Body = fmt.Sprintf("functions: cannot marshal struct to json, err: (%s)", err.Error())
+		return defaultResponse, err
+	}
+
+	defaultResponse.Body = string(bodyByte)
+	return defaultResponse, nil
 }
 
 func main() {
