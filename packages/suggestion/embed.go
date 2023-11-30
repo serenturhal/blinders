@@ -9,25 +9,19 @@ import (
 var (
 	randSource             *rand.Rand = nil
 	messageSuggestionEmbed            = []string{
-		`
-Sender context:
+		`Sender context:
     Language: %s
     Level: %s
 Recent messages: [
 %s
 ]
 Prompt:
-    Given the recent messages in the conversation, the user's context,
-    provide a message that the user could send next.
-    Ensure that the suggestion is contextually relevant, considerate, and aligned with the user's language proficiency.
+    You are sender, and you have to reply the latest message.
+    Ensure that the message is contextually relevant, considerate, and aligned with the sender's language proficiency.
     Aim for a response that flows seamlessly within the ongoing conversation.
-    Just return the completed message, not any guides.`,
+    Just return the text.`,
 	}
 )
-
-func init() {
-	randSource = rand.New(rand.NewSource(time.Now().Unix()))
-}
 
 func randomEmbed(i ...int) (string, error) {
 	if len(i) == 1 {
@@ -35,6 +29,10 @@ func randomEmbed(i ...int) (string, error) {
 			return "", fmt.Errorf("embed: index out of length, got (%d)", i[0])
 		}
 		return messageSuggestionEmbed[i[0]], nil
+	}
+
+	if randSource == nil {
+		randSource = rand.New(rand.NewSource(time.Now().Unix()))
 	}
 	return messageSuggestionEmbed[randSource.Intn(len(messageSuggestionEmbed))], nil
 }

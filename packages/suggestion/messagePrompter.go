@@ -42,14 +42,14 @@ func (p *MessageSuggestionPrompt) Update(objs ...any) error {
 	return nil
 }
 
-func (p *MessageSuggestionPrompt) _mustImplementedPrompter() {
+func (p *MessageSuggestionPrompt) _mustImplementPrompter() {
 	var _ Prompter = p
 }
 
-func NewMessageSuggestionPrompt() MessageSuggestionPrompt {
+func NewMessageSuggestionPrompt() *MessageSuggestionPrompt {
 	embed, _ := randomEmbed()
 
-	return MessageSuggestionPrompt{
+	return &MessageSuggestionPrompt{
 		embed: embed,
 	}
 }

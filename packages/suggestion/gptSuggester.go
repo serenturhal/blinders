@@ -4,50 +4,65 @@ import (
 	"blinders/packages/common"
 	"context"
 	"errors"
-	"fmt"
 
 	openai "github.com/sashabaranov/go-openai"
 )
 
 var DefaultSuggesterOptions = GPTSuggesterOptions{
-	ChatModel:         openai.GPT3Dot5TurboInstruct,
-	TextModel:         openai.GPT3Dot5TurboInstruct,
-	NChat:             3,
-	NText:             1,
-	ModelTemperateure: 0.6,
+	prompter:          NewMessageSuggestionPrompt(),
+	chatModel:         openai.GPT3Dot5TurboInstruct,
+	textModel:         openai.GPT3Dot5TurboInstruct,
+	nChat:             3,
+	nText:             1,
+	modelTemperateure: 0.6,
 }
 
 type GPTSuggesterOptions struct {
-	ChatModel         string
-	TextModel         string
-	NChat             int
-	NText             int
-	ModelTemperateure float32
+	prompter          Prompter
+	chatModel         string
+	textModel         string
+	nChat             int
+	nText             int
+	modelTemperateure float32
 }
 
 type GPTSuggester struct {
-	prompter Prompter
-	client   *openai.Client
+	client *openai.Client
 	GPTSuggesterOptions
 }
 
-func (s *GPTSuggester) ChatCompletion(ctx context.Context, userContext common.UserContext, msgs []common.Message) ([]string, error) {
-	suggestions := []string{}
-	err := s.prompter.Update(userContext, msgs)
-	if err != nil {
-		return suggestions, err
+func (s *GPTSuggester) ChatCompletion(ctx context.Context, userContext common.UserContext, msgs []common.Message, prompter ...Prompter) ([]string, error) {
+	var (
+		suggestions       = []string{}
+		prompt            = ""
+		err         error = nil
+	)
+
+	switch len(prompter) {
+	case 1:
+		p := prompter[0]
+		err = p.Update(userContext, msgs)
+		if err != nil {
+			break
+		}
+		prompt, err = p.Build()
+	default:
+		err = s.prompter.Update(userContext, msgs)
+		if err != nil {
+			break
+		}
+		prompt, err = s.prompter.Build()
 	}
 
-	prompt, err := s.prompter.Build()
 	if err != nil {
 		return suggestions, err
 	}
 
 	req := openai.CompletionRequest{
-		Model:       s.ChatModel,
+		Model:       s.chatModel,
 		Prompt:      prompt,
-		N:           s.NChat,
-		Temperature: 0.6,
+		N:           s.nChat,
+		Temperature: s.modelTemperateure,
 	}
 	rsp, err := s.client.CreateCompletion(ctx, req)
 	if err != nil {
@@ -59,38 +74,41 @@ func (s *GPTSuggester) ChatCompletion(ctx context.Context, userContext common.Us
 	}
 
 	for _, choice := range rsp.Choices {
-		fmt.Printf("choice: %v\n", choice)
 		suggestions = append(suggestions, choice.Text)
 	}
 	return suggestions, nil
 }
 
-func (s *GPTSuggester) TextCompletion(ctx context.Context, prompt string) (string, error) {
+func (s *GPTSuggester) TextCompletion(ctx context.Context, prompt string) ([]string, error) {
 	req := openai.CompletionRequest{
-		Model:       s.TextModel,
+		Model:       s.textModel,
 		Prompt:      prompt,
-		N:           s.NText,
-		Temperature: s.ModelTemperateure,
+		N:           s.nText,
+		Temperature: s.modelTemperateure,
 	}
 	rsp, err := s.client.CreateCompletion(ctx, req)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
+	suggestions := []string{}
 	if len(rsp.Choices) == 0 {
-		return "", errors.New("gptSuggester: got empty reply from server")
+		return suggestions, errors.New("gptSuggester: got empty reply from server")
 	}
-	return rsp.Choices[0].Text, nil
+
+	for _, choice := range rsp.Choices {
+		suggestions = append(suggestions, choice.Text)
+	}
+	return suggestions, nil
 }
 
 func (s *GPTSuggester) _mustImplementSuggester() {
 	var _ Suggester = s
 }
 
-func NewGPTSuggestor(client *openai.Client, prompter Prompter, opts ...Option) (*GPTSuggester, error) {
+func NewGPTSuggestor(client *openai.Client, opts ...Option) (*GPTSuggester, error) {
 	gptSuggester := &GPTSuggester{
 		client:              client,
-		prompter:            prompter,
 		GPTSuggesterOptions: DefaultSuggesterOptions,
 	}
 	for _, opt := range opts {
@@ -110,30 +128,36 @@ func optionAdapter(closer func(s *GPTSuggester)) Option {
 
 func WithTemperature(temperature float32) Option {
 	return optionAdapter(func(s *GPTSuggester) {
-		s.ModelTemperateure = temperature
+		s.modelTemperateure = temperature
 	})
 }
 
 func WithNText(N int) Option {
 	return optionAdapter(func(s *GPTSuggester) {
-		s.NText = N
+		s.nText = N
 	})
 }
 
 func WithNChat(N int) Option {
 	return optionAdapter(func(s *GPTSuggester) {
-		s.NChat = N
+		s.nChat = N
 	})
 }
 
 func WithTextModel(model string) Option {
 	return optionAdapter(func(s *GPTSuggester) {
-		s.TextModel = model
+		s.textModel = model
 	})
 }
 
 func WithChatModel(model string) Option {
 	return optionAdapter(func(s *GPTSuggester) {
-		s.ChatModel = model
+		s.chatModel = model
+	})
+}
+
+func WithPrompter(prompter Prompter) Option {
+	return optionAdapter(func(s *GPTSuggester) {
+		s.prompter = prompter
 	})
 }

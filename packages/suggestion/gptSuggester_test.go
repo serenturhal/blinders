@@ -21,38 +21,53 @@ func TestInit(t *testing.T) {
 	fmt.Println(suggester.GPTSuggesterOptions)
 }
 
+func TestTextCompletion(t *testing.T) {
+	suggester := initSuggester(t)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+	prompt := "Just reply 'hello, world!'"
+	suggetions, err := suggester.TextCompletion(ctx, prompt)
+	assert.Nil(t, err)
+	assert.Equal(t, suggester.nText, len(suggetions))
+
+	fmt.Println(suggetions)
+}
+
 // This test will use the OpenAI API, it may be charged, consider uncomment for testing
-// func TestSuggest(t *testing.T) {
-// 	suggester := initSuggester(t)
-// 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
-// 	defer cancel()
-// 	sender := newUser("user1", "sample1")
-// 	receiver := newUser("user2", "sample2")
-// 	userContext := newUserContext(
-// 		&sender,
-// 		common.LanguageContext{
-// 			Lang:  common.NewLanguage("vi"),
-// 			Level: common.Advanced,
-// 		},
-// 		common.LanguageContext{
-// 			Lang:  common.NewLanguage("en"),
-// 			Level: common.Beginner,
-// 		},
-// 	)
-// 	msgs := []common.Message{
-// 		*common.NewMessage(sender.ID, receiver.ID, "Hello, how are you?"),
-// 		*common.NewMessage(receiver.ID, sender.ID, "Fine, how about you?"),
-// 		*common.NewMessage(sender.ID, receiver.ID, "Too. Did you come to the class yesterday?"),
-// 		*common.NewMessage(receiver.ID, sender.ID, "Yes, yesterday the teacher gave the students some homework."),
-// 	}
-// 	suggestions, err := suggester.ChatCompletion(ctx, userContext, msgs)
-// 	assert.Nil(t, err)
-// 	assert.NotNil(t, suggestions)
-// 	assert.Equal(t, suggester.NChat, len(suggestions))
-// 	for _, suggestion := range suggestions {
-// 		fmt.Printf("suggestion: %v\n", suggestion)
-// 	}
-// }
+func TestSuggest(t *testing.T) {
+	suggester := initSuggester(t)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+
+	sender := newUser("user1", "sample1")
+	receiver := newUser("user2", "sample2")
+	userContext := newUserContext(
+		&sender,
+		common.LanguageContext{
+			Lang:  common.LangVi,
+			Level: common.Advanced,
+		},
+		common.LanguageContext{
+			Lang:  common.LangEn,
+			Level: common.Beginner,
+		},
+	)
+	msgs := []common.Message{
+		*common.NewMessage(sender.ID, receiver.ID, "Hello, how are you?"),
+		*common.NewMessage(receiver.ID, sender.ID, "Fine, how about you?"),
+		*common.NewMessage(sender.ID, receiver.ID, "Too. Did you come to the class yesterday?"),
+		*common.NewMessage(receiver.ID, sender.ID, "Yes, yesterday the teacher gave the students some homework."),
+	}
+
+	suggestions, err := suggester.ChatCompletion(ctx, userContext, msgs)
+	assert.Nil(t, err)
+	assert.NotNil(t, suggestions)
+	assert.Equal(t, suggester.nChat, len(suggestions))
+
+	for _, suggestion := range suggestions {
+		fmt.Printf("suggestion: %v\n", suggestion)
+	}
+}
 
 func TestIntegrateWithMessagePackage(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
@@ -96,11 +111,10 @@ func initSuggester(t *testing.T) *GPTSuggester {
 	opts := []Option{
 		WithNChat(1),
 	}
-	prompter := NewMessageSuggestionPrompt()
-	suggester, err := NewGPTSuggestor(client, &prompter, opts...)
+	suggester, err := NewGPTSuggestor(client, opts...)
 	assert.Nil(t, err)
 	assert.NotNil(t, suggester)
-	assert.Equal(t, 1, suggester.NChat)
+	assert.Equal(t, 1, suggester.nChat)
 	return suggester
 }
 

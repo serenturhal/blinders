@@ -43,7 +43,12 @@ func TestUpdatePrompt(t *testing.T) {
 	assert.NotNil(t, prompter.Update(sender))
 }
 
-func initPrompt(t *testing.T) (sender common.User, receiver common.User, senderContext common.UserContext, prompter MessageSuggestionPrompt) {
+func initPrompt(t *testing.T) (
+	sender common.User,
+	receiver common.User,
+	senderContext common.UserContext,
+	prompter *MessageSuggestionPrompt,
+) {
 	sender = newUser("sender", "sender@email")
 	receiver = newUser("receiver", "receiver@email")
 	senderContext = newUserContext(
