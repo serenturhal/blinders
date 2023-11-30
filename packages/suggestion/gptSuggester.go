@@ -33,9 +33,9 @@ type GPTSuggester struct {
 
 func (s *GPTSuggester) ChatCompletion(ctx context.Context, userContext common.UserContext, msgs []common.Message, prompter ...Prompter) ([]string, error) {
 	var (
-		suggestions       = []string{}
-		prompt            = ""
-		err         error = nil
+		suggestions = []string{}
+		prompt      = ""
+		err         error
 	)
 
 	switch len(prompter) {
@@ -100,10 +100,6 @@ func (s *GPTSuggester) TextCompletion(ctx context.Context, prompt string) ([]str
 		suggestions = append(suggestions, choice.Text)
 	}
 	return suggestions, nil
-}
-
-func (s *GPTSuggester) _mustImplementSuggester() {
-	var _ Suggester = s
 }
 
 func NewGPTSuggestor(client *openai.Client, opts ...Option) (*GPTSuggester, error) {

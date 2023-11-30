@@ -20,7 +20,7 @@ var (
 
 func init() {
 	if suggester == nil {
-		var err error = nil
+		var err error
 		client := openai.NewClient(apiKey)
 		suggester, err = suggestion.NewGPTSuggestor(client)
 		if err != nil {

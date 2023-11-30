@@ -80,10 +80,6 @@ func (m *FirestoreManager) GetUsersIdOfRoom(ctx context.Context, rid string) ([]
 	return room.UserIDs, nil
 }
 
-func (m *FirestoreManager) _mustImplementMessage() {
-	var _ Manager = m
-}
-
 func NewFirestoreManager(client *firestore.Client) *FirestoreManager {
 	return &FirestoreManager{
 		client: client,
