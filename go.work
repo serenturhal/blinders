@@ -3,8 +3,7 @@ go 1.21.3
 use (
 	./functions/collecting
 	./functions/flashcard
-	./functions/suggestion/chatsuggestion
-	./functions/suggestion/textSuggestion
+	./functions/suggestion
 	./functions/translation
 	./packages/authentication
 	./packages/common
