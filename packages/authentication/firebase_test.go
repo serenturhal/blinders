@@ -47,9 +47,9 @@ func TestFirebaseSuccess(t *testing.T) {
 		Email: "minhdat15012002@gmail.com",
 	}
 	validToken, err := GetUserIDToken(validUser)
-	// validToken, err := maker.Generate(validUser)
 	assert.Nil(t, err)
 	assert.NotEmpty(t, validToken)
+
 	u, err := maker.Verify(validToken)
 	assert.Nil(t, err)
 	assert.NotNil(t, u)
@@ -75,7 +75,6 @@ func TestFirebaseWithInvalidUser(t *testing.T) {
 	invalidToken := "invalidTOken"
 	u, err := maker.Verify(invalidToken)
 
-	// validToken, err := maker.Generate(validUser)
 	assert.NotNil(t, err)
 	assert.Nil(t, u)
 }
@@ -86,10 +85,12 @@ func GetUserIDToken(user *common.User) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
 	client, err := app.Auth(ctx)
 	if err != nil {
 		return "", err
 	}
+
 	tokenString, err := client.CustomToken(ctx, user.ID)
 	if err != nil {
 		return "", err
