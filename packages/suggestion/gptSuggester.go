@@ -9,21 +9,21 @@ import (
 )
 
 var DefaultSuggesterOptions = GPTSuggesterOptions{
-	prompter:          NewMessageSuggestionPrompt(),
-	chatModel:         openai.GPT3Dot5TurboInstruct,
-	textModel:         openai.GPT3Dot5TurboInstruct,
-	nChat:             3,
-	nText:             1,
-	modelTemperateure: 0.6,
+	prompter:         NewMessageSuggestionPrompt(),
+	chatModel:        openai.GPT3Dot5TurboInstruct,
+	textModel:        openai.GPT3Dot5TurboInstruct,
+	nChat:            2,
+	nText:            1,
+	modelTemperature: 0.4,
 }
 
 type GPTSuggesterOptions struct {
-	prompter          Prompter
-	chatModel         string
-	textModel         string
-	nChat             int
-	nText             int
-	modelTemperateure float32
+	prompter         Prompter
+	chatModel        string
+	textModel        string
+	nChat            int
+	nText            int
+	modelTemperature float32
 }
 
 type GPTSuggester struct {
@@ -62,7 +62,7 @@ func (s *GPTSuggester) ChatCompletion(ctx context.Context, userContext common.Us
 		Model:       s.chatModel,
 		Prompt:      prompt,
 		N:           s.nChat,
-		Temperature: s.modelTemperateure,
+		Temperature: s.modelTemperature,
 	}
 	rsp, err := s.client.CreateCompletion(ctx, req)
 	if err != nil {
@@ -84,7 +84,7 @@ func (s *GPTSuggester) TextCompletion(ctx context.Context, prompt string) ([]str
 		Model:       s.textModel,
 		Prompt:      prompt,
 		N:           s.nText,
-		Temperature: s.modelTemperateure,
+		Temperature: s.modelTemperature,
 	}
 	rsp, err := s.client.CreateCompletion(ctx, req)
 	if err != nil {
@@ -124,7 +124,7 @@ func optionAdapter(closer func(s *GPTSuggester)) Option {
 
 func WithTemperature(temperature float32) Option {
 	return optionAdapter(func(s *GPTSuggester) {
-		s.modelTemperateure = temperature
+		s.modelTemperature = temperature
 	})
 }
 
