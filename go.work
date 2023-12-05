@@ -8,7 +8,9 @@ use (
 	./functions/translation
 	./packages/authentication
 	./packages/common
+	./packages/context
 	./packages/message
 	./packages/suggestion
 	./packages/translation
+	./services/suggestions
 )
