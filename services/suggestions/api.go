@@ -2,7 +2,8 @@ package suggestion
 
 import (
 	"blinders/packages/common"
-	"blinders/packages/context"
+	"blinders/packages/user"
+	"blinders/utils"
 	"encoding/json"
 	"fmt"
 	"reflect"
@@ -18,6 +19,19 @@ type SuggestionPayload struct {
 
 func (s *Service) HandleTextSuggestion() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
+		token := ctx.Get("Authentication")
+		if token == "" {
+			return ctx.Status(400).JSON(fiber.Map{
+				"error": "suggestion: token in Authentication header not found",
+			})
+		}
+		usr, err := utils.VerifyFirestoreToken(token)
+		if err != nil {
+			return ctx.Status(400).JSON(fiber.Map{
+				"error": fmt.Sprintf("suggestion: cannot verify user with given token (%s)", token),
+			})
+		}
+
 		req := new(SuggestionPayload)
 		if err := json.Unmarshal(ctx.Body(), req); err != nil {
 			return ctx.Status(400).JSON(fiber.Map{
@@ -25,8 +39,14 @@ func (s *Service) HandleTextSuggestion() fiber.Handler {
 				"suggestions": []string{},
 			})
 		}
+		userData, err := user.GetUserData(usr.ID)
+		if err != nil {
+			return ctx.Status(400).JSON(fiber.Map{
+				"error": fmt.Sprintf("suggestion: cannot get data of user, err: (%s)", err.Error()),
+			})
+		}
 
-		suggestions, err := s.suggester.TextCompletion(ctx.Context(), req.Text)
+		suggestions, err := s.suggester.TextCompletion(ctx.Context(), userData, req.Text)
 		if err != nil {
 			return ctx.Status(400).JSON(fiber.Map{
 				"error":       err.Error(),
@@ -88,7 +108,7 @@ func (s *Service) HandleChatSuggestion() fiber.Handler {
 		}
 
 		// should communicate with user service
-		userContext, err := context.GetUserContext(req.UserID)
+		userContext, err := user.GetUserData(req.UserID)
 		if err != nil {
 			return ctx.Status(400).JSON(fiber.Map{
 				"suggestions": []string{},

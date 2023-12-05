@@ -17,15 +17,15 @@ func TestBuildPrompt(t *testing.T) {
 
 func TestUpdatePrompt(t *testing.T) {
 	sender, receiver, userContext, prompter := initPrompt(t)
-	assert.Equal(t, userContext, prompter.ctx)
+	assert.Equal(t, userContext, prompter.UserData)
 
 	newContext := newUserContext(
 		&receiver,
-		common.LanguageContext{},
-		common.LanguageContext{},
+		common.Language{},
+		common.Language{},
 	)
 	assert.Nil(t, prompter.Update(newContext))
-	assert.Equal(t, newContext, prompter.ctx)
+	assert.Equal(t, newContext, prompter.UserData)
 
 	lenMessages := 5
 	msgs := []common.Message{}
@@ -46,17 +46,17 @@ func TestUpdatePrompt(t *testing.T) {
 func initPrompt(t *testing.T) (
 	sender common.User,
 	receiver common.User,
-	senderContext common.UserContext,
+	senderData common.UserData,
 	prompter *MessageSuggestionPrompt,
 ) {
 	sender = newUser("sender", "sender@email")
 	receiver = newUser("receiver", "receiver@email")
-	senderContext = newUserContext(
+	senderData = newUserContext(
 		&sender,
-		common.LanguageContext{
+		common.Language{
 			Lang:  common.LangVi,
 			Level: common.Beginner,
-		}, common.LanguageContext{
+		}, common.Language{
 			Lang:  common.LangEn,
 			Level: common.Beginner,
 		})
@@ -73,12 +73,12 @@ func initPrompt(t *testing.T) (
 
 	prompter = NewMessageSuggestionPrompt()
 	assert.NotNil(t, prompter)
-	assert.Nil(t, prompter.Update(senderContext, msgs))
+	assert.Nil(t, prompter.Update(senderData, msgs))
 	return
 }
 
-func newUserContext(user *common.User, native common.LanguageContext, language common.LanguageContext) common.UserContext {
-	return common.UserContext{
+func newUserContext(user *common.User, native common.Language, language common.Language) common.UserData {
+	return common.UserData{
 		UserID:   user.ID,
 		Native:   native,
 		Learning: language,

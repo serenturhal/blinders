@@ -6,6 +6,6 @@ import (
 )
 
 type Suggester interface {
-	ChatCompletion(ctx context.Context, userContext common.UserContext, recentMessages []common.Message, prompter ...Prompter) ([]string, error)
-	TextCompletion(ctx context.Context, prompt string) ([]string, error)
+	ChatCompletion(context.Context, common.UserData, []common.Message, ...Prompter) ([]string, error)
+	TextCompletion(context.Context, common.UserData, string) ([]string, error)
 }

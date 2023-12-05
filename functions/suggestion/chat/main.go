@@ -1,9 +1,11 @@
 package main
 
 import (
+	"blinders/functions/utils"
 	"blinders/packages/common"
-	blinderContext "blinders/packages/context"
 	"blinders/packages/suggestion"
+	"blinders/packages/user"
+	commonUtils "blinders/utils"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -25,7 +27,7 @@ func init() {
 	if suggester == nil {
 		var err error
 		client := openai.NewClient(apiKey)
-		suggester, err = suggestion.NewGPTSuggestor(client)
+		suggester, err = suggestion.NewGPTSuggester(client)
 		if err != nil {
 			panic(err)
 		}
@@ -33,8 +35,7 @@ func init() {
 }
 
 type ChatSuggestRequest struct {
-	UserID string          `json:"userId"`
-	Msgs   []ClientMessage `json:"messages"`
+	Msgs []ClientMessage `json:"messages"`
 }
 
 type ClientMessage struct {
@@ -71,9 +72,27 @@ func (m ClientMessage) ToCommonMessage() common.Message {
 }
 
 func HandleRequest(ctx context.Context, event events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	token, ok := event.Headers["Authentication"]
+	if !ok {
+		return utils.APIGatewayProxyResponseWithJSON(
+			400,
+			map[string]any{
+				"error": "function: Token not found",
+			})
+	}
+
+	usr, err := commonUtils.VerifyFirestoreToken(token)
+	if err != nil {
+		return utils.APIGatewayProxyResponseWithJSON(
+			400,
+			map[string]any{
+				"error": fmt.Sprintf("function: cannot verify user, err : (%s)", err.Error()),
+			})
+	}
+
 	suggestionRequest := new(ChatSuggestRequest)
 	if err := json.Unmarshal([]byte(event.Body), suggestionRequest); err != nil {
-		return APIGatewayProxyResponseWithJSON(
+		return utils.APIGatewayProxyResponseWithJSON(
 			400,
 			map[string]any{
 				"error": fmt.Sprintf("function: cannot unmarshal request body, err : (%s)", err.Error()),
@@ -84,46 +103,31 @@ func HandleRequest(ctx context.Context, event events.APIGatewayProxyRequest) (ev
 	for _, m := range suggestionRequest.Msgs {
 		msgs = append(msgs, m.ToCommonMessage())
 	}
-	userContext, err := blinderContext.GetUserContext(suggestionRequest.UserID)
+
+	userData, err := user.GetUserData(usr.ID)
 	if err != nil {
-		return APIGatewayProxyResponseWithJSON(
+		return utils.APIGatewayProxyResponseWithJSON(
 			400,
 			map[string]any{
-				"error": fmt.Sprintf("function: cannot get context of user, userid: (%s) err: (%s)", suggestionRequest.UserID, err.Error()),
+				"error": fmt.Sprintf("function: cannot get data of user, userid: (%s) err: (%s)", usr.ID, err.Error()),
 			})
 	}
 
-	suggestions, err := suggester.ChatCompletion(ctx, userContext, msgs)
+	suggestions, err := suggester.ChatCompletion(ctx, userData, msgs)
 	if err != nil {
-		return APIGatewayProxyResponseWithJSON(
+		return utils.APIGatewayProxyResponseWithJSON(
 			400,
 			map[string]any{
 				"error": fmt.Sprintf("function: cannot get suggestions, err: (%s)", err.Error()),
 			})
 	}
 
-	return APIGatewayProxyResponseWithJSON(
+	return utils.APIGatewayProxyResponseWithJSON(
 		200,
 		map[string]any{
 			"suggestions": suggestions,
 		},
 	)
-}
-
-func APIGatewayProxyResponseWithJSON(code int, v any) (events.APIGatewayProxyResponse, error) {
-	bodyByte, err := json.Marshal(v)
-	if err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: 400,
-			Body:       fmt.Sprintf("functions: cannot marshal struct to json, err: (%s)", err.Error()),
-		}, err
-	}
-
-	return events.APIGatewayProxyResponse{
-		StatusCode: code,
-		Headers:    map[string]string{"Content-Type": "application/json"},
-		Body:       string(bodyByte),
-	}, nil
 }
 
 func main() {

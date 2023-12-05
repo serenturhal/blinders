@@ -19,7 +19,7 @@ func initService() *service.Service {
 
 	client := openai.NewClient(openaiKey)
 
-	suggester, err := pkg.NewGPTSuggestor(client)
+	suggester, err := pkg.NewGPTSuggester(client)
 	if err != nil {
 		panic(err)
 	}

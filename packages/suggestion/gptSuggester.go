@@ -31,7 +31,12 @@ type GPTSuggester struct {
 	GPTSuggesterOptions
 }
 
-func (s *GPTSuggester) ChatCompletion(ctx context.Context, userContext common.UserContext, msgs []common.Message, prompter ...Prompter) ([]string, error) {
+func (s *GPTSuggester) ChatCompletion(
+	ctx context.Context,
+	userData common.UserData,
+	msgs []common.Message,
+	prompter ...Prompter,
+) ([]string, error) {
 	var (
 		suggestions = []string{}
 		prompt      = ""
@@ -41,13 +46,13 @@ func (s *GPTSuggester) ChatCompletion(ctx context.Context, userContext common.Us
 	switch len(prompter) {
 	case 1:
 		p := prompter[0]
-		err = p.Update(userContext, msgs)
+		err = p.Update(userData, msgs)
 		if err != nil {
 			break
 		}
 		prompt, err = p.Build()
 	default:
-		err = s.prompter.Update(userContext, msgs)
+		err = s.prompter.Update(userData, msgs)
 		if err != nil {
 			break
 		}
@@ -79,7 +84,11 @@ func (s *GPTSuggester) ChatCompletion(ctx context.Context, userContext common.Us
 	return suggestions, nil
 }
 
-func (s *GPTSuggester) TextCompletion(ctx context.Context, prompt string) ([]string, error) {
+func (s *GPTSuggester) TextCompletion(
+	ctx context.Context,
+	user common.UserData,
+	prompt string,
+) ([]string, error) {
 	req := openai.CompletionRequest{
 		Model:       s.textModel,
 		Prompt:      prompt,
@@ -102,7 +111,7 @@ func (s *GPTSuggester) TextCompletion(ctx context.Context, prompt string) ([]str
 	return suggestions, nil
 }
 
-func NewGPTSuggestor(client *openai.Client, opts ...Option) (*GPTSuggester, error) {
+func NewGPTSuggester(client *openai.Client, opts ...Option) (*GPTSuggester, error) {
 	gptSuggester := &GPTSuggester{
 		client:              client,
 		GPTSuggesterOptions: DefaultSuggesterOptions,

@@ -26,7 +26,7 @@ func TestTextCompletion(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 	prompt := "Just reply 'hello, world!'"
-	suggetions, err := suggester.TextCompletion(ctx, prompt)
+	suggetions, err := suggester.TextCompletion(ctx, common.UserData{}, prompt)
 	assert.Nil(t, err)
 	assert.Equal(t, suggester.nText, len(suggetions))
 
@@ -43,11 +43,11 @@ func TestSuggest(t *testing.T) {
 	receiver := newUser("user2", "sample2")
 	userContext := newUserContext(
 		&sender,
-		common.LanguageContext{
+		common.Language{
 			Lang:  common.LangVi,
 			Level: common.Advanced,
 		},
-		common.LanguageContext{
+		common.Language{
 			Lang:  common.LangEn,
 			Level: common.Beginner,
 		},
@@ -76,10 +76,10 @@ func TestIntegrateWithMessagePackage(t *testing.T) {
 		user        = newUser("RyuIyfR24uo9l8DCTGjS", "minhdat15012002@gmail.com")
 		userContext = newUserContext(
 			&user,
-			common.LanguageContext{
+			common.Language{
 				Lang:  common.LangVi,
 				Level: common.Advanced,
-			}, common.LanguageContext{
+			}, common.Language{
 				Lang:  common.LangEn,
 				Level: common.Beginner,
 			})
@@ -111,7 +111,7 @@ func initSuggester(t *testing.T) *GPTSuggester {
 	opts := []Option{
 		WithNChat(1),
 	}
-	suggester, err := NewGPTSuggestor(client, opts...)
+	suggester, err := NewGPTSuggester(client, opts...)
 	assert.Nil(t, err)
 	assert.NotNil(t, suggester)
 	assert.Equal(t, 1, suggester.nChat)
