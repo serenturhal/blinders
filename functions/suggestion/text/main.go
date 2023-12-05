@@ -60,21 +60,19 @@ func HandleRequest(ctx context.Context, event events.APIGatewayProxyRequest) (ev
 }
 
 func APIGatewayProxyResponseWithJSON(code int, v any) (events.APIGatewayProxyResponse, error) {
-	var (
-		defaultResponse = events.APIGatewayProxyResponse{
-			StatusCode: code,
-		}
-		err error
-	)
-
 	bodyByte, err := json.Marshal(v)
 	if err != nil {
-		defaultResponse.Body = fmt.Sprintf("functions: cannot marshal struct to json, err: (%s)", err.Error())
-		return defaultResponse, err
+		return events.APIGatewayProxyResponse{
+			StatusCode: 400,
+			Body:       fmt.Sprintf("functions: cannot marshal struct to json, err: (%s)", err.Error()),
+		}, err
 	}
 
-	defaultResponse.Body = string(bodyByte)
-	return defaultResponse, nil
+	return events.APIGatewayProxyResponse{
+		StatusCode: code,
+		Headers:    map[string]string{"Content-Type": "application/json"},
+		Body:       string(bodyByte),
+	}, nil
 }
 
 func main() {
