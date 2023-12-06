@@ -9,7 +9,7 @@ import (
 )
 
 var DefaultSuggesterOptions = GPTSuggesterOptions{
-	prompter:         NewMessageSuggestionPrompt(),
+	prompter:         NewMessageSuggestionPrompter(),
 	chatModel:        openai.GPT3Dot5TurboInstruct,
 	textModel:        openai.GPT3Dot5TurboInstruct,
 	nChat:            2,

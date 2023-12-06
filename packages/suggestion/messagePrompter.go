@@ -7,13 +7,13 @@ import (
 	"strings"
 )
 
-type MessageSuggestionPrompt struct {
+type MessageSuggestionPrompter struct {
 	embed    string // embed string that could be use to embed user's context and messages to make complete prompt
 	UserData common.UserData
 	messages []common.Message
 }
 
-func (p MessageSuggestionPrompt) Build() (string, error) {
+func (p MessageSuggestionPrompter) Build() (string, error) {
 	msgs := []string{}
 	for _, msg := range p.messages {
 		switch msg.FromID {
@@ -26,7 +26,7 @@ func (p MessageSuggestionPrompt) Build() (string, error) {
 	return fmt.Sprintf(p.embed, p.UserData.Learning.Lang, p.UserData.Learning.Level, strings.Join(msgs, "\n")), nil
 }
 
-func (p *MessageSuggestionPrompt) Update(objs ...any) error {
+func (p *MessageSuggestionPrompter) Update(objs ...any) error {
 	for _, obj := range objs {
 		switch doc := obj.(type) {
 		case common.UserData:
@@ -34,16 +34,16 @@ func (p *MessageSuggestionPrompt) Update(objs ...any) error {
 		case []common.Message:
 			p.messages = doc
 		default:
-			return errors.New("messageSuggestionPrompter: expected(*common.UserContext, []common.Message) got unknown")
+			return errors.New("messageSuggestionPrompter: expected(common.UserContext, []common.Message) got unknown")
 		}
 	}
 	return nil
 }
 
-func NewMessageSuggestionPrompt() *MessageSuggestionPrompt {
+func NewMessageSuggestionPrompter() *MessageSuggestionPrompter {
 	embed, _ := randomEmbed()
 
-	return &MessageSuggestionPrompt{
+	return &MessageSuggestionPrompter{
 		embed: embed,
 	}
 }

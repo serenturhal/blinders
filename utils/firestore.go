@@ -24,11 +24,7 @@ func init() {
 		if err != nil {
 			panic(err)
 		}
-		authClient, err := app.Auth(ctx)
-		if err != nil {
-			panic(err)
-		}
-		authenticater, err = auth.NewFirebaseAuthManager(authClient)
+		authenticater, err = auth.NewFirebaseAuthManager(app)
 		if err != nil {
 			panic(err)
 		}

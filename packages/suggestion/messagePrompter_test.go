@@ -47,7 +47,7 @@ func initPrompt(t *testing.T) (
 	sender common.User,
 	receiver common.User,
 	senderData common.UserData,
-	prompter *MessageSuggestionPrompt,
+	prompter *MessageSuggestionPrompterere,
 ) {
 	sender = newUser("sender", "sender@email")
 	receiver = newUser("receiver", "receiver@email")
@@ -71,7 +71,7 @@ func initPrompt(t *testing.T) (
 		}
 	}
 
-	prompter = NewMessageSuggestionPrompt()
+	prompter = NewMessageSuggestionPrompter()
 	assert.NotNil(t, prompter)
 	assert.Nil(t, prompter.Update(senderData, msgs))
 	return

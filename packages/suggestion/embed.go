@@ -9,14 +9,14 @@ import (
 var (
 	randSource             *rand.Rand = nil
 	messageSuggestionEmbed            = []string{
-		`Sender context:
+		`Sender information:
     Language: %s
     Level: %s
 Recent messages: [
 %s
 ]
 Prompt:
-    You are sender, and you have to reply the latest message.
+    You are the sender, and you have to reply the latest message.
     Ensure that the message is contextually relevant, considerate, and aligned with the sender's language proficiency.
     Aim for a response that flows seamlessly within the ongoing conversation.
     Just return the text.`,

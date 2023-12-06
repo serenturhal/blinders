@@ -8,6 +8,7 @@ import (
 type User struct {
 	ID    string `json:"userID"`
 	Email string `json:"userEmail"`
+	UID   string `json:"firebaseUID"`
 }
 
 func (u User) String() string {
