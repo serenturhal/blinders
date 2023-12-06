@@ -10,8 +10,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"reflect"
-	"time"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -39,45 +37,26 @@ type ChatSuggestRequest struct {
 }
 
 type ClientMessage struct {
-	Timestamp any    `json:"time"`
-	ID        string `json:"id"`
-	Content   string `json:"content"`
-	FromID    string `json:"senderId"`
-	ChatID    string `json:"roomId"`
+	Content string `json:"content"`
+	FromID  string `json:"senderId"`
+	ChatID  string `json:"roomId"`
 }
 
 func (m ClientMessage) ToCommonMessage() common.Message {
-	var Timestamp int64
-	switch timestamp := m.Timestamp.(type) {
-	case int:
-		Timestamp = int64(timestamp)
-	case string:
-		// expect date time as string type, "Tue Dec 05 2023 12:35:04 GMT+0700"
-		layout := "Mon Jan 02 2006 15:04:05 GMT-0700"
-		t, err := time.Parse(layout, timestamp)
-		if err != nil {
-			panic(fmt.Sprintf("clienmessage: given time (%s) cannot parse with layout (%s)", timestamp, layout))
-		}
-		Timestamp = t.Unix()
-	default:
-		panic(fmt.Sprintf("clienmessage: unknow timestamp type (%s)", reflect.TypeOf(m.Timestamp).String()))
-	}
-
 	return common.Message{
-		FromID:    m.FromID,
-		ToID:      m.ChatID,
-		Content:   m.Content,
-		Timestamp: Timestamp,
+		FromID:  m.FromID,
+		ToID:    m.ChatID,
+		Content: m.Content,
 	}
 }
 
 func HandleRequest(ctx context.Context, event events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	token, ok := event.Headers["Authorization"]
+	token, ok := event.Headers["authorization"]
 	if !ok {
 		return utils.APIGatewayProxyResponseWithJSON(
 			400,
 			map[string]any{
-				"error": "function: Token not found",
+				"error": "function: Token in authorization header not found",
 			})
 	}
 

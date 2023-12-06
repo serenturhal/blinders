@@ -108,7 +108,7 @@ func (s *Service) HandleChatSuggestion() fiber.Handler {
 		}
 
 		// should communicate with user service
-		userContext, err := user.GetUserData(req.UserID)
+		userData, err := user.GetUserData(req.UserID)
 		if err != nil {
 			return ctx.Status(400).JSON(fiber.Map{
 				"suggestions": []string{},
@@ -120,7 +120,7 @@ func (s *Service) HandleChatSuggestion() fiber.Handler {
 			msgs = append(msgs, msg.ToCommonMessage())
 		}
 
-		suggestions, err := s.suggester.ChatCompletion(ctx.Context(), userContext, msgs)
+		suggestions, err := s.suggester.ChatCompletion(ctx.Context(), userData, msgs)
 		if err != nil {
 			return ctx.Status(400).JSON(fiber.Map{
 				"suggestions": []string{},
