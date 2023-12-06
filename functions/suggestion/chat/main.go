@@ -72,7 +72,7 @@ func (m ClientMessage) ToCommonMessage() common.Message {
 }
 
 func HandleRequest(ctx context.Context, event events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	token, ok := event.Headers["Authentication"]
+	token, ok := event.Headers["Authorization"]
 	if !ok {
 		return utils.APIGatewayProxyResponseWithJSON(
 			400,

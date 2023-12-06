@@ -19,10 +19,10 @@ type SuggestionPayload struct {
 
 func (s *Service) HandleTextSuggestion() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
-		token := ctx.Get("Authentication")
+		token := ctx.Get("Authorization")
 		if token == "" {
 			return ctx.Status(400).JSON(fiber.Map{
-				"error": "suggestion: token in Authentication header not found",
+				"error": "suggestion: token in Authorization header not found",
 			})
 		}
 		usr, err := utils.VerifyFirestoreToken(token)

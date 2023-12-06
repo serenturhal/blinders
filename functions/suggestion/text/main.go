@@ -36,10 +36,10 @@ type SuggestionPayload struct {
 }
 
 func HandleRequest(ctx context.Context, event events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	token, ok := event.Headers["Authentication"]
+	token, ok := event.Headers["Authorization"]
 	if !ok {
 		return utils.APIGatewayProxyResponseWithJSON(400, map[string]any{
-			"error": "function: Token at Authentication header not found",
+			"error": "function: Token at Authorization header not found",
 		})
 	}
 
