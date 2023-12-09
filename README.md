@@ -4,7 +4,7 @@ Monorepo, a microservices backend project named Blinders for a language learning
 
 ## System Architecture
 
-<img align="center" width="870" alt="image" src="https://github.com/dev-zenonian/blinders/assets/104194494/bd64876f-eeb6-4f85-bcd5-7e058a442a23">
+<img width="1081" alt="image" src="https://github.com/dev-zenonian/blinders/assets/104194494/91616345-53d9-4675-9a0a-d2e8b7646d0c">
 
 
 ## Python development setup
