@@ -26,7 +26,6 @@ jobs:
               with:
                   go-version: "1.21"
                   cache: false
-            - uses: actions/checkout@v3
             - name: Lint by golangci-lint
               uses: golangci/golangci-lint-action@v3
               with:
