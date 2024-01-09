@@ -1,34 +1,24 @@
-name: Go Lint CI
+name: Go CI
 on:
-    push:
-        branches: [main, dev]
-    pull_request:
+  push:
+    branches: [main, dev]
+  pull_request:
 jobs:
-    resolve-modules:
-        name: Resolve Go Modules
-        runs-on: ubuntu-20.04
-        outputs:
-            matrix: ${{ steps.set-matrix.outputs.matrix }}
-        steps:
-            - name: Checkout Sources and Resolve Go Modules
-              uses: actions/checkout@v2
-            - id: set-matrix
-              run: ./cmd/resolve_go_modules.sh
-    lint:
-        name: Go Lint
-        needs: resolve-modules
-        runs-on: ubuntu-20.04
-        strategy:
-            matrix: ${{ fromJson(needs.resolve-modules.outputs.matrix) }}
-        steps:
-            - uses: actions/checkout@v3
-            - uses: actions/setup-go@v4
-              with:
-                  go-version: "1.21"
-                  cache: false
-            - name: Lint by golangci-lint
-              uses: golangci/golangci-lint-action@v3
-              with:
-                  version: "v1.54"
-                  working-directory: ${{ matrix.workdir }}
-                  only-new-issues: true
+  main:
+    name: Lint and Test
+    environment: development
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v4
+        with:
+          go-version: "1.21"
+
+      - name: Install golangci-lint
+        run: curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.55.2
+              
+      - name: Lint by golangci-lint  
+        run: go list -f '{{.Dir}}/...' -m | xargs -n 1 sh -c 'golangci-lint run $0 || exit -1'
+
+      # - name: Test 
+      #   run: go list -f '{{.Dir}}/...' -m | xargs -n 1 sh -c 'go test $0 || exit -1'

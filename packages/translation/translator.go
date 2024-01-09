@@ -3,8 +3,8 @@ package translation
 type Languages string
 
 const (
-	EN_VI Languages = "en-vi"
-	VI_EN Languages = "vi-en"
+	EnVi Languages = "en-vi"
+	ViEn Languages = "vi-en"
 )
 
 type Translator interface {

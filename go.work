@@ -5,8 +5,13 @@ use (
 	./functions/flashcard
 	./functions/suggestion
 	./functions/translation
-	./packages/authentication
+	./functions/utils
 	./packages/common
+	./packages/goauth
+	./packages/message
 	./packages/suggestion
 	./packages/translation
+	./packages/user
+	./packages/utils
+	./services/suggestions
 )

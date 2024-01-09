@@ -20,7 +20,7 @@ func init() {
 		fmt.Println("Error loading .env.test file")
 	}
 
-	translator = YandexTranslator{ApiKey: os.Getenv("YANDEX_API_KEY")}
+	translator = YandexTranslator{APIKey: os.Getenv("YANDEX_API_KEY")}
 }
 
 func TestTranslateWordEN_VI(t *testing.T) {
@@ -28,7 +28,7 @@ func TestTranslateWordEN_VI(t *testing.T) {
 	expectedResult := "tuyệt đối"
 	fmt.Printf("translate \"%s\" to vietnamese, expect \"%s\"\n", text, expectedResult)
 
-	result, err := translator.Translate(text, EN_VI)
+	result, err := translator.Translate(text, EnVi)
 	if err != nil {
 		t.Error(err)
 	}
@@ -43,7 +43,7 @@ func TestTranslateSentenceEN_VI(t *testing.T) {
 	expectedResult := "xin chào, tên tôi là Peakee"
 	fmt.Printf("translate \"%s\" to vietnamese, expect \"%s\"\n", text, expectedResult)
 
-	result, err := translator.Translate(text, EN_VI)
+	result, err := translator.Translate(text, EnVi)
 	if err != nil {
 		t.Error(err)
 	}
@@ -58,7 +58,7 @@ func TestTranslateWordVI_EN(t *testing.T) {
 	expectedResult := "absolutely"
 	fmt.Printf("translate \"%s\" to vietnamese, expect \"%s\"\n", text, expectedResult)
 
-	result, err := translator.Translate(text, VI_EN)
+	result, err := translator.Translate(text, ViEn)
 	if err != nil {
 		t.Error(err)
 	}
@@ -73,7 +73,7 @@ func TestTranslateSentenceVI_EN(t *testing.T) {
 	expectedResult := "hello, My name is Peakee"
 	fmt.Printf("translate \"%s\" to vietnamese, expect \"%s\"\n", text, expectedResult)
 
-	result, err := translator.Translate(text, VI_EN)
+	result, err := translator.Translate(text, ViEn)
 	if err != nil {
 		t.Error(err)
 	}

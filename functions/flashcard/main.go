@@ -11,7 +11,7 @@ type MyEvent struct {
 	Name string `json:"name"`
 }
 
-func HandleRequest(ctx context.Context, event *MyEvent) (*string, error) {
+func HandleRequest(_ context.Context, event *MyEvent) (*string, error) {
 	if event == nil {
 		return nil, fmt.Errorf("received nil event")
 	}

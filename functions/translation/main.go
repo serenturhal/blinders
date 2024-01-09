@@ -1,12 +1,13 @@
 package main
 
 import (
-	"blinders/packages/translation"
 	"context"
 	"encoding/json"
 	"fmt"
 	"log"
 	"os"
+
+	"blinders/packages/translation"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -25,7 +26,7 @@ type TranslateResponse struct {
 var translator translation.Translator
 
 func init() {
-	translator = translation.YandexTranslator{ApiKey: os.Getenv("YANDEX_API_KEY")}
+	translator = translation.YandexTranslator{APIKey: os.Getenv("YANDEX_API_KEY")}
 }
 
 func HandleRequest(_ context.Context, event events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
