@@ -2,7 +2,6 @@ package common
 
 import (
 	"fmt"
-	"strings"
 )
 
 const (
@@ -37,10 +36,5 @@ func (l Lang) String() string {
 }
 
 func (c Language) String() string {
-	str := strings.Builder{}
-	str.WriteString("[")
-	str.WriteString(fmt.Sprintf("language: %s, ", c.Lang))
-	str.WriteString(fmt.Sprintf("level: %s", c.Level))
-	str.WriteString("]")
-	return str.String()
+	return fmt.Sprintf("[language: %s, level: %s]", c.Lang, c.Level)
 }
