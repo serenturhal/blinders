@@ -1,8 +1,9 @@
 package message
 
 import (
-	"blinders/packages/common"
 	"time"
+
+	"blinders/packages/common"
 )
 
 type FirestoreMessage struct {

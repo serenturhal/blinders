@@ -1,9 +1,10 @@
 package auth
 
 import (
-	"blinders/packages/common"
 	"context"
 	"time"
+
+	"blinders/packages/common"
 
 	firebase "firebase.google.com/go/v4"
 	"google.golang.org/api/iterator"
@@ -13,7 +14,7 @@ type FirebaseAuthManager struct {
 	client *firebase.App
 }
 
-func (m FirebaseAuthManager) Generate(user *common.User) (string, error) {
+func (m FirebaseAuthManager) Generate(_ *common.User) (string, error) {
 	return "", nil
 }
 
@@ -59,7 +60,7 @@ func (m FirebaseAuthManager) Verify(token string) (*common.User, error) {
 	}, nil
 }
 
-func NewFirebaseAuthManager(firebaseApp *firebase.App) (AuthManager, error) {
+func NewFirebaseAuthManager(firebaseApp *firebase.App) (Manager, error) {
 	manager := &FirebaseAuthManager{
 		client: firebaseApp,
 	}

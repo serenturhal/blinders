@@ -1,10 +1,11 @@
 package main
 
 import (
-	pkg "blinders/packages/suggestion"
-	service "blinders/services/suggestion"
 	"fmt"
 	"os"
+
+	pkg "blinders/packages/suggestion"
+	service "blinders/services/suggestion"
 
 	"github.com/sashabaranov/go-openai"
 )

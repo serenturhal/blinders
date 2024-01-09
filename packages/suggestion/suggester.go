@@ -1,8 +1,9 @@
 package suggestion
 
 import (
-	"blinders/packages/common"
 	"context"
+
+	"blinders/packages/common"
 )
 
 type Suggester interface {

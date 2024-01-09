@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"blinders/packages/common"
 	"bytes"
 	"context"
 	"encoding/json"
@@ -11,6 +10,8 @@ import (
 	"os"
 	"testing"
 	"time"
+
+	"blinders/packages/common"
 
 	firebase "firebase.google.com/go/v4"
 	"github.com/stretchr/testify/assert"

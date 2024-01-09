@@ -13,7 +13,7 @@ import (
 func TestFirestoreAdapter(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
-	manager := initManager(t, ctx)
+	manager := initManager(ctx, t)
 
 	var (
 		roomID = "Hp8ugceFOrycOGPxC7C9"
@@ -21,7 +21,7 @@ func TestFirestoreAdapter(t *testing.T) {
 		offset = 0
 	)
 
-	uids, err := manager.GetUsersIdOfRoom(ctx, roomID)
+	uids, err := manager.GetUsersIDOfRoom(ctx, roomID)
 	assert.Nil(t, err)
 	fmt.Println(uids)
 
@@ -34,7 +34,7 @@ func TestFirestoreAdapter(t *testing.T) {
 	}
 }
 
-func initManager(t *testing.T, ctx context.Context) *FirestoreManager {
+func initManager(ctx context.Context, t *testing.T) *FirestoreManager {
 	app, err := firebase.NewApp(ctx, nil)
 	assert.Nil(t, err)
 	assert.NotNil(t, app)

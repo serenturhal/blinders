@@ -1,9 +1,10 @@
 package suggestion
 
 import (
-	"blinders/packages/common"
 	"context"
 	"errors"
+
+	"blinders/packages/common"
 
 	openai "github.com/sashabaranov/go-openai"
 )
@@ -86,7 +87,7 @@ func (s *GPTSuggester) ChatCompletion(
 
 func (s *GPTSuggester) TextCompletion(
 	ctx context.Context,
-	user common.UserData,
+	_ common.UserData,
 	prompt string,
 ) ([]string, error) {
 	req := openai.CompletionRequest{

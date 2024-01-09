@@ -1,13 +1,14 @@
 package suggestion
 
 import (
-	"blinders/packages/common"
-	"blinders/packages/message"
 	"context"
 	"fmt"
 	"os"
 	"testing"
 	"time"
+
+	"blinders/packages/common"
+	"blinders/packages/message"
 
 	firebase "firebase.google.com/go/v4"
 	"github.com/sashabaranov/go-openai"
@@ -26,11 +27,11 @@ func TestTextCompletion(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 	prompt := "Just reply 'hello, world!'"
-	suggetions, err := suggester.TextCompletion(ctx, common.UserData{}, prompt)
+	suggestions, err := suggester.TextCompletion(ctx, common.UserData{}, prompt)
 	assert.Nil(t, err)
-	assert.Equal(t, suggester.nText, len(suggetions))
+	assert.Equal(t, suggester.nText, len(suggestions))
 
-	fmt.Println(suggetions)
+	fmt.Println(suggestions)
 }
 
 // This test will use the OpenAI API, it may be charged, consider uncomment for testing
@@ -85,7 +86,7 @@ func TestIntegrateWithMessagePackage(t *testing.T) {
 			})
 		roomID = "Hp8ugceFOrycOGPxC7C9"
 	)
-	fireStoreManager := initFirestoreManager(t, ctx)
+	fireStoreManager := initFirestoreManager(ctx, t)
 	room, err := fireStoreManager.GetRoom(ctx, roomID)
 	assert.Nil(t, err)
 	assert.NotEmpty(t, room.Type)
@@ -118,7 +119,7 @@ func initSuggester(t *testing.T) *GPTSuggester {
 	return suggester
 }
 
-func initFirestoreManager(t *testing.T, ctx context.Context) *message.FirestoreManager {
+func initFirestoreManager(ctx context.Context, t *testing.T) *message.FirestoreManager {
 	app, err := firebase.NewApp(ctx, nil)
 	assert.Nil(t, err)
 	assert.NotNil(t, app)

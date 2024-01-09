@@ -1,9 +1,10 @@
 package message
 
 import (
-	"blinders/packages/common"
 	"context"
 	"fmt"
+
+	"blinders/packages/common"
 
 	"cloud.google.com/go/firestore"
 	"google.golang.org/api/iterator"
@@ -13,7 +14,12 @@ type FirestoreManager struct {
 	client *firestore.Client
 }
 
-func (m FirestoreManager) GetMessagesOfRoom(ctx context.Context, rid string, offset int, limit int) ([]common.Message, error) {
+func (m FirestoreManager) GetMessagesOfRoom(
+	ctx context.Context,
+	rid string,
+	offset int,
+	limit int,
+) ([]common.Message, error) {
 	var (
 		msgsPath = fmt.Sprintf("ChatRooms/%s/Messages", rid)
 		msgsRef  = m.client.Collection(msgsPath)
@@ -72,7 +78,7 @@ func (m *FirestoreManager) getFirestoreRoom(ctx context.Context, rid string) (*F
 	return firestoreChatRoom, nil
 }
 
-func (m *FirestoreManager) GetUsersIdOfRoom(ctx context.Context, rid string) ([]string, error) {
+func (m *FirestoreManager) GetUsersIDOfRoom(ctx context.Context, rid string) ([]string, error) {
 	room, err := m.getFirestoreRoom(ctx, rid)
 	if err != nil {
 		return nil, err

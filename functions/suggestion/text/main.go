@@ -1,14 +1,15 @@
 package main
 
 import (
-	"blinders/functions/utils"
-	"blinders/packages/suggestion"
-	"blinders/packages/user"
-	commonUtils "blinders/utils"
 	"context"
 	"encoding/json"
 	"fmt"
 	"os"
+
+	"blinders/functions/utils"
+	"blinders/packages/suggestion"
+	"blinders/packages/user"
+	cutils "blinders/packages/utils"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -16,8 +17,8 @@ import (
 )
 
 var (
-	suggester suggestion.Suggester = nil
-	apiKey                         = os.Getenv("OPENAI_API_KEY")
+	suggester suggestion.Suggester
+	apiKey    = os.Getenv("OPENAI_API_KEY")
 )
 
 func init() {
@@ -43,7 +44,7 @@ func HandleRequest(ctx context.Context, event events.APIGatewayProxyRequest) (ev
 		})
 	}
 
-	usr, err := commonUtils.VerifyFireStoreToken(token)
+	usr, err := cutils.VerifyFireStoreToken(token)
 	if err != nil {
 		return utils.APIGatewayProxyResponseWithJSON(400, map[string]any{
 			"error": fmt.Sprintf("function: Cannot verify given token, err: %s", err.Error()),

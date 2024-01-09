@@ -1,18 +1,19 @@
 package suggestion
 
 import (
-	"blinders/packages/common"
-	"blinders/packages/user"
-	"blinders/utils"
 	"encoding/json"
 	"fmt"
 	"reflect"
 	"time"
 
+	"blinders/packages/common"
+	"blinders/packages/user"
+	"blinders/packages/utils"
+
 	"github.com/gofiber/fiber/v2"
 )
 
-type SuggestionPayload struct {
+type Payload struct {
 	Text   string `json:"text"`
 	UserID string `json:"userID"`
 }
@@ -32,7 +33,7 @@ func (s *Service) HandleTextSuggestion() fiber.Handler {
 			})
 		}
 
-		req := new(SuggestionPayload)
+		req := new(Payload)
 		if err := json.Unmarshal(ctx.Body(), req); err != nil {
 			return ctx.Status(400).JSON(fiber.Map{
 				"error":       err.Error(),

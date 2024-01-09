@@ -1,9 +1,10 @@
 package suggestion
 
 import (
-	"blinders/packages/suggestion"
 	"net"
 	"time"
+
+	"blinders/packages/suggestion"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"

@@ -7,8 +7,8 @@ import (
 )
 
 var (
-	randSource             *rand.Rand = nil
-	messageSuggestionEmbed            = []string{
+	randSource             *rand.Rand
+	messageSuggestionEmbed = []string{
 		`Sender information:
     Language: %s
     Level: %s

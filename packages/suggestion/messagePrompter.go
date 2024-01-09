@@ -1,10 +1,11 @@
 package suggestion
 
 import (
-	"blinders/packages/common"
 	"errors"
 	"fmt"
 	"strings"
+
+	"blinders/packages/common"
 )
 
 type MessageSuggestionPrompter struct {

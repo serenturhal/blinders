@@ -1,9 +1,10 @@
 package suggestion
 
 import (
-	"blinders/packages/common"
 	"fmt"
 	"testing"
+
+	"blinders/packages/common"
 
 	"github.com/stretchr/testify/assert"
 )
