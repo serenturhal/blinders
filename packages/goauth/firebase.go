@@ -10,7 +10,6 @@ import (
 )
 
 type FirebaseAuthManager struct {
-	// authClient *auth.Client
 	client *firebase.App
 }
 
