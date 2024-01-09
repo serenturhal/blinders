@@ -1,18 +1,17 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	pkg "blinders/packages/suggestion"
-	service "blinders/services/suggestion"
+	"blinders/services/suggestion/core"
 
 	"github.com/sashabaranov/go-openai"
 )
 
-func initService() *service.Service {
+func initService() *core.Service {
 	port := os.Getenv("PORT")
-	config := &service.ServiceConfig{
+	config := &core.ServiceConfig{
 		Port: port,
 	}
 
@@ -25,15 +24,15 @@ func initService() *service.Service {
 		panic(err)
 	}
 
-	sv, err := service.NewTransporter(suggester, config)
+	sv, err := core.NewTransporter(suggester, config)
 	if err != nil {
 		panic(err)
 	}
+
 	return sv
 }
 
 func main() {
-	fmt.Println("Suggestion service")
 	service := initService()
 	panic(service.Listen())
 }

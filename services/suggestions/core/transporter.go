@@ -1,4 +1,4 @@
-package suggestion
+package core
 
 import (
 	"net"
@@ -14,24 +14,6 @@ type Service struct {
 	suggester suggestion.Suggester
 	app       *fiber.App
 	*ServiceConfig
-}
-
-func NewTransporter(suggester suggestion.Suggester, cfg *ServiceConfig) (*Service, error) {
-	fiberCfg := fiber.Config{
-		ReadTimeout:     time.Second * 5,
-		WriteTimeout:    time.Second * 5,
-		ReadBufferSize:  2e5,
-		WriteBufferSize: 2e5,
-	}
-	fiberApp := fiber.New(fiberCfg)
-
-	s := &Service{
-		suggester:     suggester,
-		app:           fiberApp,
-		ServiceConfig: cfg,
-	}
-	defer s.initRoute()
-	return s, nil
 }
 
 func (s *Service) initRoute() {
@@ -50,4 +32,24 @@ func (s *Service) Listen() error {
 		return err
 	}
 	return s.app.Listener(ln)
+}
+
+func NewTransporter(suggester suggestion.Suggester, cfg *ServiceConfig) (*Service, error) {
+	fiberCfg := fiber.Config{
+		ReadTimeout:     time.Second * 5,
+		WriteTimeout:    time.Second * 5,
+		ReadBufferSize:  2e5,
+		WriteBufferSize: 2e5,
+	}
+	fiberApp := fiber.New(fiberCfg)
+
+	s := &Service{
+		suggester:     suggester,
+		app:           fiberApp,
+		ServiceConfig: cfg,
+	}
+
+	s.initRoute()
+
+	return s, nil
 }

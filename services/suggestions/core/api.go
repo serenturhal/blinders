@@ -1,8 +1,9 @@
-package suggestion
+package core
 
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"reflect"
 	"time"
 
@@ -22,20 +23,20 @@ func (s *Service) HandleTextSuggestion() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		token := ctx.Get("Authorization")
 		if token == "" {
-			return ctx.Status(400).JSON(fiber.Map{
+			return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{
 				"error": "suggestion: token in Authorization header not found",
 			})
 		}
 		usr, err := utils.VerifyFireStoreToken(token)
 		if err != nil {
-			return ctx.Status(400).JSON(fiber.Map{
+			return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{
 				"error": fmt.Sprintf("suggestion: cannot verify user with given token (%s)", token),
 			})
 		}
 
 		req := new(Payload)
 		if err := json.Unmarshal(ctx.Body(), req); err != nil {
-			return ctx.Status(400).JSON(fiber.Map{
+			return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{
 				"error":       err.Error(),
 				"suggestions": []string{},
 			})
