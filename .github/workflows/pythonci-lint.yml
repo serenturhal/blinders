@@ -1,22 +1,26 @@
-name: Python Lint CI
+name: Python CI
 on:
-    push:
-        branches: [main, dev]
-    pull_request:
+  push:
+    branches: [main, dev]
+  pull_request:
 jobs:
-    default:
-        name: Default
-        runs-on: ubuntu-20.04
-        steps:
-            - uses: actions/checkout@v2
-            - name: Setup Python
-              uses: actions/setup-python@v4
-              with:
-                  python-version: "3.10"
-                  architecture: "x64"
-            - name: Checking python
-              run: python --version
-            - name: Install development dependencies
-              run: pip install poetry && poetry config virtualenvs.create false && poetry install --no-root
-            - name: Linting
-              run: ./cmd/check_pylint.sh
+  main:
+    name: Lint and Test
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+          architecture: "x64"
+
+      - name: Checking python
+        run: python --version
+
+      - name: Install development dependencies
+        run: pip install poetry && poetry config virtualenvs.create false && poetry install --no-root
+
+      - name: Linting
+        run: ./cmd/check_pylint.sh

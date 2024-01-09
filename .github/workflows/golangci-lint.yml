@@ -1,11 +1,11 @@
-name: Blinders CI
+name: Go CI
 on:
   push:
     branches: [main, dev]
   pull_request:
 jobs:
   main:
-    name: Go CI
+    name: Lint and Test
     environment: development
     runs-on: ubuntu-20.04
     steps:
