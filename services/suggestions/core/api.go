@@ -7,9 +7,9 @@ import (
 	"reflect"
 	"time"
 
-	"blinders/packages/common"
-	"blinders/packages/user"
-	"blinders/packages/utils"
+	"blinders/packages/auth"
+	"blinders/packages/db"
+	"blinders/packages/suggestion"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -21,27 +21,16 @@ type Payload struct {
 
 func (s *Service) HandleTextSuggestion() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
-		token := ctx.Get("Authorization")
-		if token == "" {
-			return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{
-				"error": "suggestion: token in Authorization header not found",
-			})
-		}
-		usr, err := utils.VerifyFireStoreToken(token)
-		if err != nil {
-			return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{
-				"error": fmt.Sprintf("suggestion: cannot verify user with given token (%s)", token),
-			})
-		}
+		user := ctx.Locals(auth.UserAuthKey).(*auth.UserAuth)
 
 		req := new(Payload)
 		if err := json.Unmarshal(ctx.Body(), req); err != nil {
 			return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{
-				"error":       err.Error(),
-				"suggestions": []string{},
+				"message": err.Error(),
 			})
 		}
-		userData, err := user.GetUserData(usr.ID)
+
+		userData, err := db.GetUserData(user.AuthID)
 		if err != nil {
 			return ctx.Status(400).JSON(fiber.Map{
 				"error": fmt.Sprintf("suggestion: cannot get data of user, err: (%s)", err.Error()),
@@ -73,9 +62,11 @@ type ClientMessage struct {
 	Content   string `json:"content"`
 	FromID    string `json:"senderId"`
 	ChatID    string `json:"roomId"`
+	Sender    string `json:"sender"`
+	Receiver  string `json:"receiver"`
 }
 
-func (m ClientMessage) ToCommonMessage() common.Message {
+func (m ClientMessage) ToCommonMessage() suggestion.Message {
 	var Timestamp int64
 	switch timestamp := m.Timestamp.(type) {
 	case int:
@@ -92,9 +83,9 @@ func (m ClientMessage) ToCommonMessage() common.Message {
 		panic(fmt.Sprintf("clientMessage: unknown timestamp type (%s)", reflect.TypeOf(m.Timestamp).String()))
 	}
 
-	return common.Message{
-		FromID:    m.FromID,
-		ToID:      m.ChatID,
+	return suggestion.Message{
+		Sender:    m.Sender,
+		Receiver:  m.Receiver,
 		Content:   m.Content,
 		Timestamp: Timestamp,
 	}
@@ -110,14 +101,14 @@ func (s *Service) HandleChatSuggestion() fiber.Handler {
 		}
 
 		// should communicate with user service
-		userData, err := user.GetUserData(req.UserID)
+		userData, err := db.GetUserData(req.UserID)
 		if err != nil {
 			return ctx.Status(400).JSON(fiber.Map{
 				"suggestions": []string{},
 			})
 		}
 
-		msgs := []common.Message{}
+		msgs := []suggestion.Message{}
 		for _, msg := range req.Messages {
 			msgs = append(msgs, msg.ToCommonMessage())
 		}

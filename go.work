@@ -7,11 +7,10 @@ use (
 	./functions/translation
 	./functions/utils
 	./packages/common
+	./packages/db
 	./packages/goauth
-	./packages/message
 	./packages/suggestion
 	./packages/translation
-	./packages/user
 	./packages/utils
 	./services/suggestions
 )
