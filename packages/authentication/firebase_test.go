@@ -22,7 +22,7 @@ const (
 )
 
 var (
-	CredentialsPath = os.Getenv("GOOLE_APPLICATION_CREDENTIALS")
+	CredentialsPath = os.Getenv("GOOGLE_APPLICATION_CREDENTIALS")
 	FirebaseAPIKey  = os.Getenv("GOOGLE_API_KEY")
 )
 

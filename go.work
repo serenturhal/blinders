@@ -12,6 +12,6 @@ use (
 	./packages/suggestion
 	./packages/translation
 	./packages/user
+	./packages/utils
 	./services/suggestions
-	./utils
 )

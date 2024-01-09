@@ -1,1 +1,0 @@
-# Translation AWS lambda function

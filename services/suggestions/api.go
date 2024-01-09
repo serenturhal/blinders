@@ -25,7 +25,7 @@ func (s *Service) HandleTextSuggestion() fiber.Handler {
 				"error": "suggestion: token in Authorization header not found",
 			})
 		}
-		usr, err := utils.VerifyFirestoreToken(token)
+		usr, err := utils.VerifyFireStoreToken(token)
 		if err != nil {
 			return ctx.Status(400).JSON(fiber.Map{
 				"error": fmt.Sprintf("suggestion: cannot verify user with given token (%s)", token),
@@ -83,11 +83,11 @@ func (m ClientMessage) ToCommonMessage() common.Message {
 		layout := "Mon Jan 02 2006 15:04:05 GMT-0700"
 		t, err := time.Parse(layout, timestamp)
 		if err != nil {
-			panic(fmt.Sprintf("clienmessage: given time (%s) cannot parse with layout (%s)", timestamp, layout))
+			panic(fmt.Sprintf("clientMessage: given time (%s) cannot parse with layout (%s)", timestamp, layout))
 		}
 		Timestamp = t.Unix()
 	default:
-		panic(fmt.Sprintf("clienmessage: unknow timestamp type (%s)", reflect.TypeOf(m.Timestamp).String()))
+		panic(fmt.Sprintf("clientMessage: unknown timestamp type (%s)", reflect.TypeOf(m.Timestamp).String()))
 	}
 
 	return common.Message{

@@ -20,7 +20,7 @@ type (
 	Level string
 	Lang  struct {
 		Code string `json:"languageCode"` // ISO-[639-1] Code of language based
-		Name string `json:"languageName"` // English name of lanague
+		Name string `json:"languageName"` // English name of language
 	}
 	Language struct {
 		Lang  Lang  `json:"language"`

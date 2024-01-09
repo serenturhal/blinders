@@ -43,7 +43,7 @@ func HandleRequest(ctx context.Context, event events.APIGatewayProxyRequest) (ev
 		})
 	}
 
-	usr, err := commonUtils.VerifyFirestoreToken(token)
+	usr, err := commonUtils.VerifyFireStoreToken(token)
 	if err != nil {
 		return utils.APIGatewayProxyResponseWithJSON(400, map[string]any{
 			"error": fmt.Sprintf("function: Cannot verify given token, err: %s", err.Error()),

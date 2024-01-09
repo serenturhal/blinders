@@ -31,6 +31,6 @@ func init() {
 	}
 }
 
-func VerifyFirestoreToken(token string) (*common.User, error) {
+func VerifyFireStoreToken(token string) (*common.User, error) {
 	return authenticater.Verify(token)
 }

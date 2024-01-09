@@ -47,7 +47,7 @@ func initPrompt(t *testing.T) (
 	sender common.User,
 	receiver common.User,
 	senderData common.UserData,
-	prompter *MessageSuggestionPrompterere,
+	prompter *MessageSuggestionPrompter,
 ) {
 	sender = newUser("sender", "sender@email")
 	receiver = newUser("receiver", "receiver@email")
