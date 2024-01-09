@@ -9,6 +9,7 @@ use (
 	./packages/common
 	./packages/db
 	./packages/goauth
+	./packages/interfaces
 	./packages/suggestion
 	./packages/translation
 	./packages/utils
