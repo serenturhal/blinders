@@ -2,6 +2,11 @@
 
 Monorepo, a microservices backend project named Blinders for a language learning platform. Almost use Golang, Python, and Terraform for provisioning, all the services are hosted on AWS.
 
+## System Architecture
+
+<img width="1081" alt="image" src="https://github.com/dev-zenonian/blinders/assets/104194494/91616345-53d9-4675-9a0a-d2e8b7646d0c">
+
+
 ## Python development setup
 
 ### Tools

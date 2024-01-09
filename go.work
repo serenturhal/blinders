@@ -6,8 +6,8 @@ use (
 	./functions/suggestion
 	./functions/translation
 	./functions/utils
-	./packages/authentication
 	./packages/common
+	./packages/goauth
 	./packages/message
 	./packages/suggestion
 	./packages/translation
