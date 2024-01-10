@@ -1,4 +1,4 @@
-package suggestion
+package suggest
 
 type Suggestion struct {
 	Suggestions    []string

@@ -7,7 +7,7 @@ import (
 	"log"
 	"os"
 
-	"blinders/packages/translation"
+	"blinders/packages/translate"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -23,10 +23,10 @@ type TranslateResponse struct {
 	Languages  string `json:"languages"`
 }
 
-var translator translation.Translator
+var translator translate.Translator
 
 func init() {
-	translator = translation.YandexTranslator{APIKey: os.Getenv("YANDEX_API_KEY")}
+	translator = translate.YandexTranslator{APIKey: os.Getenv("YANDEX_API_KEY")}
 }
 
 func HandleRequest(_ context.Context, event events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
@@ -43,7 +43,7 @@ func HandleRequest(_ context.Context, event events.APIGatewayV2HTTPRequest) (eve
 		langs = "en-vi"
 	}
 
-	translated, err := translator.Translate(text, translation.Languages(langs))
+	translated, err := translator.Translate(text, translate.Languages(langs))
 	if err != nil {
 		log.Println("error translating: ", err)
 		return events.APIGatewayV2HTTPResponse{

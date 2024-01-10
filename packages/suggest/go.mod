@@ -1,4 +1,4 @@
-module blinders/packages/suggestion
+module blinders/packages/suggest
 
 go 1.21.3
 

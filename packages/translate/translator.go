@@ -1,4 +1,4 @@
-package translation
+package translate
 
 type Languages string
 

@@ -1,4 +1,4 @@
-module blinders/packages/translation
+module blinders/packages/translate
 
 go 1.21.3
 
