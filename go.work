@@ -1,10 +1,14 @@
 go 1.21.3
 
 use (
+	./functions/chat
 	./functions/collecting
-	./functions/flashcard
+	./functions/grammar
+	./functions/matching
+	./functions/practice
 	./functions/suggestion
 	./functions/translation
+	./functions/users
 	./functions/utils
 	./packages/common
 	./packages/db

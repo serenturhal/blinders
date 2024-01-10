@@ -1,4 +1,4 @@
-module blinders/functions/flashcard
+module blinders/functions/practice
 
 go 1.21.3
 

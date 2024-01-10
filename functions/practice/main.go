@@ -15,7 +15,7 @@ func HandleRequest(_ context.Context, event *MyEvent) (*string, error) {
 	if event == nil {
 		return nil, fmt.Errorf("received nil event")
 	}
-	message := fmt.Sprintf("Hello %s, from flashcard function!", event.Name)
+	message := fmt.Sprintf("Hello %s, from practice function!", event.Name)
 	return &message, nil
 }
 
