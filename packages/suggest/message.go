@@ -20,6 +20,7 @@ func (m Message) String() string {
 	return fmt.Sprintf("[From: %s, To: %s, At: %d, Content: %s]", m.Sender, m.Receiver, m.Timestamp, m.Content)
 }
 
+// TODO: need to resolve timestamp
 func NewMessage(Sender string, Receiver string, content string) *Message {
 	return &Message{Sender, Receiver, content, time.Now().Unix()}
 }
