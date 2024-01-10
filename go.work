@@ -17,5 +17,6 @@ use (
 	./packages/suggestion
 	./packages/translation
 	./packages/utils
+	./services/chat
 	./services/suggestions
 )
