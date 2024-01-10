@@ -6,17 +6,17 @@ use (
 	./functions/grammar
 	./functions/matching
 	./functions/practice
-	./functions/suggestion
-	./functions/translation
+	./functions/suggest
+	./functions/translate
 	./functions/users
 	./functions/utils
 	./packages/common
 	./packages/db
 	./packages/goauth
 	./packages/interfaces
-	./packages/suggestion
-	./packages/translation
+	./packages/suggest
+	./packages/translate
 	./packages/utils
 	./services/chat
-	./services/suggestions
+	./services/suggest
 )

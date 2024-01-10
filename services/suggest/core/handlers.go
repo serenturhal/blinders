@@ -1,15 +1,13 @@
-package core
+package suggestcore
 
 import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"reflect"
-	"time"
 
 	"blinders/packages/auth"
 	"blinders/packages/db"
-	"blinders/packages/suggestion"
+	"blinders/packages/suggest"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -37,7 +35,7 @@ func (s *Service) HandleTextSuggestion() fiber.Handler {
 			})
 		}
 
-		suggestions, err := s.suggester.TextCompletion(ctx.Context(), userData, req.Text)
+		suggestions, err := s.Suggester.TextCompletion(ctx.Context(), userData, req.Text)
 		if err != nil {
 			return ctx.Status(400).JSON(fiber.Map{
 				"error":       err.Error(),
@@ -66,31 +64,6 @@ type ClientMessage struct {
 	Receiver  string `json:"receiver"`
 }
 
-func (m ClientMessage) ToCommonMessage() suggestion.Message {
-	var Timestamp int64
-	switch timestamp := m.Timestamp.(type) {
-	case int:
-		Timestamp = int64(timestamp)
-	case string:
-		// expect date time as string type, "Tue Dec 05 2023 12:35:04 GMT+0700"
-		layout := "Mon Jan 02 2006 15:04:05 GMT-0700"
-		t, err := time.Parse(layout, timestamp)
-		if err != nil {
-			panic(fmt.Sprintf("clientMessage: given time (%s) cannot parse with layout (%s)", timestamp, layout))
-		}
-		Timestamp = t.Unix()
-	default:
-		panic(fmt.Sprintf("clientMessage: unknown timestamp type (%s)", reflect.TypeOf(m.Timestamp).String()))
-	}
-
-	return suggestion.Message{
-		Sender:    m.Sender,
-		Receiver:  m.Receiver,
-		Content:   m.Content,
-		Timestamp: Timestamp,
-	}
-}
-
 func (s *Service) HandleChatSuggestion() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		req := new(ChatSuggestionPayload)
@@ -108,12 +81,12 @@ func (s *Service) HandleChatSuggestion() fiber.Handler {
 			})
 		}
 
-		msgs := []suggestion.Message{}
+		msgs := []suggest.Message{}
 		for _, msg := range req.Messages {
 			msgs = append(msgs, msg.ToCommonMessage())
 		}
 
-		suggestions, err := s.suggester.ChatCompletion(ctx.Context(), userData, msgs)
+		suggestions, err := s.Suggester.ChatCompletion(ctx.Context(), userData, msgs)
 		if err != nil {
 			return ctx.Status(400).JSON(fiber.Map{
 				"suggestions": []string{},
