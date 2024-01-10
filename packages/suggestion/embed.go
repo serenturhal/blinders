@@ -9,17 +9,13 @@ import (
 var (
 	randSource             *rand.Rand
 	messageSuggestionEmbed = []string{
-		`Sender information:
-    Language: %s
-    Level: %s
-Recent messages: [
-%s
-]
-Prompt:
-    You are the sender, and you have to reply the latest message.
-    Ensure that the message is contextually relevant, considerate, and aligned with the sender's language proficiency.
-    Aim for a response that flows seamlessly within the ongoing conversation.
-    Just return the text.`,
+		`Sender information: language: %s, level: %s
+		Recent messages: [%s]
+		Prompt:
+			You are the sender, and you have to reply the latest message.
+			Ensure that the message is contextually relevant, considerate, and aligned with the sender's language proficiency.
+			Aim for a response that flows seamlessly within the ongoing conversation.
+			Just return the text.`,
 	}
 )
 

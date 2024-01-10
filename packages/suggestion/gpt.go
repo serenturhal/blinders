@@ -4,19 +4,10 @@ import (
 	"context"
 	"errors"
 
-	"blinders/packages/common"
+	"blinders/packages/db"
 
 	openai "github.com/sashabaranov/go-openai"
 )
-
-var DefaultSuggesterOptions = GPTSuggesterOptions{
-	prompter:         NewMessageSuggestionPrompter(),
-	chatModel:        openai.GPT3Dot5TurboInstruct,
-	textModel:        openai.GPT3Dot5TurboInstruct,
-	nChat:            2,
-	nText:            1,
-	modelTemperature: 0.4,
-}
 
 type GPTSuggesterOptions struct {
 	prompter         Prompter
@@ -27,6 +18,15 @@ type GPTSuggesterOptions struct {
 	modelTemperature float32
 }
 
+var DefaultSuggesterOptions = GPTSuggesterOptions{
+	prompter:         NewMessageSuggestionPrompter(),
+	chatModel:        openai.GPT3Dot5TurboInstruct,
+	textModel:        openai.GPT3Dot5TurboInstruct,
+	nChat:            2,
+	nText:            1,
+	modelTemperature: 0.4,
+}
+
 type GPTSuggester struct {
 	client *openai.Client
 	GPTSuggesterOptions
@@ -34,8 +34,8 @@ type GPTSuggester struct {
 
 func (s *GPTSuggester) ChatCompletion(
 	ctx context.Context,
-	userData common.UserData,
-	msgs []common.Message,
+	userData db.UserData,
+	msgs []Message,
 	prompter ...Prompter,
 ) ([]string, error) {
 	var (
@@ -82,14 +82,11 @@ func (s *GPTSuggester) ChatCompletion(
 	for _, choice := range rsp.Choices {
 		suggestions = append(suggestions, choice.Text)
 	}
+
 	return suggestions, nil
 }
 
-func (s *GPTSuggester) TextCompletion(
-	ctx context.Context,
-	_ common.UserData,
-	prompt string,
-) ([]string, error) {
+func (s *GPTSuggester) TextCompletion(ctx context.Context, _ db.UserData, prompt string) ([]string, error) {
 	req := openai.CompletionRequest{
 		Model:       s.textModel,
 		Prompt:      prompt,
@@ -120,8 +117,11 @@ func NewGPTSuggester(client *openai.Client, opts ...Option) (*GPTSuggester, erro
 	for _, opt := range opts {
 		opt(gptSuggester)
 	}
+
 	return gptSuggester, nil
 }
+
+type Option func(s any)
 
 func optionAdapter(closer func(s *GPTSuggester)) Option {
 	return func(i any) {

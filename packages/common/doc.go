@@ -1,6 +1,4 @@
 /*
-Package common provides reusable structs that are designed
-
-to be used by other packages within the application.
+Package common provides reusable structs for the whole applications.
 */
 package common
