@@ -1,17 +1,22 @@
 go 1.21.3
 
 use (
+	./functions/chat
 	./functions/collecting
-	./functions/flashcard
-	./functions/suggestion
-	./functions/translation
+	./functions/grammar
+	./functions/matching
+	./functions/practice
+	./functions/suggest
+	./functions/translate
+	./functions/users
 	./functions/utils
 	./packages/common
 	./packages/db
 	./packages/goauth
 	./packages/interfaces
-	./packages/suggestion
-	./packages/translation
+	./packages/suggest
+	./packages/translate
 	./packages/utils
-	./services/suggestions
+	./services/chat
+	./services/suggest
 )

@@ -6,6 +6,12 @@ Monorepo, a microservices backend project named Blinders for a language learning
 
 <img width="1081" alt="image" src="https://github.com/dev-zenonian/blinders/assets/104194494/91616345-53d9-4675-9a0a-d2e8b7646d0c">
 
+## Resources
+
+Prepare env file `.env.development`, please check from `.env.example` for more detail
+
+Prepare firebase admin credentials file, create file `firebase.admin.development.json`
+
 ## Go development setup
 
 Using [golangci-lint](https://golangci-lint.run/) to manage all linter, formatter and setup ci, detail configs in `golangci.yml`. You should config `golangci-lint` in your code editor to pass all the linters
