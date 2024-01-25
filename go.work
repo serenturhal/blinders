@@ -1,4 +1,4 @@
-go 1.22.0
+go 1.21.3
 
 use (
 	./cli
@@ -17,6 +17,7 @@ use (
 	./packages/goauth
 	./packages/interfaces
 	./packages/session
+	./packages/match
 	./packages/suggest
 	./packages/translate
 	./packages/utils
