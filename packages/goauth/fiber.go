@@ -18,6 +18,6 @@ func FiberAuthMiddleware(m Manager) fiber.Handler {
 
 		ctx.Locals(UserAuthKey, user)
 
-		return nil
+		return ctx.Next()
 	}
 }
