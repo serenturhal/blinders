@@ -22,7 +22,7 @@ use (
 	./packages/translate
 	./packages/utils
 	./services/chat
-	./services/rest
+	./services/match
 	./services/suggest
 	./tests
 )
