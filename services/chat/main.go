@@ -7,19 +7,19 @@ import (
 
 	"blinders/packages/auth"
 	"blinders/packages/utils"
-	chatcore "blinders/services/chat/core"
+	chatapi "blinders/services/chat/api"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
 )
 
-var service chatcore.Service
+var service chatapi.Service
 
 func init() {
 	app := fiber.New()
 	adminJSON, _ := utils.GetFile("firebase.admin.development.json")
 	auth, _ := auth.NewFirebaseManager(adminJSON)
-	service = chatcore.Service{App: app, Auth: auth}
+	service = chatapi.Service{App: app, Auth: auth}
 	service.InitRoute()
 	if err := godotenv.Load(".env.development"); err != nil {
 		log.Fatal("failed to load env", err)

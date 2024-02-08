@@ -1,4 +1,4 @@
-package chatcore
+package chatapi
 
 import (
 	"blinders/packages/auth"
