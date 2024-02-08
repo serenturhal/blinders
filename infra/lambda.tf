@@ -8,9 +8,9 @@ resource "aws_lambda_function" "blinders_dictionary" {
   source_code_hash = filebase64sha256("../functions/dictionary/lambda_bundle.zip")
 }
 
-resource "null_resource" "translation" {
+resource "null_resource" "translate" {
   provisioner "local-exec" {
-    command = "GOOS=linux GOARCH=amd64 CGO_ENABLED=0 GOFLAGS=-trimpath go build -mod=readonly -ldflags='-s -w' -o ../dist/ ../functions/translation/"
+    command = "GOOS=linux GOARCH=amd64 CGO_ENABLED=0 GOFLAGS=-trimpath go build -mod=readonly -ldflags='-s -w' -o ../dist/ ../functions/translate/"
   }
 
   triggers = {
@@ -18,22 +18,22 @@ resource "null_resource" "translation" {
   }
 }
 
-data "archive_file" "translation" {
-  depends_on = [null_resource.translation]
+data "archive_file" "translate" {
+  depends_on = [null_resource.translate]
 
   type        = "zip"
-  source_file = "../dist/translation"
-  output_path = "../dist/translation.zip"
+  source_file = "../dist/translate"
+  output_path = "../dist/translate.zip"
 }
 
-resource "aws_lambda_function" "blinders_translation" {
-  function_name = "Blinders_Translation_Lambda_Function"
+resource "aws_lambda_function" "blinders_translate" {
+  function_name = "Blinders_translate_Lambda_Function"
   role          = aws_iam_role.lambda_role.arn
-  handler       = "translation"
+  handler       = "translate"
   memory_size   = 128
 
-  filename         = "../dist/translation.zip"
-  source_code_hash = data.archive_file.translation.output_base64sha256
+  filename         = "../dist/translate.zip"
+  source_code_hash = data.archive_file.translate.output_base64sha256
 
   runtime = "go1.x"
 

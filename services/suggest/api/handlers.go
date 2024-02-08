@@ -1,4 +1,4 @@
-package suggestcore
+package suggestapi
 
 import (
 	"encoding/json"

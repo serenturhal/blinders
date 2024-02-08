@@ -8,14 +8,14 @@ import (
 	"blinders/packages/auth"
 	"blinders/packages/suggest"
 	"blinders/packages/utils"
-	suggestcore "blinders/services/suggestion/core"
+	suggestapi "blinders/services/suggest/api"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
 	"github.com/sashabaranov/go-openai"
 )
 
-var service suggestcore.Service
+var service suggestapi.Service
 
 func init() {
 	if err := godotenv.Load(".env.development"); err != nil {
@@ -32,7 +32,7 @@ func init() {
 		log.Fatal("failed to init openai client", err)
 	}
 
-	service = suggestcore.Service{App: app, Auth: auth, Suggester: suggester}
+	service = suggestapi.Service{App: app, Auth: auth, Suggester: suggester}
 	service.InitRoute()
 }
 

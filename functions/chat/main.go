@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 
-	chatcore "blinders/services/chat/core"
+	chatapi "blinders/services/chat/api"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -13,7 +13,7 @@ import (
 var fiberLambda *fiberadapter.FiberLambda
 
 func init() {
-	chatService := chatcore.Service{}
+	chatService := chatapi.Service{}
 	chatService.InitRoute()
 	fiberLambda = fiberadapter.New(chatService.App)
 }

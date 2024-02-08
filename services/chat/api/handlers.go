@@ -1,4 +1,4 @@
-package chatcore
+package chatapi
 
 import "github.com/gofiber/fiber/v2"
 
