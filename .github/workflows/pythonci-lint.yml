@@ -23,4 +23,4 @@ jobs:
         run: pip install poetry && poetry config virtualenvs.create false && poetry install --no-root
 
       - name: Linting
-        run: ./scrips/check_pylint.sh
+        run: ./scripts/check_pylint.sh
