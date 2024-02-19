@@ -13,6 +13,7 @@ type Matcher interface {
 	Match(ctx context.Context, fromID string, toID string) error
 	// Suggest returns list of users that maybe match with given user
 	Suggest(ctx context.Context, id string) ([]UserMatch, error)
+	// TODO: Temporarily expose this method. Users should be automatically added after a new user event is fired from the user service.
 	AddUser(ctx context.Context, user UserMatch) error
 }
 
