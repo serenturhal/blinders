@@ -8,7 +8,7 @@ resource "aws_lambda_function" "dictionary" {
   depends_on       = [aws_iam_role_policy_attachment.attach_iam_policy_to_iam_role]
 }
 
-resource "null_resource" "translate" {
+resource "null_resource" "go_build" {
   provisioner "local-exec" {
     command = "cd .. && sh ./scripts/build_golambda.sh"
   }
@@ -18,8 +18,9 @@ resource "null_resource" "translate" {
   }
 }
 
+# use archive_file instead of pre-zip file to control source code hash (consistent with plan and apply)
 data "archive_file" "translate" {
-  depends_on = [null_resource.translate]
+  depends_on = [null_resource.go_build]
 
   type        = "zip"
   source_file = "../dist/translate"
@@ -27,17 +28,55 @@ data "archive_file" "translate" {
 }
 
 resource "aws_lambda_function" "translate" {
-  function_name = "blinders_translate"
-  role          = aws_iam_role.lambda_role.arn
-  handler       = "translate"
-  memory_size   = 128
-
+  function_name    = "blinders_translate"
   filename         = "../dist/translate.zip"
+  handler          = "translate"
+  role             = aws_iam_role.lambda_role.arn
+  depends_on       = [aws_iam_role_policy_attachment.attach_iam_policy_to_iam_role]
+  memory_size      = 128
+  runtime          = "go1.x"
   source_code_hash = data.archive_file.translate.output_base64sha256
-
-  runtime = "go1.x"
 
   environment {
     variables = local.envs
   }
+}
+
+
+# use archive_file instead of pre-zip file to control source code hash (consistent with plan and apply)
+data "archive_file" "connect" {
+  depends_on = [null_resource.go_build]
+
+  type        = "zip"
+  source_file = "../dist/connect"
+  output_path = "../dist/connect.zip"
+}
+
+resource "aws_lambda_function" "ws_connect" {
+  function_name    = "blinders_ws_connect"
+  filename         = "../dist/connect.zip"
+  handler          = "connect"
+  role             = aws_iam_role.lambda_role.arn
+  depends_on       = [aws_iam_role_policy_attachment.attach_iam_policy_to_iam_role]
+  runtime          = "go1.x"
+  source_code_hash = data.archive_file.connect.output_base64sha256
+}
+
+# use archive_file instead of pre-zip file to control source code hash (consistent with plan and apply)
+data "archive_file" "disconnect" {
+  depends_on = [null_resource.go_build]
+
+  type        = "zip"
+  source_file = "../dist/disconnect"
+  output_path = "../dist/disconnect.zip"
+}
+
+resource "aws_lambda_function" "ws_disconnect" {
+  function_name    = "blinders_ws_disconnect"
+  filename         = "../dist/disconnect.zip"
+  handler          = "disconnect"
+  role             = aws_iam_role.lambda_role.arn
+  depends_on       = [aws_iam_role_policy_attachment.attach_iam_policy_to_iam_role]
+  runtime          = "go1.x"
+  source_code_hash = data.archive_file.disconnect.output_base64sha256
 }
