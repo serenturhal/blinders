@@ -3,7 +3,6 @@ package match
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -18,7 +17,7 @@ type Matcher interface {
 }
 
 type UserMatch struct {
-	UserID    string   `json:"user_id" bson:"user_id,omiempty"`
+	UserID    string   `json:"id" bson:"userID,omiempty"`
 	Name      string   `json:"name" bson:"name,omiempty"`
 	Gender    string   `json:"gender" bson:"gender,omiempty"`
 	Major     string   `json:"major" bson:"major,omiempty"`
@@ -58,8 +57,22 @@ func (m *MongoMatcher) Match(ctx context.Context, fromID, toID string) error {
 }
 
 func (m *MongoMatcher) Suggest(ctx context.Context, fromID string) ([]UserMatch, error) {
-	// TODO: Temporarily get all users
-	return m.Get(ctx, bson.M{"user_id": bson.M{"$ne": fromID}})
+	// TODO: Temporarily  get 5 random users
+	cur, err := m.UserCol.Aggregate(ctx, []bson.M{{"$match": bson.M{"userID": bson.M{"$ne": fromID}}}, {"$sample": bson.M{"size": 5}}})
+	if err != nil {
+		return nil, err
+	}
+	defer cur.Close(ctx)
+
+	res := []UserMatch{}
+	for cur.Next(ctx) {
+		user := new(UserMatch)
+		if err := cur.Decode(user); err != nil {
+			return nil, err
+		}
+		res = append(res, *user)
+	}
+	return res, nil
 }
 
 func (m *MongoMatcher) AddUserMatch(ctx context.Context, user UserMatch) error {
@@ -77,26 +90,6 @@ func (m *MongoMatcher) AddUserMatch(ctx context.Context, user UserMatch) error {
 	}
 
 	return nil
-}
-
-func (m *MongoMatcher) Get(ctx context.Context, filter bson.M) ([]UserMatch, error) {
-	ctx, cancel := context.WithTimeout(ctx, time.Second*5)
-	defer cancel()
-	cur, err := m.UserCol.Find(ctx, filter)
-	if err != nil {
-		return nil, err
-	}
-	defer cur.Close(ctx)
-
-	res := []UserMatch{}
-	for cur.Next(ctx) {
-		user := new(UserMatch)
-		if err := cur.Decode(user); err != nil {
-			return nil, err
-		}
-		res = append(res, *user)
-	}
-	return res, nil
 }
 
 type matchEntry struct {
