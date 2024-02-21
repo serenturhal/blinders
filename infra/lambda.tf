@@ -1,4 +1,4 @@
-resource "aws_lambda_function" "blinders_dictionary" {
+resource "aws_lambda_function" "dictionary" {
   runtime          = "python3.10"
   filename         = "../functions/dictionary/lambda_bundle.zip"
   function_name    = "Blinders_Dictionary_Lambda_Function"
@@ -13,9 +13,9 @@ resource "null_resource" "translate" {
     command = "GOOS=linux GOARCH=amd64 CGO_ENABLED=0 GOFLAGS=-trimpath go build -mod=readonly -ldflags='-s -w' -o ../dist/ ../functions/translate/"
   }
 
-  triggers = {
-    always_run = "${timestamp()}"
-  }
+  # triggers = {
+  #   always_run = "${timestamp()}"
+  # }
 }
 
 data "archive_file" "translate" {
@@ -26,7 +26,7 @@ data "archive_file" "translate" {
   output_path = "../dist/translate.zip"
 }
 
-resource "aws_lambda_function" "blinders_translate" {
+resource "aws_lambda_function" "translate" {
   function_name = "Blinders_translate_Lambda_Function"
   role          = aws_iam_role.lambda_role.arn
   handler       = "translate"
