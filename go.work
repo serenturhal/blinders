@@ -10,6 +10,7 @@ use (
 	./functions/translate
 	./functions/users
 	./functions/utils
+	./functions/websocket
 	./packages/common
 	./packages/db
 	./packages/goauth

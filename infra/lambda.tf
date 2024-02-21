@@ -1,7 +1,7 @@
 resource "aws_lambda_function" "dictionary" {
   runtime          = "python3.10"
   filename         = "../functions/dictionary/lambda_bundle.zip"
-  function_name    = "Blinders_Dictionary_Lambda_Function"
+  function_name    = "blinders_dictionary"
   handler          = "blinders.dictionary_aws_lambda_function.lambda_handler"
   role             = aws_iam_role.lambda_role.arn
   depends_on       = [aws_iam_role_policy_attachment.attach_iam_policy_to_iam_role]
@@ -10,12 +10,12 @@ resource "aws_lambda_function" "dictionary" {
 
 resource "null_resource" "translate" {
   provisioner "local-exec" {
-    command = "GOOS=linux GOARCH=amd64 CGO_ENABLED=0 GOFLAGS=-trimpath go build -mod=readonly -ldflags='-s -w' -o ../dist/ ../functions/translate/"
+    command = "cd .. && sh ./scripts/build_golambda.sh"
   }
 
-  # triggers = {
-  #   always_run = "${timestamp()}"
-  # }
+  triggers = {
+    always_run = "${timestamp()}"
+  }
 }
 
 data "archive_file" "translate" {
@@ -27,7 +27,7 @@ data "archive_file" "translate" {
 }
 
 resource "aws_lambda_function" "translate" {
-  function_name = "Blinders_translate_Lambda_Function"
+  function_name = "blinders_translate"
   role          = aws_iam_role.lambda_role.arn
   handler       = "translate"
   memory_size   = 128
