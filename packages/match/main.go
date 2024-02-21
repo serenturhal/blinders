@@ -13,12 +13,13 @@ type Matcher interface {
 	Match(ctx context.Context, fromID string, toID string) error
 	// Suggest returns list of users that maybe match with given user
 	Suggest(ctx context.Context, id string) ([]UserMatch, error)
-	// TODO: Temporarily expose this method. Users should be automatically added after a new user event is fired from the user service.
+	// TODO: Temporarily expose this method. User should be automatically added to match db after a new user event is fired from the user service.
 	AddUserMatch(ctx context.Context, user UserMatch) error
 }
 
 type UserMatch struct {
 	UserID    string   `json:"user_id" bson:"user_id,omiempty"`
+	Name      string   `json:"name" bson:"name,omiempty"`
 	Gender    string   `json:"gender" bson:"gender,omiempty"`
 	Major     string   `json:"major" bson:"major,omiempty"`
 	Native    string   `json:"native" bson:"native,omiempty"`
@@ -58,7 +59,7 @@ func (m *MongoMatcher) Match(ctx context.Context, fromID, toID string) error {
 
 func (m *MongoMatcher) Suggest(ctx context.Context, fromID string) ([]UserMatch, error) {
 	// TODO: Temporarily get all users
-	return m.Get(ctx, bson.M{"data.user_id": bson.M{"$ne": fromID}})
+	return m.Get(ctx, bson.M{"user_id": bson.M{"$ne": fromID}})
 }
 
 func (m *MongoMatcher) AddUserMatch(ctx context.Context, user UserMatch) error {
