@@ -14,21 +14,22 @@ type Matcher interface {
 	// Suggest returns list of users that maybe match with given user
 	Suggest(ctx context.Context, id string) ([]UserMatch, error)
 	// TODO: Temporarily expose this method. Users should be automatically added after a new user event is fired from the user service.
-	AddUser(ctx context.Context, user UserMatch) error
+	AddUserMatch(ctx context.Context, user UserMatch) error
 }
 
 type UserMatch struct {
-	UserID   string `json:"user_id" bson:"user_id"`
-	Name     string `json:"name" bson:"name"`
-	Gender   string `json:"gender" bson:"gender"`
-	Native   string `json:"native" bson:"native"`
-	Learning string `json:"learning" bson:"learning"`
-	Age      int    `json:"age" bson:"age"`
+	UserID    string   `json:"user_id" bson:"user_id,omiempty"`
+	Gender    string   `json:"gender" bson:"gender,omiempty"`
+	Major     string   `json:"major" bson:"major,omiempty"`
+	Native    string   `json:"native" bson:"native,omiempty"`
+	Learnings []string `json:"learnings" bson:"learning,omiempty"`
+	Interests []string `json:"interests" bson:"interests,omiempty"`
+	Age       int      `json:"age" bson:"age,omiempty"`
 }
 
 type UserStore struct {
-	UserMatch `bson:"data"`
 	Vector    []float32 `bson:"vector"`
+	UserMatch `bson:",inline,omiempty"`
 }
 
 type MongoMatcher struct {
@@ -60,7 +61,7 @@ func (m *MongoMatcher) Suggest(ctx context.Context, fromID string) ([]UserMatch,
 	return m.Get(ctx, bson.M{"data.user_id": bson.M{"$ne": fromID}})
 }
 
-func (m *MongoMatcher) AddUser(ctx context.Context, user UserMatch) error {
+func (m *MongoMatcher) AddUserMatch(ctx context.Context, user UserMatch) error {
 	embedding, err := m.Embedder.Embed(user)
 	if err != nil {
 		return err
@@ -88,11 +89,11 @@ func (m *MongoMatcher) Get(ctx context.Context, filter bson.M) ([]UserMatch, err
 
 	res := []UserMatch{}
 	for cur.Next(ctx) {
-		user := new(UserStore)
+		user := new(UserMatch)
 		if err := cur.Decode(user); err != nil {
 			return nil, err
 		}
-		res = append(res, user.UserMatch)
+		res = append(res, *user)
 	}
 	return res, nil
 }
