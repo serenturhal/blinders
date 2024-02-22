@@ -1,6 +1,7 @@
 go 1.21.3
 
 use (
+	./cli
 	./functions/chat
 	./functions/collecting
 	./functions/grammar

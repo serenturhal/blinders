@@ -6,3 +6,6 @@ dev-container:
 
 dev-container-down:
 	docker compose -f dev.docker-compose.yml down
+
+setup-cli:
+	go install ./cli/blinders.go

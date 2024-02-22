@@ -44,3 +44,21 @@ If not using `poetry`
 ```shell
 pip install -e .
 ```
+
+## CLI tools
+
+Install the CLI to go packages
+
+```
+make setup-cli
+```
+
+Need to setup `.env`, use `.env.production` and `.env.development`. See example in `env.example`
+
+### Usage
+
+Run help command for more details
+
+```
+blinders --help
+```
