@@ -1,5 +1,5 @@
 resource "aws_lambda_function" "dictionary" {
-  function_name    = "blinders_dictionary"
+  function_name    = "blinders-dictionary"
   filename         = "../functions/dictionary/lambda_bundle.zip"
   handler          = "blinders.dictionary_aws_lambda_function.lambda_handler"
   source_code_hash = filebase64sha256("../functions/dictionary/lambda_bundle.zip")
@@ -28,7 +28,7 @@ data "archive_file" "translate" {
 }
 
 resource "aws_lambda_function" "translate" {
-  function_name    = "blinders_translate"
+  function_name    = "blinders-translate"
   filename         = "../dist/translate.zip"
   handler          = "translate"
   role             = aws_iam_role.lambda_role.arn
@@ -53,9 +53,28 @@ data "archive_file" "connect" {
 }
 
 resource "aws_lambda_function" "ws_connect" {
-  function_name    = "blinders_ws_connect"
+  function_name    = "blinders-ws-connect"
   filename         = "../dist/connect.zip"
   handler          = "connect"
+  role             = aws_iam_role.lambda_role.arn
+  depends_on       = [aws_iam_role_policy_attachment.attach_iam_policy_to_iam_role]
+  runtime          = "go1.x"
+  source_code_hash = data.archive_file.connect.output_base64sha256
+}
+
+
+data "archive_file" "ws_authorizer" {
+  depends_on = [null_resource.go_build]
+
+  type        = "zip"
+  source_file = "../dist/authorizer"
+  output_path = "../dist/ws_authorizer.zip"
+}
+
+resource "aws_lambda_function" "ws_authorizer" {
+  function_name    = "blinders-ws-authorizer"
+  filename         = "../dist/ws_authorizer.zip"
+  handler          = "authorizer"
   role             = aws_iam_role.lambda_role.arn
   depends_on       = [aws_iam_role_policy_attachment.attach_iam_policy_to_iam_role]
   runtime          = "go1.x"
@@ -72,7 +91,7 @@ data "archive_file" "disconnect" {
 }
 
 resource "aws_lambda_function" "ws_disconnect" {
-  function_name    = "blinders_ws_disconnect"
+  function_name    = "blinders-ws-disconnect"
   filename         = "../dist/disconnect.zip"
   handler          = "disconnect"
   role             = aws_iam_role.lambda_role.arn

@@ -36,6 +36,14 @@ resource "aws_apigatewayv2_api_mapping" "websocket_api_v1" {
   api_mapping_key = "v1"
 }
 
+resource "aws_apigatewayv2_authorizer" "websocket_authorizer" {
+  name             = "blinders-websocket-authorizer"
+  api_id           = aws_apigatewayv2_api.websocket_api.id
+  authorizer_type  = "REQUEST"
+  authorizer_uri   = aws_lambda_function.ws_authorizer.invoke_arn
+  identity_sources = ["route.request.header.Authorization"]
+}
+
 output "http-api-endpoint" {
   value = "https://${aws_apigatewayv2_api_mapping.http_api_v1.domain_name}/${aws_apigatewayv2_api_mapping.http_api_v1.api_mapping_key}"
 }

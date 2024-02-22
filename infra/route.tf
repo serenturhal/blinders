@@ -56,9 +56,11 @@ resource "aws_apigatewayv2_integration" "ws_connect" {
 }
 
 resource "aws_apigatewayv2_route" "ws_connect" {
-  api_id    = aws_apigatewayv2_api.websocket_api.id
-  route_key = "$connect"
-  target    = "integrations/${aws_apigatewayv2_integration.ws_connect.id}"
+  api_id             = aws_apigatewayv2_api.websocket_api.id
+  route_key          = "$connect"
+  target             = "integrations/${aws_apigatewayv2_integration.ws_connect.id}"
+  authorization_type = "CUSTOM"
+  authorizer_id      = aws_apigatewayv2_authorizer.websocket_authorizer.id
 }
 
 
@@ -88,6 +90,17 @@ resource "aws_lambda_permission" "ws_disconnect" {
   statement_id  = "AllowExecutionFromAPIGateway"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.ws_disconnect.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_apigatewayv2_api.websocket_api.execution_arn}/*/*"
+}
+
+
+# authorizer
+# grant invoke lambda permission to api gateway (init trigger for lambda)
+resource "aws_lambda_permission" "ws_authorizer" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.ws_authorizer.function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_apigatewayv2_api.websocket_api.execution_arn}/*/*"
 }
