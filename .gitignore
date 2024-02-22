@@ -18,6 +18,8 @@
 **/*.tfstate
 **/*.tfstate.*
 
+*.pem
+
 .env
 .env.*
 !.env.example
