@@ -14,6 +14,7 @@ func setup() (*Manager, func()) {
 	})
 	manager := NewManager(redisClient)
 	return manager, func() {
+		_ = manager.RedisClient.Del(context.Background(), ConstructUserKey("1"))
 		redisClient.Close()
 	}
 }
@@ -24,4 +25,40 @@ func TestRedisConn(t *testing.T) {
 
 	err := manager.RedisClient.Ping(context.Background()).Err()
 	assert.Nil(t, err)
+}
+
+func TestAddSession(t *testing.T) {
+	manager, teardown := setup()
+	defer teardown()
+
+	err := manager.AddSession("1", "1")
+	assert.Nil(t, err)
+
+	value, err := manager.GetSessions("1")
+	assert.Nil(t, err)
+	assert.Contains(t, value, ConstructConnectionKey("1"))
+}
+
+func TestRemoveSession(t *testing.T) {
+	manager, teardown := setup()
+	defer teardown()
+
+	err := manager.RemoveSession("1", "1")
+	assert.Nil(t, err)
+	value, err := manager.GetSessions("1")
+	assert.Nil(t, err)
+	assert.NotContains(t, value, ConstructConnectionKey("1"))
+}
+
+func TestGetSessions(t *testing.T) {
+	manager, teardown := setup()
+	defer teardown()
+
+	_ = manager.AddSession("1", "1")
+	_ = manager.AddSession("1", "2")
+	value, err := manager.GetSessions("1")
+	assert.Nil(t, err)
+	assert.Len(t, value, 2)
+	assert.Contains(t, value, ConstructConnectionKey("1"))
+	assert.Contains(t, value, ConstructConnectionKey("2"))
 }

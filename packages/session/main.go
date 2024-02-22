@@ -21,10 +21,16 @@ func NewManager(redisClient *redis.Client) *Manager {
 func (m *Manager) AddSession(userID string, connectionID string) error {
 	key := ConstructUserKey(userID)
 	value := ConstructConnectionKey(connectionID)
-	return m.RedisClient.Set(context.Background(), key, value, 0).Err()
+	return m.RedisClient.SAdd(context.Background(), key, value).Err()
 }
 
-func (m *Manager) GetSession(userID string) (string, error) {
+func (m *Manager) RemoveSession(userID string, connectionID string) error {
 	key := ConstructUserKey(userID)
-	return m.RedisClient.Get(context.Background(), key).Result()
+	value := ConstructConnectionKey(connectionID)
+	return m.RedisClient.SRem(context.Background(), key, value).Err()
+}
+
+func (m *Manager) GetSessions(userID string) ([]string, error) {
+	key := ConstructUserKey(userID)
+	return m.RedisClient.SMembers(context.Background(), key).Result()
 }
