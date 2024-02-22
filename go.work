@@ -15,6 +15,7 @@ use (
 	./packages/db
 	./packages/goauth
 	./packages/interfaces
+	./packages/session
 	./packages/suggest
 	./packages/translate
 	./packages/utils

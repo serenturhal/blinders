@@ -1,2 +1,8 @@
 golint:
 	go list -f '{{.Dir}}/...' -m | xargs -n 1 sh -c 'golangci-lint run $$0 || exit -1'
+
+dev-container:
+	docker compose -f dev.docker-compose.yml up -d
+
+dev-container-down:
+	docker compose -f dev.docker-compose.yml down
