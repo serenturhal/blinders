@@ -22,7 +22,7 @@
 .env.*
 !.env.example
 
-firebase.admin.*.json
+firebase.admin*.json
 
 node_modules
 .yarn

@@ -67,18 +67,19 @@ data "archive_file" "ws_authorizer" {
   depends_on = [null_resource.go_build]
 
   type        = "zip"
-  source_file = "../dist/authorizer"
+  source_dir  = "../dist/authorizer"
   output_path = "../dist/ws_authorizer.zip"
 }
 
+# unzip ws_authorizer -> handler, firebase.admin.json -> TODO: protect firebase.admin.json
 resource "aws_lambda_function" "ws_authorizer" {
   function_name    = "blinders-ws-authorizer"
   filename         = "../dist/ws_authorizer.zip"
-  handler          = "authorizer"
+  handler          = "handler"
   role             = aws_iam_role.lambda_role.arn
   depends_on       = [aws_iam_role_policy_attachment.attach_iam_policy_to_iam_role]
   runtime          = "go1.x"
-  source_code_hash = data.archive_file.connect.output_base64sha256
+  source_code_hash = data.archive_file.ws_authorizer.output_base64sha256
 }
 
 # use archive_file instead of pre-zip file to control source code hash (consistent with plan and apply)
