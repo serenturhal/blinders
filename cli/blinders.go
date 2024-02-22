@@ -5,6 +5,8 @@ import (
 	"log"
 	"os"
 
+	"blinders/cli/commands"
+
 	"github.com/joho/godotenv"
 	"github.com/urfave/cli/v2"
 )
@@ -20,14 +22,15 @@ func main() {
 				Usage: "Define environment for the CLI",
 			},
 		},
-		Commands: []*cli.Command{},
+		Commands: []*cli.Command{&commands.AuthCommand},
 		Before: func(ctx *cli.Context) error {
+			fmt.Println("running on", ctx.String("env"))
+
 			envFile := fmt.Sprintf(".env.%s", ctx.String("env"))
 			if godotenv.Load(envFile) != nil {
 				log.Fatal("Error loading .env file", envFile)
 			}
 
-			fmt.Println("[cli] running at", os.Getenv("ENVIRONMENT"))
 			return nil
 		},
 	}

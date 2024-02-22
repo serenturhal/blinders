@@ -26,3 +26,5 @@ firebase.admin.*.json
 
 node_modules
 .yarn
+
+auth.*.json
