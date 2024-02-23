@@ -11,8 +11,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// username:password@host:port
-const MongoURLTemplate = "mongodb://%s:%s@%s/%s"
+// username:password@host:port/database
+const MongoURLTemplate = "mongodb://%s:%s@%s:%s/%s"
 
 const (
 	UserCollection         = "users"
@@ -32,7 +32,8 @@ func NewMongoManager(url string, name string) *MongoManager {
 
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(url))
 	if err != nil {
-		log.Fatal("cannot connect to mongo")
+		log.Println("cannot connect to mongo", err)
+		return nil
 	}
 
 	return &MongoManager{

@@ -26,7 +26,7 @@ func NewUsers(col *mongo.Collection) *Users {
 		Options: options.Index().SetUnique(true),
 	})
 	if err != nil {
-		log.Println("can not create index for firebaseUID", err)
+		log.Println("can not create index for firebaseUID:", err)
 		return nil
 	}
 

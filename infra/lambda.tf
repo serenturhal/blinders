@@ -84,6 +84,10 @@ resource "aws_lambda_function" "ws_authorizer" {
   depends_on       = [aws_iam_role_policy_attachment.attach_iam_policy_to_iam_role]
   runtime          = "go1.x"
   source_code_hash = data.archive_file.ws_authorizer.output_base64sha256
+
+  environment {
+    variables = local.envs
+  }
 }
 
 # use archive_file instead of pre-zip file to control source code hash (consistent with plan and apply)

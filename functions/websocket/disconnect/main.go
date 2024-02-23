@@ -2,12 +2,10 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"log"
 	"os"
 
-	"blinders/packages/auth"
 	"blinders/packages/session"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -31,15 +29,13 @@ func HandleRequest(
 	request events.APIGatewayWebsocketProxyRequest,
 ) (events.APIGatewayProxyResponse, error) {
 	connectionID := request.RequestContext.ConnectionID
-	userStr := request.RequestContext.Authorizer.(map[string]interface{})["user"].(string)
+	userID := request.RequestContext.Authorizer.(map[string]interface{})["principalId"].(string)
 
-	var user auth.UserAuth
-	err := json.Unmarshal([]byte(userStr), &user)
-	if err != nil {
+	if userID == "" {
 		return events.APIGatewayProxyResponse{StatusCode: 404, Body: "user not found"}, nil
 	}
 
-	err = sessionManager.RemoveSession(user.AuthID, connectionID)
+	err := sessionManager.RemoveSession(userID, connectionID)
 	if err != nil {
 		log.Println(err)
 		return events.APIGatewayProxyResponse{StatusCode: 500, Body: "failed to remove session"}, nil
