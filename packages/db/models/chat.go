@@ -3,12 +3,12 @@ package models
 import "go.mongodb.org/mongo-driver/bson/primitive"
 
 type Conversation struct {
-	ID        primitive.ObjectID `bson:"_id" json:"Id"`
-	Members   []Member
-	Messages  []Message
-	CreatedAt primitive.DateTime
-	UpdatedAt primitive.DateTime
-	Metadata  ConversationMetadata
+	ID        primitive.ObjectID   `bson:"_id"       json:"Id"`
+	Members   []Member             `bson:"members"   json:"members"`
+	Messages  []Message            `bson:"messages"  json:"messages"`
+	CreatedAt primitive.DateTime   `bson:"createdAt" json:"createdAt"`
+	UpdatedAt primitive.DateTime   `bson:"updatedAt" json:"updatedAt"`
+	Metadata  ConversationMetadata `bson:"metadata"  json:"metadata"`
 }
 
 type ConversationMetadata struct {
@@ -17,28 +17,28 @@ type ConversationMetadata struct {
 }
 
 type Member struct {
-	ID                    primitive.ObjectID `bson:"_id" json:"Id"`
-	UserID                primitive.ObjectID
-	Nickname              string
-	LatestViewedMessageID primitive.ObjectID
-	CreatedAt             primitive.DateTime
-	UpdatedAt             primitive.DateTime
-	JoinedAt              primitive.DateTime
+	ID                    primitive.ObjectID `bson:"_id"                   json:"Id"`
+	UserID                primitive.ObjectID `bson:"userId"                json:"userId"`
+	Nickname              string             `bson:"nickname"              json:"nickname"`
+	LatestViewedMessageID primitive.ObjectID `bson:"latestViewedMessageId" json:"latestViewedMessageId"`
+	CreatedAt             primitive.DateTime `bson:"createdAt"             json:"createdAt"`
+	UpdatedAt             primitive.DateTime `bson:"updatedAt"             json:"updatedAt"`
+	JoinedAt              primitive.DateTime `bson:"joinedAt"              json:"joinedAt"`
 }
 
 type Message struct {
-	ID        primitive.ObjectID `bson:"_id" json:"Id"`
-	SenderID  primitive.ObjectID
-	Content   string
-	Status    string
-	CreatedAt primitive.DateTime
-	UpdatedAt primitive.DateTime
-	Emotions  []MessageEmotion
+	ID        primitive.ObjectID `bson:"_id"       json:"Id"`
+	SenderID  primitive.ObjectID `bson:"senderId"  json:"senderId"`
+	Content   string             `bson:"content"   json:"content"`
+	Status    string             `bson:"status"    json:"status"`
+	CreatedAt primitive.DateTime `bson:"createdAt" json:"createdAt"`
+	UpdatedAt primitive.DateTime `bson:"updatedAt" json:"updatedAt"`
+	Emotions  []MessageEmotion   `bson:"emotions"  json:"emotions"`
 }
 
 type MessageEmotion struct {
-	SenderID  primitive.ObjectID
-	Content   string
-	CreatedAt primitive.DateTime
-	UpdatedAt primitive.DateTime
+	SenderID  primitive.ObjectID `bson:"senderId"  json:"senderId"`
+	Content   string             `bson:"content"   json:"content"`
+	CreatedAt primitive.DateTime `bson:"createdAt" json:"createdAt"`
+	UpdatedAt primitive.DateTime `bson:"updatedAt" json:"updatedAt"`
 }
