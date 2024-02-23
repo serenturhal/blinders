@@ -50,3 +50,13 @@ func TestGetUserByID(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, user, queriedUser)
 }
+
+func TestGetUserByIDNotFound(t *testing.T) {
+	_, err := manager.Users.GetUserByID(primitive.NewObjectID())
+	assert.NotNil(t, err)
+}
+
+func TestGetUserByFirebaseUIDNotFound(t *testing.T) {
+	_, err := manager.Users.GetUserByFirebaseUID(primitive.NewObjectID().String())
+	assert.NotNil(t, err)
+}
