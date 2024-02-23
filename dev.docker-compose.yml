@@ -5,9 +5,19 @@ services:
     image: redis:latest
     restart: always
     ports:
-      - "6379:6379"
+      - 6379:6379
     volumes:
       - ./volumes/redis:/root/redis
       - ./volumes/redis/redis.conf:/usr/local/etc/redis/redis.conf
     environment:
       - REDIS_PORT=6379
+
+  mongodb:
+    image: mongo:latest
+    restart: always
+    ports:
+      - 27017:27017
+    volumes:
+      - ./volumes/mongo-entrypoint:/docker-entrypoint-initdb.d
+      - ./volumes/mongodb:/data/db
+      - ./volumes/mongoconfig:/data/configdb
