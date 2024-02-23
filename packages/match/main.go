@@ -16,22 +16,6 @@ type Matcher interface {
 	AddUserMatch(ctx context.Context, user UserMatch) error
 }
 
-type UserMatch struct {
-	UserID    string   `json:"id" bson:"userID,omiempty"`
-	Name      string   `json:"name" bson:"name,omiempty"`
-	Gender    string   `json:"gender" bson:"gender,omiempty"`
-	Major     string   `json:"major" bson:"major,omiempty"`
-	Native    string   `json:"native" bson:"native,omiempty"`
-	Learnings []string `json:"learnings" bson:"learning,omiempty"`
-	Interests []string `json:"interests" bson:"interests,omiempty"`
-	Age       int      `json:"age" bson:"age,omiempty"`
-}
-
-type UserStore struct {
-	Vector    []float32 `bson:"vector"`
-	UserMatch `bson:",inline,omiempty"`
-}
-
 type MongoMatcher struct {
 	UserCol  *mongo.Collection
 	MatchCol *mongo.Collection

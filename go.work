@@ -5,7 +5,6 @@ use (
 	./functions/chat
 	./functions/collecting
 	./functions/grammar
-	./functions/match
 	./functions/practice
 	./functions/suggest
 	./functions/translate

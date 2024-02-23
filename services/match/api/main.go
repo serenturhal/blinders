@@ -1,4 +1,4 @@
-package core
+package matchapi
 
 import (
 	"blinders/packages/auth"
@@ -17,6 +17,9 @@ func (s Service) InitRoute() {
 	s.App.Get("/ping", func(c *fiber.Ctx) error {
 		return c.SendString("service healthy")
 	})
-	matchRoute := s.App.Group("/match", auth.FiberAuthMiddleware(s.Auth))
-	matchRoute.Get("/match")
+
+	matchRoute := s.App.Group("/match")
+	matchRoute.Get("/suggest", s.HandleGetMatch)
+	matchRoute.Post("/", s.HandleMatch)
+	matchRoute.Post("/add", s.HandleAddMatchUser)
 }
