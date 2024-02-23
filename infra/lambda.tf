@@ -60,6 +60,10 @@ resource "aws_lambda_function" "ws_connect" {
   depends_on       = [aws_iam_role_policy_attachment.attach_iam_policy_to_iam_role]
   runtime          = "go1.x"
   source_code_hash = data.archive_file.connect.output_base64sha256
+
+  environment {
+    variables = local.envs
+  }
 }
 
 
@@ -99,4 +103,9 @@ resource "aws_lambda_function" "ws_disconnect" {
   depends_on       = [aws_iam_role_policy_attachment.attach_iam_policy_to_iam_role]
   runtime          = "go1.x"
   source_code_hash = data.archive_file.disconnect.output_base64sha256
+
+
+  environment {
+    variables = local.envs
+  }
 }
