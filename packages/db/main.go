@@ -1,35 +1,44 @@
 package db
 
 import (
-	"fmt"
-	"strings"
+	"context"
+	"log"
+	"time"
 
-	"blinders/packages/common"
+	"blinders/packages/db/repo"
+
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-type UserData struct {
-	UserID   string          `json:"userID"`
-	Native   common.Language `json:"nativeLanguage"`
-	Learning common.Language `json:"learningLanguage"`
+// username:password@host:port
+const MongoURLTemplate = "mongodb://%s:%s@%s/%s"
+
+const (
+	UserCollection         = "users"
+	ConversationCollection = "conversations"
+)
+
+type MongoManager struct {
+	Client        *mongo.Client
+	Database      string
+	Users         *repo.Users
+	Conversations *repo.Conversations
 }
 
-func (d UserData) String() string {
-	str := strings.Builder{}
-	str.WriteString(fmt.Sprintf("Native language: %s\n", d.Native))
-	str.WriteString(fmt.Sprintf("Learning language: %s\n", d.Native))
-	return str.String()
-}
+func NewMongoManager(url string, name string) *MongoManager {
+	ctx, cal := context.WithTimeout(context.Background(), time.Second*10)
+	defer cal()
 
-func GetUserData(userID string) (UserData, error) {
-	return UserData{
-		UserID: userID,
-		Native: common.Language{
-			Lang:  common.LangVi,
-			Level: common.Intermediate,
-		},
-		Learning: common.Language{
-			Lang:  common.LangEn,
-			Level: common.Beginner,
-		},
-	}, nil
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(url))
+	if err != nil {
+		log.Fatal("cannot connect to mongo")
+	}
+
+	return &MongoManager{
+		Client:        client,
+		Database:      name,
+		Users:         repo.NewUsers(client.Database(name).Collection(UserCollection)),
+		Conversations: repo.NewConversations(client.Database(name).Collection(ConversationCollection)),
+	}
 }
