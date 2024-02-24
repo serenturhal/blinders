@@ -1,5 +1,10 @@
 package match
 
+import (
+	"bytes"
+	"encoding/binary"
+)
+
 type UserMatch struct {
 	UserID    string   `json:"id" bson:"userID,omiempty"`
 	Name      string   `json:"name" bson:"name,omiempty"`
@@ -12,7 +17,19 @@ type UserMatch struct {
 	Age       int      `json:"age" bson:"age,omiempty"`
 }
 
-type UserStore struct {
-	Vector    []float32 `bson:"vector"`
-	UserMatch `bson:",inline,omiempty"`
+type (
+	EmbeddingVector [128]float32
+	UserStore       struct {
+		UserMatch `bson:",inline,omiempty"`
+		Vector    EmbeddingVector `bson:"vector"`
+	}
+)
+
+func (v EmbeddingVector) MarshalBinary() ([]byte, error) {
+	buf := new(bytes.Buffer)
+	err := binary.Write(buf, binary.LittleEndian, v)
+	if err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
 }

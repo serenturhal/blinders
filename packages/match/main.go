@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/redis/go-redis/v9"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -17,9 +18,24 @@ type Matcher interface {
 }
 
 type MongoMatcher struct {
-	UserCol  *mongo.Collection
-	MatchCol *mongo.Collection
-	Embedder Embedder
+	UserCol     *mongo.Collection
+	MatchCol    *mongo.Collection
+	Embedder    Embedder
+	RedisClient *redis.Client
+}
+
+func (m *MongoMatcher) InitIndex(ctx context.Context) {
+	err := m.RedisClient.Do(
+		ctx,
+		"FT.CREATE",
+		"my_idx",
+		"ON", "HASH",
+		"PREFIX", "1", "match:",
+		"SCHEMA", "embed",
+		"VECTOR", "HNSW", "6", "TYPE", "FLOAT32", "DIM", "128", "DISTANCE_METRIC", "L2",
+	).Err()
+
+	fmt.Println(err)
 }
 
 func (m *MongoMatcher) Match(ctx context.Context, fromID, toID string) error {
@@ -42,16 +58,27 @@ func (m *MongoMatcher) Match(ctx context.Context, fromID, toID string) error {
 
 func (m *MongoMatcher) Suggest(ctx context.Context, fromID string) ([]UserMatch, error) {
 	// TODO: Temporarily  get 5 random users
-	cur, err := m.UserCol.Aggregate(ctx, []bson.M{{"$match": bson.M{"userID": bson.M{"$ne": fromID}}}, {"$sample": bson.M{"size": 5}}})
+	user, err := m._getUserMatchWithID(ctx, fromID)
 	if err != nil {
 		return nil, err
 	}
-	defer cur.Close(ctx)
+	embed, err := m.Embedder.Embed(*user)
+	if err != nil {
+		return nil, err
+	}
+
+	slice := m.RedisClient.Do(ctx,
+		"FT.SEARCH",
+		"my_idx",
+		"(*)=>[KNN 6 @embed $vec]", "PARAMS", "2", "vec", embed, "DIALECT", "2",
+		"RETURN", "1", "id",
+	).Val().(map[any]any)
 
 	res := []UserMatch{}
-	for cur.Next(ctx) {
-		user := new(UserMatch)
-		if err := cur.Decode(user); err != nil {
+	for _, doc := range slice["results"].([]any) {
+		userID := doc.(map[any]any)["extra_attributes"].(map[any]any)["id"].(string)
+		user, err := m._getUserMatchWithID(ctx, userID)
+		if err != nil {
 			return nil, err
 		}
 		res = append(res, *user)
@@ -69,6 +96,10 @@ func (m *MongoMatcher) AddUserMatch(ctx context.Context, user UserMatch) error {
 		UserMatch: user,
 		Vector:    embedding,
 	}
+	if err := m.RedisClient.HSet(ctx, fmt.Sprintf("match:%v", user.UserID), "embed", embedding, "id", user.UserID).Err(); err != nil {
+		return err
+	}
+
 	if _, err := m.UserCol.InsertOne(ctx, userStore); err != nil {
 		return err
 	}
@@ -114,4 +145,18 @@ func (m *MongoMatcher) _addMatchEntry(ctx context.Context, fromID string, toID s
 func (m *MongoMatcher) _fulfillMatchRequest(_ context.Context, fromID string, toID string) error {
 	fmt.Println("matched" + fromID + toID)
 	return nil
+}
+
+func (m *MongoMatcher) _getUserMatchWithID(ctx context.Context, userID string) (*UserMatch, error) {
+	filter := bson.M{"userID": userID}
+	cur := m.UserCol.FindOne(ctx, filter)
+	if err := cur.Err(); err != nil {
+		return nil, err
+	}
+
+	user := new(UserMatch)
+	if err := cur.Decode(user); err != nil {
+		return nil, err
+	}
+	return user, nil
 }

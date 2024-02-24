@@ -12,6 +12,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
+	"github.com/redis/go-redis/v9"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
@@ -53,14 +54,28 @@ func init() {
 	matchCol := db.Collection("match")
 
 	auth, _ := auth.NewFirebaseManager(adminJSON)
+
+	redisClient := redis.NewClient(&redis.Options{
+		Addr:     "localhost:6379",
+		Password: "", // no password set
+		DB:       0,  // use default DB
+	})
+
+	if err := redisClient.Ping(ctx).Err(); err != nil {
+		panic(err)
+	}
+
+	core := &match.MongoMatcher{
+		UserCol:     userCol,
+		MatchCol:    matchCol,
+		Embedder:    match.MockEmbedder{},
+		RedisClient: redisClient,
+	}
+
 	service = matchapi.Service{
 		Auth: auth,
 		App:  app,
-		Core: &match.MongoMatcher{
-			UserCol:  userCol,
-			MatchCol: matchCol,
-			Embedder: match.MockEmbedder{},
-		},
+		Core: core,
 	}
 	service.InitRoute()
 }

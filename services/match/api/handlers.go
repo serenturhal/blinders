@@ -3,7 +3,6 @@ package matchapi
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"time"
 
 	"blinders/packages/auth"
@@ -27,7 +26,6 @@ func (s *Service) HandleGetMatch(ctx *fiber.Ctx) error {
 		return ctx.Status(fiber.StatusInternalServerError).
 			JSON(fiber.Map{"error": err})
 	}
-	fmt.Println("matchs", matchs)
 
 	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{"matchs": matchs})
 }
@@ -62,14 +60,14 @@ func (s *Service) HandleMatch(ctx *fiber.Ctx) error {
 }
 
 func (s *Service) HandleAddMatchUser(ctx *fiber.Ctx) error {
+	ctxWithTimeout, cancel := context.WithTimeout(ctx.Context(), time.Second*5)
+	defer cancel()
 	user := new(match.UserMatch)
 	if err := json.Unmarshal(ctx.Body(), user); err != nil {
 		return err
 	}
-	fmt.Println(user)
-	ctxx, cancel := context.WithTimeout(ctx.Context(), time.Second*5)
-	defer cancel()
-	if err := s.Core.AddUserMatch(ctxx, *user); err != nil {
+
+	if err := s.Core.AddUserMatch(ctxWithTimeout, *user); err != nil {
 		return err
 	}
 	return nil
