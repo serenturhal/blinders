@@ -65,7 +65,7 @@ func HandleRequest(
 				Body:       "invalid send message event",
 			}, nil
 		}
-		_, _, _ = wschat.HandleSendMessage(userID, connectionID, *payload)
+		_, _ = wschat.HandleSendMessage(userID, connectionID, *payload)
 	default:
 		return events.APIGatewayProxyResponse{StatusCode: http.StatusBadRequest}, nil
 	}

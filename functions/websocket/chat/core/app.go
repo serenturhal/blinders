@@ -5,7 +5,7 @@ import (
 	"blinders/packages/session"
 )
 
-var app App
+var app *App
 
 type App struct {
 	Session *session.Manager
@@ -13,11 +13,11 @@ type App struct {
 }
 
 // init app construct an app instance for internal use
-func InitApp(sessionManager *session.Manager, database *db.MongoManager) *App {
-	app = App{
-		Session: sessionManager,
-		DB:      database,
+func InitApp(sm *session.Manager, dbm *db.MongoManager) *App {
+	app = &App{
+		Session: sm,
+		DB:      dbm,
 	}
 
-	return &app
+	return app
 }

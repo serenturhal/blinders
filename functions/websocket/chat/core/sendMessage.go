@@ -15,30 +15,33 @@ func HandleSendMessage(
 	rawUserID string, // for all case, userID must be valid and user existed
 	connectionID string,
 	payload UserSendMessagePayload,
-) (<-chan *DistributeEvent, <-chan error, error) {
+) (<-chan *DistributeEvent, error) {
 	dCh := make(chan *DistributeEvent)
-	errCh := make(chan error)
 	wg := sync.WaitGroup{}
 
 	userID, _ := primitive.ObjectIDFromHex(rawUserID)
 	conversationID, err := primitive.ObjectIDFromHex(payload.ConversationID)
 	if err != nil {
-		return dCh, errCh, fmt.Errorf("invalid conversationId: %s", payload.ConversationID)
+		return dCh, fmt.Errorf("invalid conversationId: %s", payload.ConversationID)
 	}
-	replyTo, err := primitive.ObjectIDFromHex(payload.ReplyTo)
-	if err != nil {
-		return dCh, errCh, fmt.Errorf("invalid replyTo: %s", payload.ReplyTo)
+
+	var replyTo primitive.ObjectID
+	if payload.ReplyTo != "" {
+		replyTo, err = primitive.ObjectIDFromHex(payload.ReplyTo)
+		if err != nil {
+			return dCh, fmt.Errorf("invalid replyTo: %s", payload.ReplyTo)
+		}
 	}
 
 	conversation, err := queryConversationOfUser(conversationID, userID)
 	if err != nil {
-		return dCh, errCh, fmt.Errorf("failed to query conversation: %v", err)
+		return dCh, fmt.Errorf("failed to query conversation: %v", err)
 	}
 
 	if !replyTo.IsZero() {
 		err := checkValidReplyTo(replyTo, conversationID)
 		if err != nil {
-			return dCh, errCh, fmt.Errorf("cannot reply to message %s", payload.ReplyTo)
+			return dCh, fmt.Errorf("cannot reply to message %s", payload.ReplyTo)
 		}
 	}
 
@@ -63,9 +66,10 @@ func HandleSendMessage(
 
 	wg.Add(1)
 	go func() {
+		// do we need to wait for inserting success to distribute message to users?
 		_, err := app.DB.Messages.InsertNewMessage(message)
 		if err != nil {
-			errCh <- fmt.Errorf("[important] failed to insert message %v", err)
+			log.Fatalln("[dangerous] failed to insert message", err)
 		}
 		wg.Done()
 	}()
@@ -75,7 +79,7 @@ func HandleSendMessage(
 		dCh <- nil
 	}()
 
-	return dCh, errCh, nil
+	return dCh, nil
 }
 
 // query conversation by id
