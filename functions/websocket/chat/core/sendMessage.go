@@ -54,7 +54,7 @@ func HandleSendMessage(
 
 	wg.Add(1)
 	go func() {
-		distributeAckMessage(message, connectionID, dCh)
+		distributeAckMessage(message, connectionID, payload.ResolveID, dCh)
 		wg.Done()
 	}()
 
@@ -116,13 +116,14 @@ func checkValidReplyTo(replyTo primitive.ObjectID, conversationID primitive.Obje
 func distributeAckMessage(
 	message models.Message,
 	connectionID string,
+	resolveID string,
 	dCh chan *DistributeEvent,
 ) {
 	dCh <- &DistributeEvent{
 		ConnectionID: connectionID,
 		Payload: ServerAckSendMessagePayload{
 			ChatEvent: ChatEvent{Type: ServerAckSendMessage},
-			ResolveID: message.ID.Hex(),
+			ResolveID: resolveID,
 			Message:   message,
 		},
 	}
@@ -142,7 +143,7 @@ func distributeMessageToRecipients(
 		// TODO: use go 1.22 to resolve loop with goroutine
 		go func(m models.Member) {
 			sessions, err := app.Session.GetSessions(m.UserID.Hex())
-			if err == nil {
+			if err != nil {
 				log.Println("failed to query sessions for user", m.UserID.Hex())
 				wg.Done()
 				return
