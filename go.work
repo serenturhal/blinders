@@ -22,4 +22,5 @@ use (
 	./packages/utils
 	./services/chat
 	./services/suggest
+	./tests
 )
