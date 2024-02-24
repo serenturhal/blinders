@@ -14,6 +14,8 @@ Prepare firebase admin credentials file, create file `firebase.admin.development
 
 ## Go development setup
 
+Require Go version >= 1.21
+
 Using [golangci-lint](https://golangci-lint.run/) to manage all linter, formatter and setup ci, detail configs in `golangci.yml`. You should config `golangci-lint` in your code editor to pass all the linters
 
 ## Python development setup
