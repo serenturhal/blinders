@@ -16,7 +16,7 @@ func TestInsertUser(t *testing.T) {
 	user := models.User{
 		FirebaseUID: primitive.NewObjectID().String(),
 	}
-	newUser, err := manager.Users.InsertNewUser(user)
+	newUser, err := manager.Users.InsertNewRawUser(user)
 	assert.Nil(t, err)
 	assert.NotEqual(t, newUser.ID, primitive.ObjectID{})
 	assert.Equal(t, user.ID, primitive.ObjectID{})
@@ -26,8 +26,8 @@ func TestInsertUserFailedWithDuplicatedFirebaseUID(t *testing.T) {
 	user := models.User{
 		FirebaseUID: primitive.NewObjectID().String(),
 	}
-	_, _ = manager.Users.InsertNewUser(user)
-	_, err := manager.Users.InsertNewUser(user)
+	_, _ = manager.Users.InsertNewRawUser(user)
+	_, err := manager.Users.InsertNewRawUser(user)
 	assert.NotNil(t, err)
 }
 
@@ -35,7 +35,7 @@ func TestGetUserByFirebaseUID(t *testing.T) {
 	user := models.User{
 		FirebaseUID: primitive.NewObjectID().String(),
 	}
-	user, _ = manager.Users.InsertNewUser(user)
+	user, _ = manager.Users.InsertNewRawUser(user)
 	queriedUser, err := manager.Users.GetUserByFirebaseUID(user.FirebaseUID)
 	assert.Nil(t, err)
 	assert.Equal(t, user, queriedUser)
@@ -45,7 +45,7 @@ func TestGetUserByID(t *testing.T) {
 	user := models.User{
 		FirebaseUID: primitive.NewObjectID().String(),
 	}
-	user, _ = manager.Users.InsertNewUser(user)
+	user, _ = manager.Users.InsertNewRawUser(user)
 	queriedUser, err := manager.Users.GetUserByID(user.ID)
 	assert.Nil(t, err)
 	assert.Equal(t, user, queriedUser)

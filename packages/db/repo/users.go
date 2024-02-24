@@ -13,12 +13,12 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-type Users struct {
+type UsersRepo struct {
 	Col *mongo.Collection
 }
 
-func NewUsers(col *mongo.Collection) *Users {
-	ctx, cal := context.WithTimeout(context.Background(), time.Second*5)
+func NewUsersRepo(col *mongo.Collection) *UsersRepo {
+	ctx, cal := context.WithTimeout(context.Background(), time.Second)
 	defer cal()
 
 	_, err := col.Indexes().CreateOne(ctx, mongo.IndexModel{
@@ -30,27 +30,28 @@ func NewUsers(col *mongo.Collection) *Users {
 		return nil
 	}
 
-	return &Users{
+	return &UsersRepo{
 		Col: col,
 	}
 }
 
-func (r *Users) InsertNewUser(user models.User) (models.User, error) {
-	ctx, cal := context.WithTimeout(context.Background(), time.Second*5)
+// this function creates new ID and time and insert the document to database
+func (r *UsersRepo) InsertNewRawUser(u models.User) (models.User, error) {
+	ctx, cal := context.WithTimeout(context.Background(), time.Second)
 	defer cal()
 
-	user.ID = primitive.NewObjectID()
+	u.ID = primitive.NewObjectID()
 	now := primitive.NewDateTimeFromTime(time.Now())
-	user.CreatedAt = now
-	user.UpdatedAt = now
+	u.CreatedAt = now
+	u.UpdatedAt = now
 
-	_, err := r.Col.InsertOne(ctx, user)
+	_, err := r.Col.InsertOne(ctx, u)
 
-	return user, err
+	return u, err
 }
 
-func (r *Users) GetUserByID(id primitive.ObjectID) (models.User, error) {
-	ctx, cal := context.WithTimeout(context.Background(), time.Second*5)
+func (r *UsersRepo) GetUserByID(id primitive.ObjectID) (models.User, error) {
+	ctx, cal := context.WithTimeout(context.Background(), time.Second)
 	defer cal()
 
 	var user models.User
@@ -59,8 +60,8 @@ func (r *Users) GetUserByID(id primitive.ObjectID) (models.User, error) {
 	return user, err
 }
 
-func (r *Users) GetUserByFirebaseUID(uid string) (models.User, error) {
-	ctx, cal := context.WithTimeout(context.Background(), time.Second*5)
+func (r *UsersRepo) GetUserByFirebaseUID(uid string) (models.User, error) {
+	ctx, cal := context.WithTimeout(context.Background(), time.Second)
 	defer cal()
 
 	var user models.User
