@@ -1,4 +1,4 @@
-package main
+package wschat
 
 import (
 	"fmt"
@@ -11,7 +11,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func handleSendMessage(
+func HandleSendMessage(
 	rawUserID string, // for all case, userID must be valid and user existed
 	connectionID string,
 	payload UserSendMessagePayload,
@@ -42,7 +42,7 @@ func handleSendMessage(
 		}
 	}
 
-	message := database.Messages.ConstructNewMessage(
+	message := app.DB.Messages.ConstructNewMessage(
 		userID,
 		conversationID,
 		replyTo,
@@ -63,7 +63,7 @@ func handleSendMessage(
 
 	wg.Add(1)
 	go func() {
-		_, err := database.Messages.InsertNewMessage(message)
+		_, err := app.DB.Messages.InsertNewMessage(message)
 		if err != nil {
 			errCh <- fmt.Errorf("[important] failed to insert message %v", err)
 		}
@@ -84,7 +84,7 @@ func queryConversationOfUser(
 	conversationID primitive.ObjectID,
 	userID primitive.ObjectID,
 ) (*models.Conversation, error) {
-	conversation, err := database.Conversations.GetConversationByID(conversationID)
+	conversation, err := app.DB.Conversations.GetConversationByID(conversationID)
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +99,7 @@ func queryConversationOfUser(
 }
 
 func checkValidReplyTo(replyTo primitive.ObjectID, conversationID primitive.ObjectID) error {
-	repliedMessage, err := database.Messages.GetMessageByID(replyTo)
+	repliedMessage, err := app.DB.Messages.GetMessageByID(replyTo)
 	if err != nil {
 		return err
 	} else if repliedMessage.ConversationID != conversationID {
@@ -137,7 +137,7 @@ func distributeMessageToRecipients(
 		wg.Add(1)
 		// TODO: use go 1.22 to resolve loop with goroutine
 		go func(m models.Member) {
-			sessions, err := sessionManager.GetSessions(m.UserID.Hex())
+			sessions, err := app.Session.GetSessions(m.UserID.Hex())
 			if err == nil {
 				log.Println("failed to query sessions for user", m.UserID.Hex())
 				wg.Done()

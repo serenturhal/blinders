@@ -1,4 +1,4 @@
-package main
+package wschat
 
 type DistributeEvent struct {
 	ConnectionID string
