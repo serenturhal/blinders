@@ -17,13 +17,15 @@ const MongoURLTemplate = "mongodb://%s:%s@%s:%s/%s"
 const (
 	UserCollection         = "users"
 	ConversationCollection = "conversations"
+	MessageCollection      = "conversations"
 )
 
 type MongoManager struct {
 	Client        *mongo.Client
 	Database      string
-	Users         *repo.Users
-	Conversations *repo.Conversations
+	Users         *repo.UsersRepo
+	Conversations *repo.ConversationsRepo
+	Messages      *repo.MessagesRepo
 }
 
 func NewMongoManager(url string, name string) *MongoManager {
@@ -39,7 +41,8 @@ func NewMongoManager(url string, name string) *MongoManager {
 	return &MongoManager{
 		Client:        client,
 		Database:      name,
-		Users:         repo.NewUsers(client.Database(name).Collection(UserCollection)),
-		Conversations: repo.NewConversations(client.Database(name).Collection(ConversationCollection)),
+		Users:         repo.NewUsersRepo(client.Database(name).Collection(UserCollection)),
+		Conversations: repo.NewConversationsRepo(client.Database(name).Collection(ConversationCollection)),
+		Messages:      repo.NewMessagesRepo(client.Database(name).Collection(MessageCollection)),
 	}
 }
