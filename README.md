@@ -64,3 +64,7 @@ Run help command for more details
 ```
 blinders --help
 ```
+
+### Refs
+
+- AWS Websocket API Gateway [https://github.com/aws-samples/apigateway-websockets-golang](https://github.com/aws-samples/apigateway-websockets-golang)
