@@ -29,10 +29,10 @@ func (c CustomEndpointResolve) ResolveEndpoint(_ context.Context, _ apigatewayma
 	}, nil
 }
 
-// NewAPIGatewayManagementClient creates a new API Gateway Management Client instance from the provided parameters. The
-// new client will have a custom endpoint that resolves to the application's deployed API.
+// NewAPIGatewayManagementClient creates a new API Gateway Management Client instance
+// from the provided parameters. The new client will have a custom endpoint
+// that resolves to the application's deployed API.
 func NewAPIGatewayManagementClient(cfg *aws.Config, domain, stage string) *apigatewaymanagementapi.Client {
-	// er := apigatewaymanagementapi.NewDefaultEndpointResolverV2()
 	cer := CustomEndpointResolve{
 		Domain: domain,
 		Stage:  stage,
