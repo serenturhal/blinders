@@ -113,3 +113,27 @@ resource "aws_lambda_function" "ws_disconnect" {
     variables = local.envs
   }
 }
+
+# use archive_file instead of pre-zip file to control source code hash (consistent with plan and apply)
+data "archive_file" "ws_chat" {
+  depends_on = [null_resource.go_build]
+
+  type        = "zip"
+  source_file = "../dist/wschat"
+  output_path = "../dist/wschat.zip"
+}
+
+resource "aws_lambda_function" "ws_chat" {
+  function_name    = "blinders-ws-chat"
+  filename         = "../dist/wschat.zip"
+  handler          = "wschat"
+  role             = aws_iam_role.lambda_role.arn
+  depends_on       = [aws_iam_role_policy_attachment.attach_iam_policy_to_iam_role]
+  runtime          = "go1.x"
+  source_code_hash = data.archive_file.ws_chat.output_base64sha256
+
+
+  environment {
+    variables = local.envs
+  }
+}

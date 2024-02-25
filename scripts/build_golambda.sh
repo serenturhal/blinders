@@ -16,3 +16,6 @@ echo "copied firebase.admin.json to authorizer"
 
 GOOS=linux GOARCH=amd64 CGO_ENABLED=0 GOFLAGS=-trimpath go build -mod=readonly -ldflags='-s -w' -o ./dist/ ./functions/websocket/disconnect
 echo "build disconnect lambda function completed"
+
+GOOS=linux GOARCH=amd64 CGO_ENABLED=0 GOFLAGS=-trimpath go build -mod=readonly -ldflags='-s -w' -o ./dist/wschat ./functions/websocket/chat
+echo "build websocket chat lambda function completed"
