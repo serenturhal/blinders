@@ -45,7 +45,6 @@ func init() {
 		os.Getenv("MONGO_DATABASE"),
 	)
 
-	fmt.Println(url)
 	database := db.NewMongoManager(url, os.Getenv("MONGO_DATABASE"))
 	if database == nil {
 		log.Fatal("cannot create database manager")
@@ -71,25 +70,25 @@ func HandleRequest(
 	connectionID := req.RequestContext.ConnectionID
 	userID := req.RequestContext.Authorizer.(map[string]interface{})["principalId"].(string)
 
-	genericEvent, err := utils.JSONConvert[wschat.ChatEvent](req.Body)
+	genericEvent, err := utils.ParseJSON[wschat.ChatEvent]([]byte(req.Body))
 	if err != nil {
-		return nil, err
+		log.Println("can not parse request payload, require type in payload", err)
 	}
 
 	switch genericEvent.Type {
 	case wschat.UserSendMessage:
-		payload, err := utils.JSONConvert[wschat.UserSendMessagePayload](req.Body)
+		payload, err := utils.ParseJSON[wschat.UserSendMessagePayload]([]byte(req.Body))
 		if err != nil {
-			return events.APIGatewayProxyResponse{
-				StatusCode: http.StatusBadRequest,
-				Body:       "invalid send message event",
-			}, nil
+			log.Println("invalid send message event", err)
+			_ = Publish(ctx, connectionID, []byte("invalid send message event"))
+			break
 		}
 
 		dCh, err := wschat.HandleSendMessage(userID, connectionID, *payload)
 		if err != nil {
 			log.Println("failed to send message", err)
-			return events.APIGatewayProxyResponse{StatusCode: http.StatusBadRequest}, nil
+			_ = Publish(ctx, connectionID, []byte("invalid payload to send message"))
+			break
 		}
 
 		wg := sync.WaitGroup{}
@@ -117,8 +116,10 @@ func HandleRequest(
 		}
 
 		wg.Wait()
+		log.Println("message sent")
 	default:
-		return events.APIGatewayProxyResponse{StatusCode: http.StatusBadRequest}, nil
+		log.Println("not support this event", req.Body)
+		_ = Publish(ctx, connectionID, []byte("not support this event"))
 	}
 
 	return events.APIGatewayProxyResponse{StatusCode: http.StatusOK}, nil
