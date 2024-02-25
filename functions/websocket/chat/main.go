@@ -18,7 +18,6 @@ import (
 )
 
 func init() {
-	fmt.Println("init chat websocket lambda function")
 	// TODO: need to store these secrets to aws secret manager instead of pass in env
 	sessionManager := session.NewManager(redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%s:%s", os.Getenv("REDIS_HOST"), os.Getenv("REDIS_PORT")),

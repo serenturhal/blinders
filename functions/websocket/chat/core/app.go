@@ -13,6 +13,7 @@ type App struct {
 }
 
 // init app construct an app instance for internal use
+// is that violate stateless of functional design? app instance is used in a func
 func InitApp(sm *session.Manager, dbm *db.MongoManager) *App {
 	app = &App{
 		Session: sm,
