@@ -19,9 +19,9 @@ func (c CustomEndpointResolve) ResolveEndpoint(_ context.Context, _ apigatewayma
 	smithyendpoints.Endpoint, error,
 ) {
 	var endpoint url.URL
-	endpoint.Path = c.Stage
-	endpoint.Host = c.Domain
 	endpoint.Scheme = "https"
+	endpoint.Host = c.Domain
+	endpoint.Path = "v1"
 
 	return smithyendpoints.Endpoint{
 		URI:     endpoint,
