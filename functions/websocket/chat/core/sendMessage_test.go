@@ -187,19 +187,19 @@ func TestSendMessageWithDistribution(t *testing.T) {
 		switch de.ConnectionID {
 		case sConnID:
 			payload := de.Payload.(ServerAckSendMessagePayload)
-			assert.Equal(t, ServerAckSendMessage, payload.ChatEvent.Type)
+			assert.Equal(t, ServerAckSendMessage, payload.Type)
 			assert.Equal(t, conversation.ID, payload.Message.ConversationID)
 			assert.Equal(t, "", payload.Error.Error)
 			assert.Equal(t, content, payload.Message.Content)
 			assert.Equal(t, resolveID, payload.ResolveID)
 		case r1connID:
 			payload := de.Payload.(ServerSendMessagePayload)
-			assert.Equal(t, ServerSendMessage, payload.ChatEvent.Type)
+			assert.Equal(t, ServerSendMessage, payload.Type)
 			assert.Equal(t, conversation.ID, payload.Message.ConversationID)
 			assert.Equal(t, content, payload.Message.Content)
 		case r2connID:
 			payload := de.Payload.(ServerSendMessagePayload)
-			assert.Equal(t, ServerSendMessage, payload.ChatEvent.Type)
+			assert.Equal(t, ServerSendMessage, payload.Type)
 			assert.Equal(t, conversation.ID, payload.Message.ConversationID)
 			assert.Equal(t, content, payload.Message.Content)
 		}
