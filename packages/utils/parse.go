@@ -65,3 +65,13 @@ func JSONConvert[T any](from any) (*T, error) {
 
 	return &to, nil
 }
+
+func ParseJSON[T any](from []byte) (*T, error) {
+	var to T
+	err := json.Unmarshal(from, &to)
+	if err != nil {
+		return nil, fmt.Errorf("convert error: %v", err)
+	}
+
+	return &to, nil
+}
