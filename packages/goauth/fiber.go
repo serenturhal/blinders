@@ -11,7 +11,7 @@ func FiberAuthMiddleware(m Manager) fiber.Handler {
 		jwt := ctx.Get("Authorization")
 		user, err := m.Verify(jwt)
 		if err != nil {
-			_ = ctx.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			return ctx.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 				"message": err.Error(),
 			})
 		}
