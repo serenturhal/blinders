@@ -17,7 +17,7 @@ const MongoURLTemplate = "mongodb://%s:%s@%s:%s/%s"
 const (
 	UserCollection         = "users"
 	ConversationCollection = "conversations"
-	MessageCollection      = "conversations"
+	MessageCollection      = "messages"
 )
 
 type MongoManager struct {
