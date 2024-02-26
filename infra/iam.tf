@@ -15,6 +15,9 @@ resource "aws_iam_role" "lambda_role" {
 EOF
 }
 
+data "aws_region" "current" {}
+data "aws_caller_identity" "current" {}
+
 resource "aws_iam_policy" "iam_policy_for_lambda" {
   name        = "BlindersLambdaPolicy"
   path        = "/"
@@ -30,6 +33,15 @@ resource "aws_iam_policy" "iam_policy_for_lambda" {
         ],
         "Resource": "arn:aws:logs:*:*:*",
         "Effect": "Allow"
+    },
+    {
+        "Effect": "Allow",
+        "Action": [
+            "execute-api:ManageConnections" 
+        ],
+        "Resource": [
+          "arn:aws:execute-api:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${aws_apigatewayv2_api.websocket_api.id}/${aws_apigatewayv2_stage.websocket_staging.name}/*"
+        ]
     }]
 }
 EOF

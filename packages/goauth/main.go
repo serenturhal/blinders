@@ -6,6 +6,7 @@ type UserAuth struct {
 	AuthID string
 }
 
+// TODO: add interface for role-based auth
 type Manager interface {
 	Verify(jwt string) (*UserAuth, error)
 }

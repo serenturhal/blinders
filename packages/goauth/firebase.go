@@ -9,12 +9,12 @@ import (
 )
 
 type FirebaseManager struct {
-	app    *firebase.App
-	client *auth.Client
+	App    *firebase.App
+	Client *auth.Client
 }
 
 func (m FirebaseManager) Verify(jwt string) (*UserAuth, error) {
-	authToken, err := m.client.VerifyIDToken(context.Background(), jwt)
+	authToken, err := m.Client.VerifyIDToken(context.Background(), jwt)
 	if err != nil {
 		return nil, err
 	}
@@ -39,13 +39,13 @@ func NewFirebaseManager(adminConfig []byte) (*FirebaseManager, error) {
 	if err != nil {
 		return nil, err
 	}
-	manager.app = newApp
+	manager.App = newApp
 
-	newClient, err := manager.app.Auth(context.Background())
+	newClient, err := manager.App.Auth(context.Background())
 	if err != nil {
 		return nil, err
 	}
-	manager.client = newClient
+	manager.Client = newClient
 
 	return &manager, nil
 }

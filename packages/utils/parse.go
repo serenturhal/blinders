@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io"
 	"os"
+
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 func ParseJSONFile[T any](filename string) (*T, error) {
@@ -34,4 +36,42 @@ func GetFile(filename string) ([]byte, error) {
 	}
 
 	return bytes, nil
+}
+
+func BSONConvert[T any](from any) (*T, error) {
+	fromBytes, err := bson.Marshal(from)
+	if err != nil {
+		return nil, fmt.Errorf("convert error: %v", err)
+	}
+	var to T
+	err = bson.Unmarshal(fromBytes, &to)
+	if err != nil {
+		return nil, fmt.Errorf("convert error: %v", err)
+	}
+
+	return &to, nil
+}
+
+func JSONConvert[T any](from any) (*T, error) {
+	fromBytes, err := json.Marshal(from)
+	if err != nil {
+		return nil, fmt.Errorf("convert error: %v", err)
+	}
+	var to T
+	err = json.Unmarshal(fromBytes, &to)
+	if err != nil {
+		return nil, fmt.Errorf("convert error: %v", err)
+	}
+
+	return &to, nil
+}
+
+func ParseJSON[T any](from []byte) (*T, error) {
+	var to T
+	err := json.Unmarshal(from, &to)
+	if err != nil {
+		return nil, fmt.Errorf("convert error: %v", err)
+	}
+
+	return &to, nil
 }

@@ -1,6 +1,7 @@
 go 1.21.3
 
 use (
+	./cli
 	./functions/chat
 	./functions/collecting
 	./functions/grammar
@@ -10,13 +11,16 @@ use (
 	./functions/translate
 	./functions/users
 	./functions/utils
+	./functions/websocket
 	./packages/common
 	./packages/db
 	./packages/goauth
 	./packages/interfaces
+	./packages/session
 	./packages/suggest
 	./packages/translate
 	./packages/utils
 	./services/chat
 	./services/suggest
+	./tests
 )

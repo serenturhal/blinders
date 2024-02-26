@@ -4,15 +4,16 @@ data "aws_route53_zone" "blinders" {
 }
 
 resource "aws_acm_certificate" "blinders" {
-  domain_name       = "api.peakee.co"
-  validation_method = "DNS"
+  domain_name               = "peakee.co"
+  subject_alternative_names = ["api.peakee.co", "*.api.peakee.co", "ws.peakee.co", "*.ws.peakee.co"]
+  validation_method         = "DNS"
 
   lifecycle {
     create_before_destroy = true
   }
 }
 
-resource "aws_route53_record" "blinders_validation" {
+resource "aws_route53_record" "validation" {
   for_each = {
     for dvo in aws_acm_certificate.blinders.domain_validation_options : dvo.domain_name => {
       name   = dvo.resource_record_name
@@ -31,6 +32,6 @@ resource "aws_route53_record" "blinders_validation" {
 
 resource "aws_acm_certificate_validation" "blinders" {
   certificate_arn         = aws_acm_certificate.blinders.arn
-  validation_record_fqdns = [for record in aws_route53_record.blinders_validation : record.fqdn]
+  validation_record_fqdns = [for record in aws_route53_record.validation : record.fqdn]
 }
 

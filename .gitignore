@@ -13,16 +13,22 @@
 # terraform gitignore
 # Local .terraform directories
 **/.terraform*
+!**/.terraform.lock.hcl
 
 # .tfstate files
 **/*.tfstate
 **/*.tfstate.*
 
+*.pem
+
 .env
 .env.*
 !.env.example
 
-firebase.admin.*.json
+firebase.admin*.json
 
 node_modules
 .yarn
+
+auth.*.json
+volumes
