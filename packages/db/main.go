@@ -5,10 +5,10 @@ import (
 	"log"
 	"time"
 
-	"blinders/packages/db/repo"
-
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+
+	"blinders/packages/db/repo"
 )
 
 // username:password@host:port/database
@@ -18,6 +18,7 @@ const (
 	UserCollection         = "users"
 	ConversationCollection = "conversations"
 	MessageCollection      = "messages"
+	MatchCollection        = "matchs"
 )
 
 type MongoManager struct {
@@ -26,6 +27,7 @@ type MongoManager struct {
 	Users         *repo.UsersRepo
 	Conversations *repo.ConversationsRepo
 	Messages      *repo.MessagesRepo
+	Matchs        *repo.MatchsRepo
 }
 
 func NewMongoManager(url string, name string) *MongoManager {
@@ -38,11 +40,17 @@ func NewMongoManager(url string, name string) *MongoManager {
 		return nil
 	}
 
+	if err := client.Ping(ctx, nil); err != nil {
+		log.Println("cannot ping to the server", err)
+		return nil
+	}
+
 	return &MongoManager{
 		Client:        client,
 		Database:      name,
 		Users:         repo.NewUsersRepo(client.Database(name).Collection(UserCollection)),
 		Conversations: repo.NewConversationsRepo(client.Database(name).Collection(ConversationCollection)),
 		Messages:      repo.NewMessagesRepo(client.Database(name).Collection(MessageCollection)),
+		Matchs:        repo.NewMatchsRepo(client.Database(name).Collection(MatchCollection)),
 	}
 }
