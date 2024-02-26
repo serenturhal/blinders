@@ -2,58 +2,54 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 	"time"
 
 	"blinders/packages/auth"
+	"blinders/packages/db"
 	"blinders/packages/match"
 	"blinders/packages/utils"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
 	"github.com/redis/go-redis/v9"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"go.mongodb.org/mongo-driver/mongo/readpref"
 
 	matchapi "blinders/services/match/api"
 )
 
-var (
-	service matchapi.Service
-	client  *mongo.Client
-)
+var service matchapi.Service
 
 func init() {
 	if err := godotenv.Load(".env"); err != nil {
 		panic(err)
 	}
-	app := fiber.New()
-
-	adminJSON, _ := utils.GetFile("firebase.admin.development.json")
-
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
-	defer cancel()
-	opts := options.Client().ApplyURI(os.Getenv("MONGO_URL")).SetAuth(options.Credential{
-		Username: os.Getenv("MONGO_DB_USERNAME"),
-		Password: os.Getenv("MONGO_DB_PASSWORD"),
+	app := fiber.New(fiber.Config{
+		DisableStartupMessage: true,
 	})
 
-	mongoClient, err := mongo.Connect(ctx, opts)
+	adminJSON, _ := utils.GetFile("firebase.admin.json")
+	authManager, err := auth.NewFirebaseManager(adminJSON)
 	if err != nil {
 		panic(err)
 	}
-	client = mongoClient
-	if err := client.Ping(ctx, &readpref.ReadPref{}); err != nil {
-		panic(err)
-	}
 
-	db := client.Database(os.Getenv("MONGO_DB"))
-	userCol := db.Collection("user")
-	matchCol := db.Collection("match")
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
 
-	auth, _ := auth.NewFirebaseManager(adminJSON)
+	url := fmt.Sprintf(
+		db.MongoURLTemplate,
+		os.Getenv("MONGO_USERNAME"),
+		os.Getenv("MONGO_PASSWORD"),
+		os.Getenv("MONGO_HOST"),
+		os.Getenv("MONGO_PORT"),
+		os.Getenv("MONGO_DATABASE"),
+	)
+
+	db := db.NewMongoManager(url, os.Getenv("MONGO_DATABASE"))
+
+	fmt.Println("Connect to mongo url", url)
 
 	redisClient := redis.NewClient(&redis.Options{
 		Addr:     "localhost:6379",
@@ -66,14 +62,13 @@ func init() {
 	}
 
 	core := &match.MongoMatcher{
-		UserCol:     userCol,
-		MatchCol:    matchCol,
+		Repo:        db.Matchs,
 		Embedder:    match.MockEmbedder{},
 		RedisClient: redisClient,
 	}
 
 	service = matchapi.Service{
-		Auth: auth,
+		Auth: authManager,
 		App:  app,
 		Core: core,
 	}
@@ -81,11 +76,6 @@ func init() {
 }
 
 func main() {
-	defer func() {
-		if err := client.Disconnect(context.TODO()); err != nil {
-			panic(err)
-		}
-	}()
 	port := os.Getenv("MATCH_SERVICE_PORT")
 	log.Panic(service.App.Listen(":" + port))
 }
