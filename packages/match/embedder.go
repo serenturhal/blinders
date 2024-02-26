@@ -3,16 +3,18 @@ package match
 import (
 	"math/rand"
 	"time"
+
+	"blinders/packages/db/models"
 )
 
 // Embedder uses embedding model to embed user information and return embedding vector.
 type Embedder interface {
-	Embed(info UserMatch) (EmbeddingVector, error)
+	Embed(info models.MatchInfo) (EmbeddingVector, error)
 }
 
 type MockEmbedder struct{}
 
-func (e MockEmbedder) Embed(_ UserMatch) (EmbeddingVector, error) {
+func (e MockEmbedder) Embed(_ models.MatchInfo) (EmbeddingVector, error) {
 	r := rand.New(rand.NewSource(time.Now().Unix()))
 	var embed [128]float32
 	for i := range embed {
