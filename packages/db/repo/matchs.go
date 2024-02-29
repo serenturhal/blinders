@@ -2,7 +2,6 @@ package repo
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"time"
 
@@ -83,9 +82,16 @@ func (r *MatchsRepo) GetUsersByLanguage(userID string) ([]string, error) {
 	defer cancel()
 	stages := []bson.M{
 		{"$match": bson.M{
-			"native":      bson.M{"$in": user.Learnings},        // user must speak at least one language of `learnings`
-			"learnings":   bson.M{"$in": []string{user.Native}}, // user should learning `native`.
 			"firebaseUID": bson.M{"$ne": userID},
+			"$or": []bson.M{
+				{
+					"native":    bson.M{"$in": user.Learnings},        // Users must speak at least one language of `learnings`.
+					"learnings": bson.M{"$in": []string{user.Native}}, // Users should be learning their `native`.
+				},
+				{
+					"learnings": bson.M{"$in": user.Learnings}, // Users who learn the same language as the current user.
+				},
+			},
 		}},
 		// at here we may sort users based on any rank mark from the system.
 		// currently, we random choose 1000 user.
@@ -111,7 +117,6 @@ func (r *MatchsRepo) GetUsersByLanguage(userID string) ([]string, error) {
 		if err := cur.Decode(doc); err != nil {
 			return nil, err
 		}
-		fmt.Println(doc)
 		ids = append(ids, doc.FirebaseUID)
 	}
 	return ids, nil

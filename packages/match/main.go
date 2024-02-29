@@ -29,8 +29,8 @@ func NewMongoMatcher(Db *db.MongoManager, RedisClient *redis.Client) *MongoMatch
 }
 
 // currently, suggest suggests 5 users that are not friend of current user.
-// TODO: make suggestions more diverse.
 func (m *MongoMatcher) Suggest(ctx context.Context, fromID string) ([]models.MatchInfo, error) {
+	// Get 1000 users that maybe match with current user (user that speak and learn language)
 	user, err := m.Db.Users.GetUserByFirebaseUID(fromID)
 	if err != nil {
 		return nil, err
@@ -55,22 +55,17 @@ func (m *MongoMatcher) Suggest(ctx context.Context, fromID string) ([]models.Mat
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(candidates, len(candidates))
 
 	includeFilter := ""
 	if len(candidates) != 0 {
-		for idx, candidate := range candidates {
-			if idx == 0 {
-				includeFilter = candidate
-			} else {
-				includeFilter += " | " + candidate
-			}
+		includeFilter = candidates[0]
+		for idx := 1; idx < len(candidates); idx++ {
+			includeFilter += " | " + candidates[idx]
 		}
 		includeFilter = fmt.Sprintf("@id:(%s)", includeFilter)
 	}
 
 	prefilter := fmt.Sprintf("(%s %s)", excludeFilter, includeFilter)
-	fmt.Println(prefilter)
 
 	cmd := m.RedisClient.Do(ctx,
 		"FT.SEARCH",
