@@ -2,6 +2,7 @@ package repo
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"time"
 
@@ -21,11 +22,18 @@ func NewMatchsRepo(col *mongo.Collection) *MatchsRepo {
 	ctx, cal := context.WithTimeout(context.Background(), time.Second*5)
 	defer cal()
 
-	_, err := col.Indexes().CreateOne(ctx, mongo.IndexModel{
+	if _, err := col.Indexes().CreateOne(ctx, mongo.IndexModel{
 		Keys:    bson.M{"userID": 1},
 		Options: options.Index().SetUnique(true),
-	})
-	if err != nil {
+	}); err != nil {
+		log.Println("can not create index for userID:", err)
+		return nil
+	}
+
+	if _, err := col.Indexes().CreateOne(ctx, mongo.IndexModel{
+		Keys:    bson.M{"firebaseUID": 1},
+		Options: options.Index().SetUnique(true),
+	}); err != nil {
 		log.Println("can not create index for firebaseUID:", err)
 		return nil
 	}
@@ -62,4 +70,49 @@ func (r *MatchsRepo) GetUserByFirebaseUID(uid string) (models.MatchInfo, error) 
 	err := r.Col.FindOne(ctx, bson.M{"firebaseUID": uid}).Decode(&doc)
 
 	return doc, err
+}
+
+// GetMatchCandidates returns `numReturn` ID of users that speak one language of `learnings` and are currently learning `native`.
+func (r *MatchsRepo) GetUsersByLanguage(userID string) ([]string, error) {
+	user, err := r.GetUserByFirebaseUID(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+	stages := []bson.M{
+		{"$match": bson.M{
+			"native":      bson.M{"$in": user.Learnings},        // user must speak at least one language of `learnings`
+			"learnings":   bson.M{"$in": []string{user.Native}}, // user should learning `native`.
+			"firebaseUID": bson.M{"$ne": userID},
+		}},
+		// at here we may sort users based on any rank mark from the system.
+		// currently, we random choose 1000 user.
+		{
+			"$sample": bson.M{"size": 1000},
+		},
+		{"$project": bson.M{"_id": 0, "firebaseUID": 1}},
+	}
+
+	cur, err := r.Col.Aggregate(ctx, stages)
+	if err != nil {
+		return nil, err
+	}
+	defer cur.Close(ctx)
+
+	type ReturnType struct {
+		FirebaseUID string `bson:"firebaseUID"`
+	}
+
+	ids := []string{}
+	for cur.Next(ctx) {
+		doc := new(ReturnType)
+		if err := cur.Decode(doc); err != nil {
+			return nil, err
+		}
+		fmt.Println(doc)
+		ids = append(ids, doc.FirebaseUID)
+	}
+	return ids, nil
 }

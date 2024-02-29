@@ -42,16 +42,35 @@ func (m *MongoMatcher) Suggest(ctx context.Context, fromID string) ([]models.Mat
 		return nil, err
 	}
 	embed := embedArr[0]
-	fmt.Println(embed)
 
 	// exclude friends of current user
 	// TODO: Need to optimize; currently, excluding 700 users takes 230ms on M1 chip with 16GB RAM.
 	excludeFilter := fromID
 	for _, friendID := range user.FriendsFirebaseUID {
-		excludeFilter = excludeFilter + " | " + friendID
+		excludeFilter += " | " + friendID
+	}
+	excludeFilter = fmt.Sprintf("-@id:(%s)", excludeFilter)
+
+	candidates, err := m.Db.Matchs.GetUsersByLanguage(user.FirebaseUID)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println(candidates, len(candidates))
+
+	includeFilter := ""
+	if len(candidates) != 0 {
+		for idx, candidate := range candidates {
+			if idx == 0 {
+				includeFilter = candidate
+			} else {
+				includeFilter += " | " + candidate
+			}
+		}
+		includeFilter = fmt.Sprintf("@id:(%s)", includeFilter)
 	}
 
-	prefilter := fmt.Sprintf("(-@id:(%s))", excludeFilter)
+	prefilter := fmt.Sprintf("(%s %s)", excludeFilter, includeFilter)
+	fmt.Println(prefilter)
 
 	cmd := m.RedisClient.Do(ctx,
 		"FT.SEARCH",
