@@ -2,10 +2,11 @@ package match
 
 import (
 	"context"
-	"log"
+	"encoding/json"
+	"fmt"
 
+	"blinders/packages/db"
 	"blinders/packages/db/models"
-	"blinders/packages/db/repo"
 
 	"github.com/redis/go-redis/v9"
 )
@@ -13,85 +14,68 @@ import (
 type Matcher interface {
 	// Suggest returns list of users that maybe match with given user
 	Suggest(ctx context.Context, id string) ([]models.MatchInfo, error)
-	// TODO: Temporarily expose this method. User should be automatically added to match db after a new user event is fired from the user service.
-	AddUserMatch(ctx context.Context, user models.MatchInfo) error
 }
 
 type MongoMatcher struct {
-	Embedder    Embedder
-	Repo        *repo.MatchsRepo
+	Db          *db.MongoManager
 	RedisClient *redis.Client
 }
 
-func (m *MongoMatcher) InitIndex(ctx context.Context) {
-	err := m.RedisClient.Do(
-		ctx,
-		"FT.CREATE",
-		"idx:match_vss",
-		"ON", "HASH",
-		"PREFIX", "1", "match:",
-		"SCHEMA", "embed", "VECTOR",
-		"HNSW", "6",
-		"TYPE", "FLOAT32",
-		"DIM", "128",
-		"DISTANCE_METRIC", "L2",
-	).Err()
-	if err != nil {
-		log.Println(err)
+func NewMongoMatcher(Db *db.MongoManager, RedisClient *redis.Client) *MongoMatcher {
+	return &MongoMatcher{
+		Db:          Db,
+		RedisClient: RedisClient,
 	}
 }
 
+// currently, suggest suggests 5 users that are not friend of current user.
+// TODO: make suggestions more diverse.
 func (m *MongoMatcher) Suggest(ctx context.Context, fromID string) ([]models.MatchInfo, error) {
-	// TODO: Temporarily  get 5 random users
-	user, err := m.Repo.GetUserByFirebaseUID(fromID)
-	if err != nil {
-		return nil, err
-	}
-	embed, err := m.Embedder.Embed(user)
+	user, err := m.Db.Users.GetUserByFirebaseUID(fromID)
 	if err != nil {
 		return nil, err
 	}
 
-	slice := m.RedisClient.Do(ctx,
+	jsonStr, _ := m.RedisClient.JSONGet(ctx, CreateMatchKeyWithUserID(fromID), "$.embed").Result()
+	embedArr := []EmbeddingVector{}
+	if err := json.Unmarshal([]byte(jsonStr), &embedArr); err != nil {
+		return nil, err
+	}
+	embed := embedArr[0]
+	fmt.Println(embed)
+
+	// exclude friends of current user
+	// TODO: Need to optimize; currently, excluding 700 users takes 230ms on M1 chip with 16GB RAM.
+	excludeFilter := fromID
+	for _, friendID := range user.FriendsFirebaseUID {
+		excludeFilter = excludeFilter + " | " + friendID
+	}
+
+	prefilter := fmt.Sprintf("(-@id:(%s))", excludeFilter)
+
+	cmd := m.RedisClient.Do(ctx,
 		"FT.SEARCH",
 		"idx:match_vss",
-		"(*)=>[KNN 5 @embed $vec]",
+		fmt.Sprintf("%s=>[KNN 5 @embed $query_vector as vector_score]", prefilter),
+		"SORTBY", "vector_score",
 		"PARAMS", "2",
-		"vec", embed,
+		"query_vector", &embed,
 		"DIALECT", "2",
 		"RETURN", "1", "id",
-	).Val().(map[any]any)
+	)
+	if err := cmd.Err(); err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
 
 	res := []models.MatchInfo{}
-	for _, doc := range slice["results"].([]any) {
+	for _, doc := range cmd.Val().(map[any]any)["results"].([]any) {
 		userID := doc.(map[any]any)["extra_attributes"].(map[any]any)["id"].(string)
-		user, err := m.Repo.GetUserByFirebaseUID(userID)
+		user, err := m.Db.Matchs.GetUserByFirebaseUID(userID)
 		if err != nil {
 			return nil, err
 		}
 		res = append(res, user)
 	}
 	return res, nil
-}
-
-func (m *MongoMatcher) AddUserMatch(ctx context.Context, user models.MatchInfo) error {
-	embedding, err := m.Embedder.Embed(user)
-	if err != nil {
-		return err
-	}
-
-	if err := m.RedisClient.HSet(
-		ctx,
-		CreateMatchKeyWithUserID(user.FirebaseUID),
-		"embed", embedding,
-		"id", user.FirebaseUID,
-	).Err(); err != nil {
-		return err
-	}
-
-	if _, err := m.Repo.InsertNewRawMatchInfo(user); err != nil {
-		return err
-	}
-
-	return nil
 }

@@ -15,10 +15,10 @@ type Embedder interface {
 type MockEmbedder struct{}
 
 func (e MockEmbedder) Embed(_ models.MatchInfo) (EmbeddingVector, error) {
-	r := rand.New(rand.NewSource(time.Now().Unix()))
-	var embed [128]float32
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	var embed [384]float32
 	for i := range embed {
 		embed[i] = r.Float32()
 	}
-	return embed, nil
+	return embed[:], nil
 }

@@ -6,7 +6,7 @@ import (
 )
 
 type (
-	EmbeddingVector [128]float32
+	EmbeddingVector []float32
 )
 
 func (v EmbeddingVector) MarshalBinary() ([]byte, error) {
@@ -16,4 +16,13 @@ func (v EmbeddingVector) MarshalBinary() ([]byte, error) {
 		return nil, err
 	}
 	return buf.Bytes(), nil
+}
+
+func (v *EmbeddingVector) UnmarshalBinary(data []byte) error {
+	buf := bytes.NewReader(data)
+	err := binary.Read(buf, binary.LittleEndian, v)
+	if err != nil {
+		return err
+	}
+	return nil
 }
