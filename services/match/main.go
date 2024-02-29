@@ -61,17 +61,9 @@ func init() {
 		panic(err)
 	}
 
-	core := &match.MongoMatcher{
-		Repo:        db.Matchs,
-		Embedder:    match.MockEmbedder{},
-		RedisClient: redisClient,
-	}
+	core := match.NewMongoMatcher(db, redisClient, match.MockEmbedder{})
 
-	service = matchapi.Service{
-		Auth: authManager,
-		App:  app,
-		Core: core,
-	}
+	service = matchapi.Service{Auth: authManager, App: app, Core: core}
 	service.InitRoute()
 }
 

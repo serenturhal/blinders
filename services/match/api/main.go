@@ -20,5 +20,4 @@ func (s Service) InitRoute() {
 
 	matchRoute := s.App.Group("/match", auth.FiberAuthMiddleware(s.Auth))
 	matchRoute.Get("/suggest", s.HandleGetMatch)
-	matchRoute.Post("/", s.HandleAddMatchUser)
 }
