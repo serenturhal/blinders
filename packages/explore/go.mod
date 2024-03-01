@@ -1,4 +1,4 @@
-module blinders/packages/match
+module blinders/packages/explore
 
 go 1.21.3
 

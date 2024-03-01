@@ -1,4 +1,4 @@
-package matchapi
+package exploreapi
 
 import (
 	"context"

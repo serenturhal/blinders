@@ -9,17 +9,17 @@ import (
 
 	"blinders/packages/auth"
 	"blinders/packages/db"
-	"blinders/packages/match"
+	"blinders/packages/explore"
 	"blinders/packages/utils"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
 	"github.com/redis/go-redis/v9"
 
-	matchapi "blinders/services/match/api"
+	exploreapi "blinders/services/explore/api"
 )
 
-var service matchapi.Service
+var service exploreapi.Service
 
 func init() {
 	if err := godotenv.Load(".env"); err != nil {
@@ -61,9 +61,9 @@ func init() {
 		panic(err)
 	}
 
-	core := match.NewMongoMatcher(db, redisClient)
+	core := explore.NewMongoExplorer(db, redisClient)
 
-	service = matchapi.Service{Auth: authManager, App: app, Core: core}
+	service = exploreapi.Service{Auth: authManager, App: app, Core: core}
 	service.InitRoute()
 }
 

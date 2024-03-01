@@ -1,4 +1,4 @@
-package match
+package explore
 
 import (
 	"context"
@@ -11,25 +11,25 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-type Matcher interface {
+type Explorer interface {
 	// Suggest returns list of users that maybe match with given user
 	Suggest(ctx context.Context, id string) ([]models.MatchInfo, error)
 }
 
-type MongoMatcher struct {
+type MongoExplorer struct {
 	Db          *db.MongoManager
 	RedisClient *redis.Client
 }
 
-func NewMongoMatcher(Db *db.MongoManager, RedisClient *redis.Client) *MongoMatcher {
-	return &MongoMatcher{
+func NewMongoExplorer(Db *db.MongoManager, RedisClient *redis.Client) *MongoExplorer {
+	return &MongoExplorer{
 		Db:          Db,
 		RedisClient: RedisClient,
 	}
 }
 
 // currently, suggest suggests 5 users that are not friend of current user.
-func (m *MongoMatcher) Suggest(ctx context.Context, fromID string) ([]models.MatchInfo, error) {
+func (m *MongoExplorer) Suggest(ctx context.Context, fromID string) ([]models.MatchInfo, error) {
 	// Get 1000 users that maybe match with current user (user that speak and learn language)
 	user, err := m.Db.Users.GetUserByFirebaseUID(fromID)
 	if err != nil {

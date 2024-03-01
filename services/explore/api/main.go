@@ -1,8 +1,8 @@
-package matchapi
+package exploreapi
 
 import (
 	"blinders/packages/auth"
-	"blinders/packages/match"
+	"blinders/packages/explore"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -10,7 +10,7 @@ import (
 type Service struct {
 	App  *fiber.App
 	Auth auth.Manager
-	Core match.Matcher
+	Core explore.Explorer
 }
 
 func (s Service) InitRoute() {
