@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"blinders/packages/db"
 	"blinders/packages/db/models"
@@ -13,7 +14,9 @@ import (
 
 type Explorer interface {
 	// Suggest returns list of users that maybe match with given user
-	Suggest(ctx context.Context, id string) ([]models.MatchInfo, error)
+	Suggest(id string) ([]models.MatchInfo, error)
+	// AddUserMatchInformation adds user match information to the database. A new user-created event must be fired for the embed worker to embed the recently added user.
+	AddUserMatchInformation(info models.MatchInfo) (models.MatchInfo, error)
 }
 
 type MongoExplorer struct {
@@ -29,7 +32,10 @@ func NewMongoExplorer(Db *db.MongoManager, RedisClient *redis.Client) *MongoExpl
 }
 
 // currently, suggest suggests 5 users that are not friend of current user.
-func (m *MongoExplorer) Suggest(ctx context.Context, fromID string) ([]models.MatchInfo, error) {
+func (m *MongoExplorer) Suggest(fromID string) ([]models.MatchInfo, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+
 	// Get 1000 users that maybe match with current user (user that speak and learn language)
 	user, err := m.Db.Users.GetUserByFirebaseUID(fromID)
 	if err != nil {
@@ -92,4 +98,19 @@ func (m *MongoExplorer) Suggest(ctx context.Context, fromID string) ([]models.Ma
 		res = append(res, user)
 	}
 	return res, nil
+}
+
+func (m *MongoExplorer) AddUserMatchInformation(info models.MatchInfo) (models.MatchInfo, error) {
+	user, err := m.Db.Users.GetUserByFirebaseUID(info.FirebaseUID)
+	if err != nil {
+		return models.MatchInfo{}, err
+	}
+	info.UserID = user.ID
+
+	// duplicated match information will be handled by the repository since we have already indexed the collection with firebaseUID.
+	matchInfo, err := m.Db.Matchs.InsertNewRawMatchInfo(info)
+	if err != nil {
+		return models.MatchInfo{}, err
+	}
+	return matchInfo, nil
 }

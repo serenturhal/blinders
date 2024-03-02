@@ -13,6 +13,7 @@ use (
 	./functions/websocket
 	./packages/common
 	./packages/db
+	./packages/explore
 	./packages/goauth
 	./packages/interfaces
 	./packages/session
@@ -21,7 +22,7 @@ use (
 	./packages/translate
 	./packages/utils
 	./services/chat
-	./services/match
+	./services/explore
 	./services/suggest
 	./tests
 )

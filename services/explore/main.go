@@ -19,7 +19,7 @@ import (
 	exploreapi "blinders/services/explore/api"
 )
 
-var service exploreapi.Service
+var service *exploreapi.Service
 
 func init() {
 	if err := godotenv.Load(".env"); err != nil {
@@ -63,11 +63,13 @@ func init() {
 
 	core := explore.NewMongoExplorer(db, redisClient)
 
-	service = exploreapi.Service{Auth: authManager, App: app, Core: core}
+	service = exploreapi.NewService(app, authManager, core, redisClient)
 	service.InitRoute()
 }
 
 func main() {
 	port := os.Getenv("MATCH_SERVICE_PORT")
+	go service.Loop()
+	fmt.Println("listening on: ", port)
 	log.Panic(service.App.Listen(":" + port))
 }

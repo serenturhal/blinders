@@ -55,7 +55,13 @@ class Explore(object):
             # maybe index defined
             print("error=>", e)
 
-    def AddUserMatch(self, info: MatchInfo) -> None:
+
+    def AddUserEmbed(self, info: MatchInfo) -> None:
+        # AddUserMatch call after a new match entry already added to matchcol, this will embed recently document and add to vector db
+        doc = self.matchCol.find({"firebaseUID": info.firebaseUID})
+        if doc is None:
+            print("user not existed")
+            return
         embed = self.embedder.embed(info)
         self.redisClient.json().set(
             CreateRedisMatchKey(info.firebaseUID),
@@ -65,8 +71,3 @@ class Explore(object):
                 "id": info.firebaseUID,
             },
         )
-
-        print(info)
-        res = self.matchCol.insert_one(info.__dict__)
-        if res.acknowledged:
-            print("inserted match")
