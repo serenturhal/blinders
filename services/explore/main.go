@@ -68,7 +68,7 @@ func init() {
 }
 
 func main() {
-	port := os.Getenv("MATCH_SERVICE_PORT")
+	port := os.Getenv("EXPLORE_SERVICE_PORT")
 	go service.Loop()
 	fmt.Println("listening on: ", port)
 	log.Panic(service.App.Listen(":" + port))

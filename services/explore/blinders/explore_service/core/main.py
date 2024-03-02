@@ -1,6 +1,4 @@
-from typing_extensions import IntVar
 import redis
-
 import os
 from blinders.explore_core.main import Explore
 from blinders.explore_core.types import MatchInfo
@@ -26,12 +24,12 @@ class ServiceWorker(object):
             pass
 
     def loop(self):
-        print("looping")
-        i = 0
+        consumerName = os.getenv("REDIS_CONSUMER_NAME", "default")
+        print("listening to stream, consumer name: ", consumerName)
         while True:
             entries = self.redisClient.xreadgroup(
                 "matchGroup",
-                os.getenv("REDIS_CONSUMER", "default"),
+                consumerName,
                 {"match:embed": ">"},
                 block=10000,
             )
@@ -67,4 +65,3 @@ class ServiceWorker(object):
                 age=doc.get("age"),
             )
             self.core.AddUserEmbed(info)
-            i += 1
