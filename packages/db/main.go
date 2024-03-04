@@ -1,14 +1,13 @@
 package db
 
 import (
+	"blinders/packages/db/repo"
 	"context"
 	"log"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-
-	"blinders/packages/db/repo"
 )
 
 // username:password@host:port/database
@@ -18,7 +17,7 @@ const (
 	UserCollection         = "users"
 	ConversationCollection = "conversations"
 	MessageCollection      = "messages"
-	MatchCollection        = "matchs"
+	MatchCollection        = "matches"
 )
 
 type MongoManager struct {
@@ -27,7 +26,7 @@ type MongoManager struct {
 	Users         *repo.UsersRepo
 	Conversations *repo.ConversationsRepo
 	Messages      *repo.MessagesRepo
-	Matchs        *repo.MatchesRepo
+	Matches       *repo.MatchesRepo
 }
 
 func NewMongoManager(url string, name string) *MongoManager {
@@ -51,6 +50,6 @@ func NewMongoManager(url string, name string) *MongoManager {
 		Users:         repo.NewUsersRepo(client.Database(name).Collection(UserCollection)),
 		Conversations: repo.NewConversationsRepo(client.Database(name).Collection(ConversationCollection)),
 		Messages:      repo.NewMessagesRepo(client.Database(name).Collection(MessageCollection)),
-		Matchs:        repo.NewMatchesRepo(client.Database(name).Collection(MatchCollection)),
+		Matches:       repo.NewMatchesRepo(client.Database(name).Collection(MatchCollection)),
 	}
 }
