@@ -1,20 +1,21 @@
 # load mock/json file to mongodb
+import datetime
+
 from blinders.explore_core.main import Explore, MatchInfo
 from blinders.explore_core.embedder import Embedder
 from redis.client import Redis
-from pymongo import MongoClient
+import pymongo
+from bson.objectid import ObjectId
 import os
-from dotenv import load_dotenv
+import dotenv
 import json
 
-
-load_dotenv()
-
-matchColName = "matchs"
+matchColName = "matches"
 userColName = "users"
 genders = ["male", "female"]
 
 if __name__ == "__main__":
+    dotenv.load_dotenv()
     mongoURL = "mongodb://{}:{}@{}:{}/{}".format(
         os.getenv("MONGO_USERNAME"),
         os.getenv("MONGO_PASSWORD"),
@@ -22,26 +23,30 @@ if __name__ == "__main__":
         os.getenv("MONGO_PORT"),
         os.getenv("MONGO_DATABASE"),
     )
-    mongoClient = MongoClient(mongoURL)
+    mongoClient = pymongo.MongoClient(mongoURL)
     db = mongoClient.get_database(os.getenv("MONGO_DATABASE", "Default"))
-    matchCol = db.get_collection(matchColName)
-    userCol = db.get_collection(userColName)
+    match_col = db.get_collection(matchColName)
+    user_col = db.get_collection(userColName)
 
-    embbeder = Embedder()
-    redisClient = Redis(host="localhost", port=6379)
-    explore = Explore(redisClient, embbeder, matchCol)
-    usersCur = userCol.find({})
-    matchsCur = matchCol.find({})
+    embedder = Embedder()
+    redis_client = Redis(host="localhost", port=6379)
+    explore = Explore(redis_client, embedder, match_col)
 
     with open("mock/users.json", "r") as f:
         users = json.load(f)
         for user in users:
-            userCol.insert_one(user)
+            now = datetime.datetime.now()
+            user["createdAt"] = now
+            user["updatedAt"] = now
+            user["_id"] = ObjectId(user["_id"])
+            user_col.insert_one(user)
 
-    with open("mock/matchs.json", "r") as f:
-        matchs = json.load(f)
-        for match in matchs:
-            matchCol.insert_one(match)
+    with open("mock/matches.json", "r") as f:
+        matches = json.load(f)
+        for match in matches:
+            match["userID"] = ObjectId(match["userID"])
+            match["_id"] = ObjectId(match["_id"])
+            match_col.insert_one(match)
             try:
                 matchInfo = MatchInfo(
                     match.get("firebaseUID"),
@@ -55,7 +60,7 @@ if __name__ == "__main__":
                     match.get("userID"),
                     match.get("age"),
                 )
-                explore.AddUserEmbed(matchInfo)
+                explore.add_user_embed(matchInfo)
             except Exception as e:
                 print(e)
                 break

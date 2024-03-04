@@ -1,7 +1,7 @@
 from blinders.explore_core.main import Explore
 from blinders.explore_core.embedder import Embedder
 from redis.client import Redis
-from pymongo import MongoClient
+import pymongo
 import os
 from dotenv import load_dotenv
 import json
@@ -9,7 +9,7 @@ import json
 
 load_dotenv()
 
-matchColName = "matchs"
+matchColName = "matches"
 userColName = "users"
 genders = ["male", "female"]
 
@@ -21,20 +21,18 @@ if __name__ == "__main__":
         os.getenv("MONGO_PORT"),
         os.getenv("MONGO_DATABASE"),
     )
-    print(mongoURL)
-    mongoClient = MongoClient(mongoURL)
+    mongoClient = pymongo.MongoClient(mongoURL)
     db = mongoClient[os.getenv("MONGO_DATABASE", "Default")]
-    matchCol = db[matchColName]
+    match_col = db[matchColName]
     userCol = db[userColName]
 
-    embbeder = Embedder()
+    embedder = Embedder()
     redisClient = Redis(host="localhost", port=6379)
-    explore = Explore(redisClient, embbeder, matchCol)
+    explore = Explore(redisClient, embedder, match_col)
     usersCur = userCol.find({})
-    matchsCur = matchCol.find({})
-    print(usersCur.max)
+    matchesCur = match_col.find({})
     users = []
-    matchs = []
+    matches = []
 
     while True:
         try:
@@ -47,13 +45,14 @@ if __name__ == "__main__":
 
     with open("mock/users.json", "w") as f:
         json.dump(users, f, default=str)
+
     while True:
         try:
-            curr = matchsCur.next()
+            curr = matchesCur.next()
         except Exception as e:
             print(e)
             break
         assert isinstance(curr, dict)
-        matchs.append(curr)
-    with open("mock/matchs.json", "w") as f:
-        json.dump(matchs, f, default=str)
+        matches.append(curr)
+    with open("mock/matches.json", "w") as f:
+        json.dump(matches, f, default=str)

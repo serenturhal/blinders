@@ -3,15 +3,12 @@ import datetime
 from firebase_admin import firestore, credentials, initialize_app
 from pymongo import MongoClient
 import os
-from dotenv import load_dotenv
-
-
-load_dotenv()
+import dotenv
 
 userColName = "users"
 
-
 if __name__ == "__main__":
+    dotenv.load_dotenv()
     try:
         mongoURL = "mongodb://{}:{}@{}:{}/{}".format(
             os.getenv("MONGO_USERNAME"),
@@ -20,31 +17,30 @@ if __name__ == "__main__":
             os.getenv("MONGO_PORT"),
             os.getenv("MONGO_DATABASE"),
         )
-        print(mongoURL)
-        mongoClient = MongoClient(mongoURL)
-        db = mongoClient[os.getenv("MONGO_DATABASE", "Default")]
+        mongo_client = MongoClient(mongoURL)
+        db = mongo_client[os.getenv("MONGO_DATABASE", "Default")]
 
         creds = credentials.Certificate("./firebase.admin.development.json")
         app = initialize_app(creds)
         firestoreClient = firestore.client(app)
         userDocs = firestoreClient.collection("Users").stream()
 
-        for userDoc in userDocs:
-            doc = userDoc.to_dict()
+        for user_doc in userDocs:
+            doc = user_doc.to_dict()
             if doc is None:
                 userDocs.close()
                 break
 
             userID = doc.get("firebaseUid")
             name = doc.get("name")
-            imageURL = doc.get("imageUrl")
-            friendsFirebaseUID = doc.get("friends")
+            image_url = doc.get("imageUrl")
+            friends_firebase_uid = doc.get("friends")
 
             if (
                 userID is None
                 or name is None
-                or imageURL is None
-                or friendsFirebaseUID is None
+                or image_url is None
+                or friends_firebase_uid is None
             ):
                 continue
 
@@ -52,8 +48,8 @@ if __name__ == "__main__":
             mongoUser = db[userColName].insert_one(
                 {
                     "firebaseUID": userID,
-                    "imageURL": imageURL,
-                    "friends": friendsFirebaseUID,
+                    "imageURL": image_url,
+                    "friends": friends_firebase_uid,
                     "createdAt": now,
                     "updatedAt": now,
                 }
