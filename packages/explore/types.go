@@ -9,7 +9,7 @@ type (
 	EmbeddingVector []float32
 )
 
-func (v EmbeddingVector) MarshalBinary() ([]byte, error) {
+func (v *EmbeddingVector) MarshalBinary() ([]byte, error) {
 	buf := new(bytes.Buffer)
 	err := binary.Write(buf, binary.LittleEndian, v)
 	if err != nil {
