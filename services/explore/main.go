@@ -51,21 +51,20 @@ func init() {
 		os.Getenv("MONGO_DATABASE"),
 	)
 
-	db := db.NewMongoManager(url, os.Getenv("MONGO_DATABASE"))
+	mongoManager := db.NewMongoManager(url, os.Getenv("MONGO_DATABASE"))
 
 	fmt.Println("Connect to mongo url", url)
 
 	redisClient := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
+		Addr:     os.Getenv("REDIS_URL"),
 		Password: "", // no password set
 		DB:       0,  // use default DB
 	})
-
 	if err := redisClient.Ping(ctx).Err(); err != nil {
 		panic(err)
 	}
 
-	core := explore.NewMongoExplorer(db, redisClient)
+	core := explore.NewMongoExplorer(mongoManager, redisClient)
 
 	service = exploreapi.NewService(app, authManager, core, redisClient)
 	service.InitRoute()

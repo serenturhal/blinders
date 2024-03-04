@@ -125,3 +125,18 @@ func (r *MatchesRepo) GetUsersByLanguage(userID string, numReturn uint32) ([]str
 	}
 	return ids, nil
 }
+
+func (r *MatchesRepo) DropUserWithFirebaseUID(userID string) (models.MatchInfo, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+	filter := bson.M{"firebaseUID": userID}
+	res := r.Col.FindOneAndDelete(ctx, filter)
+	if err := res.Err(); err != nil {
+		return models.MatchInfo{}, err
+	}
+	var deletedUser models.MatchInfo
+	if err := res.Decode(&deletedUser); err != nil {
+		return models.MatchInfo{}, err
+	}
+	return deletedUser, nil
+}

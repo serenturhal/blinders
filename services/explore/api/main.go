@@ -42,7 +42,7 @@ func (s *Service) InitRoute() {
 
 	matchRoute := s.App.Group("/match", auth.FiberAuthMiddleware(s.Auth))
 	matchRoute.Get("/suggest", s.HandleGetMatches)
-	// Temporarily expose this method, it must be call internal or we will listen to user update-match-information event
+	// Temporarily expose this method, it must be call internal, or we will listen to user update-match-information event
 	matchRoute.Post("/", s.HandleAddUserMatch)
 }
 

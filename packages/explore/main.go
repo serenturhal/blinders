@@ -31,12 +31,16 @@ func NewMongoExplorer(Db *db.MongoManager, RedisClient *redis.Client) *MongoExpl
 	}
 }
 
-// Currently, the suggestion algorithm recommends 5 users who are not friends of the current user.
-// The goal is to recommend users with whom the current user may communicate effectively.
-// These users should either be fluent in the language the current user is learning or actively learning the same language.
-// To achieve this, we will filter the Users database to extract users who are native speakers of the language the current user is learning,
-// or users who are currently learning the same language as the current user.
-// We will then use KNN-search in the filtered space to identify 5 users that may match with the current user.
+/*
+Suggest  recommends 5 users who are not friends of the current user.
+
+TODO: The goal is to recommend users with whom the current user may communicate effectively.
+These users should either be fluent in the language the current user is learning or actively learning the same language.
+To achieve this, we will filter the Users database to extract users who are native speakers of the language the current user is learning,
+or users who are currently learning the same language as the current user.
+
+We will then use KNN-search in the filtered space to identify 5 users that may match with the current user.
+*/
 func (m *MongoExplorer) Suggest(fromID string) ([]models.MatchInfo, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
@@ -47,15 +51,16 @@ func (m *MongoExplorer) Suggest(fromID string) ([]models.MatchInfo, error) {
 		return nil, err
 	}
 
+	// JSONGet return value wrapped in an array.
 	jsonStr, _ := m.RedisClient.JSONGet(ctx, CreateMatchKeyWithUserID(fromID), "$.embed").Result()
-	embedArr := []EmbeddingVector{}
+	var embedArr []EmbeddingVector
 	if err := json.Unmarshal([]byte(jsonStr), &embedArr); err != nil {
 		return nil, err
 	}
 	embed := embedArr[0]
 
 	// exclude friends of current user
-	// TODO: Need to optimize; currently, excluding 700 users takes 230ms on M1 chip with 16GB RAM.
+	// TODO: Need to optimize
 	excludeFilter := fromID
 	for _, friendID := range user.FriendsFirebaseUID {
 		excludeFilter += " | " + friendID
@@ -63,7 +68,7 @@ func (m *MongoExplorer) Suggest(fromID string) ([]models.MatchInfo, error) {
 	excludeFilter = fmt.Sprintf("-@id:(%s)", excludeFilter)
 
 	// get 1000 candidates
-	candidates, err := m.Db.Matchs.GetUsersByLanguage(user.FirebaseUID, 1000)
+	candidates, err := m.Db.Matches.GetUsersByLanguage(user.FirebaseUID, 1000)
 	if err != nil {
 		return nil, err
 	}
@@ -94,10 +99,10 @@ func (m *MongoExplorer) Suggest(fromID string) ([]models.MatchInfo, error) {
 		return nil, err
 	}
 
-	res := []models.MatchInfo{}
+	var res []models.MatchInfo
 	for _, doc := range cmd.Val().(map[any]any)["results"].([]any) {
 		userID := doc.(map[any]any)["extra_attributes"].(map[any]any)["id"].(string)
-		user, err := m.Db.Matchs.GetUserByFirebaseUID(userID)
+		user, err := m.Db.Matches.GetUserByFirebaseUID(userID)
 		if err != nil {
 			return nil, err
 		}
@@ -107,10 +112,16 @@ func (m *MongoExplorer) Suggest(fromID string) ([]models.MatchInfo, error) {
 	// TODO: After the suggestion process, mark these users as suggested to prevent them from being recommended in future suggestions.
 	// Idea: Recommended users will be assigned extra points, which will be added to their vector space during the vector search, making their vectors more distant from the current vector.
 	// Redis does not support sorting by expression.
-
 	return res, nil
 }
 
+/*
+AddUserMatchInformation inserts information into the match database.
+
+Currently, embedding will be handled by another service. The caller of this method must trigger a new event
+to notify that a new user has been created. This allows the embedding service to update the embedding vector
+in the vector database.
+*/
 func (m *MongoExplorer) AddUserMatchInformation(info models.MatchInfo) (models.MatchInfo, error) {
 	user, err := m.Db.Users.GetUserByFirebaseUID(info.FirebaseUID)
 	if err != nil {
@@ -119,7 +130,7 @@ func (m *MongoExplorer) AddUserMatchInformation(info models.MatchInfo) (models.M
 	info.UserID = user.ID
 
 	// duplicated match information will be handled by the repository since we have already indexed the collection with firebaseUID.
-	matchInfo, err := m.Db.Matchs.InsertNewRawMatchInfo(info)
+	matchInfo, err := m.Db.Matches.InsertNewRawMatchInfo(info)
 	if err != nil {
 		return models.MatchInfo{}, err
 	}

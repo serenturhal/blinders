@@ -26,7 +26,7 @@ func (s *Service) HandleGetMatches(ctx *fiber.Ctx) error {
 	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{"matches": matches})
 }
 
-// HandleAddUserMatch will add match-information to match db
+// HandleAddUserMatch will add match-related information to match db
 func (s *Service) HandleAddUserMatch(ctx *fiber.Ctx) error {
 	user, ok := ctx.Locals(auth.UserAuthKey).(*auth.UserAuth)
 	if !ok || user == nil {
