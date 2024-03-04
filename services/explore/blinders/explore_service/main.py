@@ -1,16 +1,15 @@
 from blinders.explore_core.main import Explore
 from blinders.explore_core.embedder import Embedder
 import pymongo
-from redis.client import Redis
+import redis
 import os
-from dotenv import load_dotenv
+import dotenv
 
 from blinders.explore_service.core.main import ServiceWorker
 
-
-matchColName = "matchs"
+matchColName = "matches"
 if __name__ == "__main__":
-    load_dotenv()
+    dotenv.load_dotenv()
     try:
         mongoURL = "mongodb://{}:{}@{}:{}/{}".format(
             os.getenv("MONGO_USERNAME"),
@@ -19,18 +18,15 @@ if __name__ == "__main__":
             os.getenv("MONGO_PORT"),
             os.getenv("MONGO_DATABASE"),
         )
-        print(mongoURL)
         mongoClient = pymongo.MongoClient(mongoURL)
         db = mongoClient[os.getenv("MONGO_DATABASE", "Default")]
         matchCol = db[matchColName]
 
-        embbeder = Embedder()
-        redisClient = Redis(host="localhost", port=6379, decode_responses=True)
-        explore = Explore(redisClient, embbeder, matchCol)
-    except Exception as e:
-        print(e)
-    service_core = ServiceWorker(redisClient=redisClient, exploreCore=explore)
-    try:
+        embedder = Embedder()
+        redis_client = redis.client.Redis(host="localhost", port=6379, decode_responses=True)
+        explore = Explore(redis_client, embedder, matchCol)
+        service_core = ServiceWorker(redis_client=redis_client, explore_core=explore)
         service_core.loop()
+
     except Exception as e:
-        print(e)
+        print("exception: ", e)

@@ -5,17 +5,17 @@ from blinders.explore_core.types import MatchInfo
 
 
 class ServiceWorker(object):
-    redisClient: redis.Redis
+    redis_client: redis.Redis
     core: Explore
 
-    def __init__(self, redisClient: redis.Redis, exploreCore: Explore) -> None:
-        self.redisClient = redisClient
-        self.core = exploreCore
-        self.initRedisGroup()
+    def __init__(self, redis_client: redis.Redis, explore_core: Explore) -> None:
+        self.redis_client = redis_client
+        self.core = explore_core
+        self.init_redis_group()
 
-    def initRedisGroup(self):
+    def init_redis_group(self):
         try:
-            res = self.redisClient.xgroup_create(
+            res = self.redis_client.xgroup_create(
                 "match:embed", "matchGroup", "$", mkstream=True
             )
             print(res)
@@ -24,12 +24,12 @@ class ServiceWorker(object):
             pass
 
     def loop(self):
-        consumerName = os.getenv("REDIS_CONSUMER_NAME", "default")
-        print("listening to stream, consumer name: ", consumerName)
+        consumer_name = os.getenv("REDIS_CONSUMER_NAME", "default")
+        print("listening to stream, consumer name: ", consumer_name)
         while True:
-            entries = self.redisClient.xreadgroup(
+            entries = self.redis_client.xreadgroup(
                 "matchGroup",
-                consumerName,
+                consumer_name,
                 {"match:embed": ">"},
                 block=1000,
                 count=1,
@@ -42,18 +42,18 @@ class ServiceWorker(object):
             if entries is None or len(entries) == 0:
                 continue
 
-            userID = entries[0][1][0][1]["id"]  # type: str
-            if not isinstance(userID, str):
+            user_id = entries[0][1][0][1]["id"]  # type: str
+            if not isinstance(user_id, str):
                 print("could not found id in stream entry")
                 continue
 
-            doc = self.core.matchCol.find_one({"firebaseUID": userID})
+            doc = self.core.match_col.find_one({"firebaseUID": user_id})
             if doc is None:
                 print("user not found")
                 return
 
             info = MatchInfo(
-                firebaseUID=userID,
+                firebaseUID=user_id,
                 name=doc.get("name"),
                 gender=doc.get("gender"),
                 major=doc.get("major"),
@@ -64,4 +64,4 @@ class ServiceWorker(object):
                 userID=doc.get("userID"),
                 age=doc.get("age"),
             )
-            self.core.AddUserEmbed(info)
+            self.core.add_user_embed(info)

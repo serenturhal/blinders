@@ -1,36 +1,36 @@
-from pymongo.collection import Collection
-from redis.client import Redis
 from blinders.explore_core.embedder import Embedder
 from blinders.explore_core.types import MatchInfo
-from blinders.explore_core.utils import CreateRedisMatchKey
+from blinders.explore_core.utils import create_redis_match_key
 from redis.commands.search.field import (
     TextField,
     VectorField,
 )
+from redis.client import Redis
 from redis.commands.search.indexDefinition import IndexDefinition, IndexType
+from pymongo.collection import Collection
 
 
 class Explore(object):
-    redisClient: Redis
+    redis_client: Redis
     embedder: Embedder
-    matchCol: Collection
+    match_col: Collection
     vector_dimension = 384
 
     def __init__(
         self,
-        RedisClient: Redis,
-        Embbeder: Embedder,
-        matchCol: Collection,
+        redis_client: Redis,
+        embedder: Embedder,
+        match_col: Collection,
     ) -> None:
-        if not RedisClient.ping():
+        if not redis_client.ping():
             raise Exception("cannot ping to redis")
 
-        self.redisClient = RedisClient
-        self.embedder = Embbeder
-        self.matchCol = matchCol
-        self.initIndex()
+        self.redis_client = redis_client
+        self.embedder = embedder
+        self.match_col = match_col
+        self.init_redis_index()
 
-    def initIndex(self):
+    def init_redis_index(self):
         try:
             schema = (
                 TextField("$.id", no_stem=True, as_name="id"),
@@ -46,7 +46,7 @@ class Explore(object):
                 ),
             )
             definition = IndexDefinition(prefix=["match:"], index_type=IndexType.JSON)
-            res = self.redisClient.ft("idx:match_vss").create_index(
+            res = self.redis_client.ft("idx:match_vss").create_index(
                 fields=schema, definition=definition
             )
             print(res)
@@ -55,16 +55,19 @@ class Explore(object):
             # maybe index defined
             print("error=>", e)
 
-
-    def AddUserEmbed(self, info: MatchInfo) -> None:
-        # AddUserMatch call after a new match entry already added to matchcol, this will embed recently document and add to vector db
-        doc = self.matchCol.find({"firebaseUID": info.firebaseUID})
+    def add_user_embed(self, info: MatchInfo) -> None:
+        """
+        add_use_embed call after a new match entry already added to matches collection, this will embed recently
+        document then add to vector database.
+        :param info: blinders.explore_core.types.MatchInfo
+        """
+        doc = self.match_col.find({"firebaseUID": info.firebaseUID})
         if doc is None:
-            print("user not existed")
-            return
+            raise Exception("user not existed")
+
         embed = self.embedder.embed(info)
-        self.redisClient.json().set(
-            CreateRedisMatchKey(info.firebaseUID),
+        self.redis_client.json().set(
+            create_redis_match_key(info.firebaseUID),
             "$",
             {
                 "embed": embed,

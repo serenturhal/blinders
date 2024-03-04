@@ -15,7 +15,8 @@ class MatchInfo:
     age: int
 
     def __str__(self) -> str:
-        return "[BEGIN]gender: {}[SEP]age: {}[SEP]job: {}[SEP]native language: {}[SEP]learning language: {}[SEP]country: {}[SEP]interests: {}[END]".format(
+        return ("[BEGIN]gender: {}[SEP]age: {}[SEP]job: {}[SEP]native language: {}[SEP]learning language: {}["
+                "SEP]country: {}[SEP]interests: {}[END]").format(
             self.gender,
             self.age,
             self.major,
