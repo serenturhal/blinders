@@ -1,10 +1,11 @@
 package db
 
 import (
-	"blinders/packages/db/repo"
 	"context"
 	"log"
 	"time"
+
+	"blinders/packages/db/repo"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
