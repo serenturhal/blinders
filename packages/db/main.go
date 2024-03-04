@@ -27,7 +27,7 @@ type MongoManager struct {
 	Users         *repo.UsersRepo
 	Conversations *repo.ConversationsRepo
 	Messages      *repo.MessagesRepo
-	Matchs        *repo.MatchsRepo
+	Matchs        *repo.MatchesRepo
 }
 
 func NewMongoManager(url string, name string) *MongoManager {
@@ -51,6 +51,6 @@ func NewMongoManager(url string, name string) *MongoManager {
 		Users:         repo.NewUsersRepo(client.Database(name).Collection(UserCollection)),
 		Conversations: repo.NewConversationsRepo(client.Database(name).Collection(ConversationCollection)),
 		Messages:      repo.NewMessagesRepo(client.Database(name).Collection(MessageCollection)),
-		Matchs:        repo.NewMatchsRepo(client.Database(name).Collection(MatchCollection)),
+		Matchs:        repo.NewMatchesRepo(client.Database(name).Collection(MatchCollection)),
 	}
 }

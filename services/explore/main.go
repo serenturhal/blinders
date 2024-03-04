@@ -26,6 +26,10 @@ func init() {
 		panic(err)
 	}
 	app := fiber.New(fiber.Config{
+		Prefork:      true,
+		WriteTimeout: time.Second * 5,
+		ReadTimeout:  time.Second * 5,
+
 		DisableStartupMessage: true,
 	})
 

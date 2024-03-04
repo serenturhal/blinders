@@ -10,19 +10,20 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func (s *Service) HandleGetMatch(ctx *fiber.Ctx) error {
+// HandleGetMatches returns 5 users that similarity with current user.
+func (s *Service) HandleGetMatches(ctx *fiber.Ctx) error {
 	user, ok := ctx.Locals(auth.UserAuthKey).(*auth.UserAuth)
 	if !ok || user == nil {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "cannot get user"})
 	}
 
-	matchs, err := s.Core.Suggest(user.AuthID)
+	matches, err := s.Core.Suggest(user.AuthID)
 	if err != nil {
 		return ctx.Status(fiber.StatusInternalServerError).
 			JSON(fiber.Map{"error": err.Error()})
 	}
 
-	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{"matchs": matchs})
+	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{"matches": matches})
 }
 
 // HandleAddUserMatch will add match-information to match db

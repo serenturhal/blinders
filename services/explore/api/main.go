@@ -35,13 +35,13 @@ func NewService(
 	}
 }
 
-func (s Service) InitRoute() {
+func (s *Service) InitRoute() {
 	s.App.Get("/ping", func(c *fiber.Ctx) error {
 		return c.SendString("service healthy")
 	})
 
 	matchRoute := s.App.Group("/match", auth.FiberAuthMiddleware(s.Auth))
-	matchRoute.Get("/suggest", s.HandleGetMatch)
+	matchRoute.Get("/suggest", s.HandleGetMatches)
 	// Temporarily expose this method, it must be call internal or we will listen to user update-match-information event
 	matchRoute.Post("/", s.HandleAddUserMatch)
 }

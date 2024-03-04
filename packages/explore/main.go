@@ -31,7 +31,12 @@ func NewMongoExplorer(Db *db.MongoManager, RedisClient *redis.Client) *MongoExpl
 	}
 }
 
-// currently, suggest suggests 5 users that are not friend of current user.
+// Currently, the suggestion algorithm recommends 5 users who are not friends of the current user.
+// The goal is to recommend users with whom the current user may communicate effectively.
+// These users should either be fluent in the language the current user is learning or actively learning the same language.
+// To achieve this, we will filter the Users database to extract users who are native speakers of the language the current user is learning,
+// or users who are currently learning the same language as the current user.
+// We will then use KNN-search in the filtered space to identify 5 users that may match with the current user.
 func (m *MongoExplorer) Suggest(fromID string) ([]models.MatchInfo, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
@@ -57,7 +62,8 @@ func (m *MongoExplorer) Suggest(fromID string) ([]models.MatchInfo, error) {
 	}
 	excludeFilter = fmt.Sprintf("-@id:(%s)", excludeFilter)
 
-	candidates, err := m.Db.Matchs.GetUsersByLanguage(user.FirebaseUID)
+	// get 1000 candidates
+	candidates, err := m.Db.Matchs.GetUsersByLanguage(user.FirebaseUID, 1000)
 	if err != nil {
 		return nil, err
 	}
@@ -97,6 +103,11 @@ func (m *MongoExplorer) Suggest(fromID string) ([]models.MatchInfo, error) {
 		}
 		res = append(res, user)
 	}
+
+	// TODO: After the suggestion process, mark these users as suggested to prevent them from being recommended in future suggestions.
+	// Idea: Recommended users will be assigned extra points, which will be added to their vector space during the vector search, making their vectors more distant from the current vector.
+	// Redis does not support sorting by expression.
+
 	return res, nil
 }
 

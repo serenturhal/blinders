@@ -5,19 +5,19 @@ import (
 	"log"
 	"time"
 
+	"blinders/packages/db/models"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-
-	"blinders/packages/db/models"
 )
 
-type MatchsRepo struct {
+type MatchesRepo struct {
 	Col *mongo.Collection
 }
 
-func NewMatchsRepo(col *mongo.Collection) *MatchsRepo {
+func NewMatchesRepo(col *mongo.Collection) *MatchesRepo {
 	ctx, cal := context.WithTimeout(context.Background(), time.Second*5)
 	defer cal()
 
@@ -37,12 +37,12 @@ func NewMatchsRepo(col *mongo.Collection) *MatchsRepo {
 		return nil
 	}
 
-	return &MatchsRepo{
+	return &MatchesRepo{
 		Col: col,
 	}
 }
 
-func (r *MatchsRepo) InsertNewRawMatchInfo(doc models.MatchInfo) (models.MatchInfo, error) {
+func (r *MatchesRepo) InsertNewRawMatchInfo(doc models.MatchInfo) (models.MatchInfo, error) {
 	ctx, cal := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cal()
 
@@ -51,7 +51,7 @@ func (r *MatchsRepo) InsertNewRawMatchInfo(doc models.MatchInfo) (models.MatchIn
 	return doc, err
 }
 
-func (r *MatchsRepo) GetMatchInfoByUserID(id primitive.ObjectID) (models.MatchInfo, error) {
+func (r *MatchesRepo) GetMatchInfoByUserID(id primitive.ObjectID) (models.MatchInfo, error) {
 	ctx, cal := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cal()
 
@@ -61,7 +61,7 @@ func (r *MatchsRepo) GetMatchInfoByUserID(id primitive.ObjectID) (models.MatchIn
 	return doc, err
 }
 
-func (r *MatchsRepo) GetUserByFirebaseUID(uid string) (models.MatchInfo, error) {
+func (r *MatchesRepo) GetUserByFirebaseUID(uid string) (models.MatchInfo, error) {
 	ctx, cal := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cal()
 
@@ -71,8 +71,8 @@ func (r *MatchsRepo) GetUserByFirebaseUID(uid string) (models.MatchInfo, error) 
 	return doc, err
 }
 
-// GetMatchCandidates returns `numReturn` ID of users that speak one language of `learnings` and are currently learning `native`.
-func (r *MatchsRepo) GetUsersByLanguage(userID string) ([]string, error) {
+// GetUsersByLanguage returns `numReturn` ID of users that speak one language of `learnings` and are currently learning `native` or are currently learning same language as user.
+func (r *MatchesRepo) GetUsersByLanguage(userID string, numReturn uint32) ([]string, error) {
 	user, err := r.GetUserByFirebaseUID(userID)
 	if err != nil {
 		return nil, err
@@ -96,7 +96,7 @@ func (r *MatchsRepo) GetUsersByLanguage(userID string) ([]string, error) {
 		// at here we may sort users based on any rank mark from the system.
 		// currently, we random choose 1000 user.
 		{
-			"$sample": bson.M{"size": 1000},
+			"$sample": bson.M{"size": numReturn},
 		},
 		{"$project": bson.M{"_id": 0, "firebaseUID": 1}},
 	}
@@ -105,13 +105,17 @@ func (r *MatchsRepo) GetUsersByLanguage(userID string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer cur.Close(ctx)
+	defer func() {
+		if err = cur.Close(ctx); err != nil {
+			log.Panicf("hepo: cannot close cursor, err: %v", err)
+		}
+	}()
 
 	type ReturnType struct {
 		FirebaseUID string `bson:"firebaseUID"`
 	}
 
-	ids := []string{}
+	var ids []string
 	for cur.Next(ctx) {
 		doc := new(ReturnType)
 		if err := cur.Decode(doc); err != nil {
