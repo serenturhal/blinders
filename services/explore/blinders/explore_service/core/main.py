@@ -31,7 +31,8 @@ class ServiceWorker(object):
                 "matchGroup",
                 consumerName,
                 {"match:embed": ">"},
-                block=10000,
+                block=1000,
+                count=1,
             )
             if not isinstance(entries, list):
                 print("reply  with unexpected format")
@@ -39,7 +40,6 @@ class ServiceWorker(object):
                 continue
 
             if entries is None or len(entries) == 0:
-                print("timeout tried again")
                 continue
 
             userID = entries[0][1][0][1]["id"]  # type: str
