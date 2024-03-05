@@ -6,6 +6,7 @@ import (
 
 	"blinders/packages/db"
 	"blinders/packages/db/models"
+
 	"github.com/stretchr/testify/assert"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -158,6 +159,7 @@ candidateLoop:
 	assert.Nil(t, err)
 	assert.Equal(t, rawUser, usr)
 }
+
 func TestMatchesRepo_DropUserWithFirebaseUID(t *testing.T) {
 	manager := db.NewMongoManager("mongodb://username:password@localhost:27017/peakee", "peakee")
 	rawUser := models.MatchInfo{

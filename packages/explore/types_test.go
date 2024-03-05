@@ -1,9 +1,10 @@
 package explore_test
 
 import (
-	"blinders/packages/explore"
 	"math/rand"
 	"testing"
+
+	"blinders/packages/explore"
 
 	"github.com/stretchr/testify/assert"
 )
