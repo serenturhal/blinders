@@ -11,8 +11,9 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+var mongoManager = db.NewMongoManager("mongodb://username:password@localhost:27017/peakee", "peakee")
+
 func TestMatchesRepo_InsertNewRawMatchInfo(t *testing.T) {
-	manager := db.NewMongoManager("mongodb://username:password@localhost:27017/peakee", "peakee")
 	rawUser := models.MatchInfo{
 		FirebaseUID: "firebaseUID",
 		Name:        "name",
@@ -25,7 +26,7 @@ func TestMatchesRepo_InsertNewRawMatchInfo(t *testing.T) {
 		UserID:      primitive.ObjectID{},
 		Age:         0,
 	}
-	r := manager.Matches
+	r := mongoManager.Matches
 	usr, err := r.InsertNewRawMatchInfo(rawUser)
 	assert.Nil(t, err)
 	assert.Equal(t, rawUser, usr)
@@ -40,7 +41,6 @@ func TestMatchesRepo_InsertNewRawMatchInfo(t *testing.T) {
 }
 
 func TestMatchesRepo_GetMatchInfoByFirebaseUID(t *testing.T) {
-	manager := db.NewMongoManager("mongodb://username:password@localhost:27017/peakee", "peakee")
 	rawUser := models.MatchInfo{
 		FirebaseUID: "firebaseUID",
 		Name:        "name",
@@ -53,7 +53,7 @@ func TestMatchesRepo_GetMatchInfoByFirebaseUID(t *testing.T) {
 		UserID:      primitive.ObjectID{},
 		Age:         0,
 	}
-	r := manager.Matches
+	r := mongoManager.Matches
 	usr, err := r.InsertNewRawMatchInfo(rawUser)
 	assert.Nil(t, err)
 	assert.Equal(t, rawUser, usr)
@@ -72,7 +72,6 @@ func TestMatchesRepo_GetMatchInfoByFirebaseUID(t *testing.T) {
 }
 
 func TestMatchesRepo_GetMatchInfoByUserID(t *testing.T) {
-	manager := db.NewMongoManager("mongodb://username:password@localhost:27017/peakee", "peakee")
 	rawUser := models.MatchInfo{
 		FirebaseUID: "firebaseUID",
 		Name:        "name",
@@ -85,7 +84,7 @@ func TestMatchesRepo_GetMatchInfoByUserID(t *testing.T) {
 		UserID:      primitive.ObjectID{},
 		Age:         0,
 	}
-	r := manager.Matches
+	r := mongoManager.Matches
 	usr, err := r.InsertNewRawMatchInfo(rawUser)
 	assert.Nil(t, err)
 	assert.Equal(t, rawUser, usr)
@@ -117,7 +116,7 @@ func TestMatchesRepo_GetUsersByLanguage(t *testing.T) {
 		Age:         0,
 	}
 	numReturn := uint32(10)
-	r := manager.Matches
+	r := mongoManager.Matches
 
 	usr, err := r.DropUserWithFirebaseUID(rawUser.FirebaseUID)
 	if err != nil {
@@ -161,7 +160,6 @@ candidateLoop:
 }
 
 func TestMatchesRepo_DropUserWithFirebaseUID(t *testing.T) {
-	manager := db.NewMongoManager("mongodb://username:password@localhost:27017/peakee", "peakee")
 	rawUser := models.MatchInfo{
 		FirebaseUID: "testID",
 		Name:        "name",
@@ -174,7 +172,7 @@ func TestMatchesRepo_DropUserWithFirebaseUID(t *testing.T) {
 		UserID:      primitive.NewObjectID(),
 		Age:         0,
 	}
-	r := manager.Matches
+	r := mongoManager.Matches
 	usr, err := r.InsertNewRawMatchInfo(rawUser)
 	assert.Nil(t, err)
 	assert.Equal(t, rawUser, usr)
