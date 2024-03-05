@@ -118,7 +118,18 @@ func TestMatchesRepo_GetUsersByLanguage(t *testing.T) {
 	numReturn := uint32(10)
 	r := manager.Matches
 
-	usr, err := r.InsertNewRawMatchInfo(rawUser)
+	usr, err := r.DropUserWithFirebaseUID(rawUser.FirebaseUID)
+	if err != nil {
+		assert.Equal(t, models.MatchInfo{}, usr)
+	} else {
+		assert.NotEmpty(t, usr)
+	}
+
+	failedGot, err := r.GetUsersByLanguage(rawUser.FirebaseUID, 10)
+	assert.NotNil(t, err)
+	assert.Len(t, failedGot, 0)
+
+	usr, err = r.InsertNewRawMatchInfo(rawUser)
 	assert.Nil(t, err)
 	assert.Equal(t, rawUser, usr)
 
