@@ -102,7 +102,7 @@ func (m *MongoExplorer) Suggest(fromID string) ([]models.MatchInfo, error) {
 	var res []models.MatchInfo
 	for _, doc := range cmd.Val().(map[any]any)["results"].([]any) {
 		userID := doc.(map[any]any)["extra_attributes"].(map[any]any)["id"].(string)
-		user, err := m.Db.Matches.GetUserByFirebaseUID(userID)
+		user, err := m.Db.Matches.GetMatchInfoByFirebaseUID(userID)
 		if err != nil {
 			return nil, err
 		}

@@ -61,7 +61,7 @@ func (r *MatchesRepo) GetMatchInfoByUserID(id primitive.ObjectID) (models.MatchI
 	return doc, err
 }
 
-func (r *MatchesRepo) GetUserByFirebaseUID(uid string) (models.MatchInfo, error) {
+func (r *MatchesRepo) GetMatchInfoByFirebaseUID(uid string) (models.MatchInfo, error) {
 	ctx, cal := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cal()
 
@@ -72,8 +72,8 @@ func (r *MatchesRepo) GetUserByFirebaseUID(uid string) (models.MatchInfo, error)
 }
 
 // GetUsersByLanguage returns `numReturn` ID of users that speak one language of `learnings` and are currently learning `native` or are currently learning same language as user.
-func (r *MatchesRepo) GetUsersByLanguage(userID string, numReturn uint32) ([]string, error) {
-	user, err := r.GetUserByFirebaseUID(userID)
+func (r *MatchesRepo) GetUsersByLanguage(firebaseUID string, numReturn uint32) ([]string, error) {
+	user, err := r.GetMatchInfoByFirebaseUID(firebaseUID)
 	if err != nil {
 		return nil, err
 	}
@@ -82,7 +82,7 @@ func (r *MatchesRepo) GetUsersByLanguage(userID string, numReturn uint32) ([]str
 	defer cancel()
 	stages := []bson.M{
 		{"$match": bson.M{
-			"firebaseUID": bson.M{"$ne": userID},
+			"firebaseUID": bson.M{"$ne": firebaseUID},
 			"$or": []bson.M{
 				{
 					"native":    bson.M{"$in": user.Learnings},        // Users must speak at least one language of `learnings`.
@@ -93,7 +93,7 @@ func (r *MatchesRepo) GetUsersByLanguage(userID string, numReturn uint32) ([]str
 				},
 			},
 		}},
-		// at here we may sort users based on any rank mark from the system.
+		// at here we may sort users based on any ranking mark from the system.
 		// currently, we random choose 1000 user.
 		{
 			"$sample": bson.M{"size": numReturn},
@@ -126,10 +126,10 @@ func (r *MatchesRepo) GetUsersByLanguage(userID string, numReturn uint32) ([]str
 	return ids, nil
 }
 
-func (r *MatchesRepo) DropUserWithFirebaseUID(userID string) (models.MatchInfo, error) {
+func (r *MatchesRepo) DropUserWithFirebaseUID(firebaseUID string) (models.MatchInfo, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
-	filter := bson.M{"firebaseUID": userID}
+	filter := bson.M{"firebaseUID": firebaseUID}
 	res := r.Col.FindOneAndDelete(ctx, filter)
 	if err := res.Err(); err != nil {
 		return models.MatchInfo{}, err
