@@ -1,6 +1,6 @@
 module blinders/packages/suggest
 
-go 1.21.3
+go 1.22.0
 
 require (
 	github.com/sashabaranov/go-openai v1.17.9
