@@ -22,8 +22,6 @@ func init() {
 	}
 
 	app := fiber.New()
-	adminJSON, _ := utils.GetFile("firebase.admin.development.json")
-	auth, _ := auth.NewFirebaseManager(adminJSON)
 
 	url := fmt.Sprintf(
 		db.MongoURLTemplate,
@@ -33,12 +31,15 @@ func init() {
 		os.Getenv("MONGO_PORT"),
 		os.Getenv("MONGO_DATABASE"),
 	)
-	db := db.NewMongoManager(url, os.Getenv("MONGO_DATABASE"))
-	if db == nil {
+	dbManager := db.NewMongoManager(url, os.Getenv("MONGO_DATABASE"))
+	if dbManager == nil {
 		log.Fatal("cannot create database manager")
 	}
 
-	apiManager = *restapi.NewManager(app, auth, db)
+	adminJSON, _ := utils.GetFile("firebase.admin.development.json")
+	authManger, _ := auth.NewFirebaseManager(dbManager.Users, adminJSON)
+
+	apiManager = *restapi.NewManager(app, authManger, dbManager)
 	_ = apiManager.InitRoute(restapi.InitOptions{})
 }
 

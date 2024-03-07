@@ -22,7 +22,7 @@ func NewUsersService(repo *repo.UsersRepo) *UsersService {
 
 func (s UsersService) GetUserByID(ctx *fiber.Ctx) error {
 	id := ctx.Params("id")
-	oid, err := primitive.ObjectIDFromHex((id))
+	oid, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		log.Println("invalid id:", err)
 		return ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
@@ -30,7 +30,7 @@ func (s UsersService) GetUserByID(ctx *fiber.Ctx) error {
 		})
 	}
 
-	user, err := s.Repo.GetUserByID(oid)
+	user, err := s.Repo.GetUserByPrimitiveID(oid)
 	if err != nil {
 		log.Println("can not get conversation:", err)
 		return ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{

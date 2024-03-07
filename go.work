@@ -23,5 +23,6 @@ use (
 	./services/chat
 	./services/explore
 	./services/suggest
+	./services/rest
 	./tests
 )

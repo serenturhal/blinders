@@ -34,9 +34,9 @@ func init() {
 	)
 
 	mongoManager := db.NewMongoManager(url, os.Getenv("MONGO_DATABASE"))
-
 	fmt.Println("Connect to mongo url", url)
-	auth, _ := auth.NewFirebaseManager(mongoManager.Users, adminJSON)
+
+	authManager, _ := auth.NewFirebaseManager(mongoManager.Users, adminJSON)
 
 	openaiKey := os.Getenv("OPENAI_API_KEY")
 	client := openai.NewClient(openaiKey)
@@ -45,7 +45,7 @@ func init() {
 		log.Fatal("failed to init openai client", err)
 	}
 
-	service = suggestapi.Service{App: app, Auth: auth, Suggester: suggester}
+	service = suggestapi.Service{App: app, Auth: authManager, Suggester: suggester}
 	service.InitRoute()
 }
 
