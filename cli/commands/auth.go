@@ -7,6 +7,7 @@ import (
 
 	"blinders/packages/auth"
 	authutils "blinders/packages/auth/utils"
+	"blinders/packages/db"
 	"blinders/packages/utils"
 
 	firebaseAuth "firebase.google.com/go/auth"
@@ -21,7 +22,16 @@ var AuthCommand = cli.Command{
 	Before: func(ctx *cli.Context) error {
 		env := ctx.String("env")
 		adminJSON, _ := utils.GetFile(fmt.Sprintf("firebase.admin.%v.json", env))
-		a, err := auth.NewFirebaseManager(adminJSON)
+		mongoURL := fmt.Sprintf(
+			db.MongoURLTemplate,
+			os.Getenv("MONGO_USERNAME"),
+			os.Getenv("MONGO_PASSWORD"),
+			os.Getenv("MONGO_HOST"),
+			os.Getenv("MONGO_PORT"),
+			os.Getenv("MONGO_DATABASE"),
+		)
+		manager := db.NewMongoManager(mongoURL, os.Getenv("MONGO_DATABASE"))
+		a, err := auth.NewFirebaseManager(manager.Users, adminJSON)
 		if err != nil {
 			return err
 		}

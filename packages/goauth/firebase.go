@@ -2,6 +2,9 @@ package auth
 
 import (
 	"context"
+	"fmt"
+
+	"blinders/packages/db/repo"
 
 	firebase "firebase.google.com/go"
 	"firebase.google.com/go/auth"
@@ -9,8 +12,9 @@ import (
 )
 
 type FirebaseManager struct {
-	App    *firebase.App
-	Client *auth.Client
+	App      *firebase.App
+	Client   *auth.Client
+	UserRepo *repo.UsersRepo
 }
 
 func (m FirebaseManager) Verify(jwt string) (*UserAuth, error) {
@@ -23,16 +27,23 @@ func (m FirebaseManager) Verify(jwt string) (*UserAuth, error) {
 	email := authToken.Claims["email"].(string)
 	name := authToken.Claims["name"].(string)
 
-	user := UserAuth{
+	user, err := m.UserRepo.GetUserByFirebaseUID(firebaseUID)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	userAuth := UserAuth{
 		Email:  email,
 		Name:   name,
 		AuthID: firebaseUID,
+		ID:     user.ID.Hex(),
 	}
 
-	return &user, nil
+	return &userAuth, nil
 }
 
-func NewFirebaseManager(adminConfig []byte) (*FirebaseManager, error) {
+func NewFirebaseManager(userRepo *repo.UsersRepo, adminConfig []byte) (*FirebaseManager, error) {
 	manager := FirebaseManager{}
 	opt := option.WithCredentialsJSON(adminConfig)
 	newApp, err := firebase.NewApp(context.Background(), nil, opt)
@@ -46,6 +57,8 @@ func NewFirebaseManager(adminConfig []byte) (*FirebaseManager, error) {
 		return nil, err
 	}
 	manager.Client = newClient
+
+	manager.UserRepo = userRepo
 
 	return &manager, nil
 }
