@@ -10,7 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-var manager = db.NewMongoManager("mongodb://localhost:27017", "blinders")
+var manager = db.NewMongoManager("mongodb://username:password@localhost:27017/peakee", "peakee")
 
 func TestInsertUser(t *testing.T) {
 	user := models.User{
@@ -46,17 +46,63 @@ func TestGetUserByID(t *testing.T) {
 		FirebaseUID: primitive.NewObjectID().String(),
 	}
 	user, _ = manager.Users.InsertNewRawUser(user)
-	queriedUser, err := manager.Users.GetUserByID(user.ID)
+	queriedUser, err := manager.Users.GetUserByPrimitiveID(user.ID)
 	assert.Nil(t, err)
 	assert.Equal(t, user, queriedUser)
 }
 
 func TestGetUserByIDNotFound(t *testing.T) {
-	_, err := manager.Users.GetUserByID(primitive.NewObjectID())
+	_, err := manager.Users.GetUserByPrimitiveID(primitive.NewObjectID())
 	assert.NotNil(t, err)
 }
 
 func TestGetUserByFirebaseUIDNotFound(t *testing.T) {
 	_, err := manager.Users.GetUserByFirebaseUID(primitive.NewObjectID().String())
 	assert.NotNil(t, err)
+}
+
+func TestUsersRepo_GetUserByUserIDSuccess(t *testing.T) {
+	user := models.User{
+		FirebaseUID: primitive.NewObjectID().String(),
+	}
+	user, _ = manager.Users.InsertNewRawUser(user)
+	queriedUser, err := manager.Users.GetUserByUserID(user.ID.Hex())
+	assert.Nil(t, err)
+	assert.Equal(t, user, queriedUser)
+
+	deleted, err := manager.Users.DropUserByUserID(user.ID.Hex())
+	assert.Nil(t, err)
+	assert.Equal(t, user, deleted)
+}
+
+func TestUsersRepo_GetUserByUserIDFailed(t *testing.T) {
+	userID := primitive.NewObjectID()
+
+	deleted, err := manager.Users.DropUserByUserID(userID.Hex())
+	if err == nil {
+		assert.NotEqual(t, models.User{}, deleted)
+	}
+
+	failedGet, err := manager.Users.GetUserByUserID(userID.Hex())
+	assert.NotNil(t, err)
+	assert.Equal(t, models.User{}, failedGet)
+}
+
+func TestUsersRepo_DropUserByUserID(t *testing.T) {
+	user := models.User{
+		FirebaseUID: primitive.NewObjectID().String(),
+	}
+	user, _ = manager.Users.InsertNewRawUser(user)
+
+	queriedUser, err := manager.Users.GetUserByUserID(user.ID.Hex())
+	assert.Nil(t, err)
+	assert.Equal(t, user, queriedUser)
+
+	deleted, err := manager.Users.DropUserByUserID(user.ID.Hex())
+	assert.Nil(t, err)
+	assert.Equal(t, user, deleted)
+
+	failedDelete, err := manager.Users.DropUserByUserID(user.ID.Hex())
+	assert.NotNil(t, err)
+	assert.Equal(t, models.User{}, failedDelete)
 }
