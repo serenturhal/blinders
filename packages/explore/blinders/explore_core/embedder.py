@@ -1,5 +1,6 @@
-from blinders.explore_core.types import MatchInfo
 from sentence_transformers import SentenceTransformer
+
+from blinders.explore_core.types import MatchInfo
 
 
 class Embedder(object):

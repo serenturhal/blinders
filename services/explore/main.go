@@ -26,18 +26,10 @@ func init() {
 		panic(err)
 	}
 	app := fiber.New(fiber.Config{
-		Prefork:      true,
-		WriteTimeout: time.Second * 5,
-		ReadTimeout:  time.Second * 5,
-
+		WriteTimeout:          time.Second * 5,
+		ReadTimeout:           time.Second * 5,
 		DisableStartupMessage: true,
 	})
-
-	adminJSON, _ := utils.GetFile("firebase.admin.json")
-	authManager, err := auth.NewFirebaseManager(adminJSON)
-	if err != nil {
-		panic(err)
-	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
@@ -61,6 +53,12 @@ func init() {
 		DB:       0,  // use default DB
 	})
 	if err := redisClient.Ping(ctx).Err(); err != nil {
+		panic(err)
+	}
+
+	adminJSON, _ := utils.GetFile("firebase.admin.json")
+	authManager, err := auth.NewFirebaseManager(mongoManager.Users, adminJSON)
+	if err != nil {
 		panic(err)
 	}
 

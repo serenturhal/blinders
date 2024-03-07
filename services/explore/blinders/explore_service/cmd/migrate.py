@@ -1,11 +1,18 @@
 # migrate migrate users from firestore collection to mongo db.
 import datetime
+import os
+
+import dotenv
 from firebase_admin import firestore, credentials, initialize_app
 from pymongo import MongoClient
-import os
-import dotenv
+from redis.client import Redis
+
+from blinders.explore_service.cmd.mock import random_match_profile
+from blinders.explore_core.main import Explore, Embedder
+
 
 userColName = "users"
+matchColName = "matches"
 
 if __name__ == "__main__":
     dotenv.load_dotenv()
@@ -19,11 +26,14 @@ if __name__ == "__main__":
         )
         mongo_client = MongoClient(mongoURL)
         db = mongo_client[os.getenv("MONGO_DATABASE", "Default")]
-
+        match_col = db[matchColName]
         creds = credentials.Certificate("./firebase.admin.development.json")
         app = initialize_app(creds)
         firestoreClient = firestore.client(app)
         userDocs = firestoreClient.collection("Users").stream()
+        embedder = Embedder()
+        redis_client = Redis(host="localhost", port=6379)
+        explore = Explore(redis_client, embedder, match_col)
 
         for user_doc in userDocs:
             doc = user_doc.to_dict()
@@ -31,29 +41,44 @@ if __name__ == "__main__":
                 userDocs.close()
                 break
 
-            userID = doc.get("firebaseUid")
+            firebase_UID = doc.get("firebaseUid")
             name = doc.get("name")
             image_url = doc.get("imageUrl")
-            friends_firebase_uid = doc.get("friends")
+            friends_user_id = doc.get("friends")
 
             if (
-                userID is None
-                or name is None
-                or image_url is None
-                or friends_firebase_uid is None
+                    name is None
+                    or image_url is None
+                    or friends_user_id is None
             ):
                 continue
 
             now = datetime.datetime.now()
-            mongoUser = db[userColName].insert_one(
+            mongo_user = db[userColName].insert_one(
                 {
-                    "firebaseUID": userID,
+                    "name": name,
                     "imageURL": image_url,
-                    "friends": friends_firebase_uid,
+                    "firebaseUID": firebase_UID,
+                    "friends": friends_user_id,
                     "createdAt": now,
                     "updatedAt": now,
                 }
             )
+
+            info = random_match_profile(str(mongo_user.inserted_id), name)
+            match_col.insert_one({
+                "userID": mongo_user.inserted_id,
+                "name": info.name,
+                "gender": info.gender,
+                "learnings": info.learnings,
+                "major": info.major,
+                "native": info.native,
+                "country": info.country,
+                "interests": info.interests,
+                "age": info.age,
+            })
+            explore.add_user_embed(info)
+
 
     except Exception as e:
         raise e

@@ -49,7 +49,7 @@ func (s *Service) InitRoute() {
 func (s *Service) Loop() {
 	for match := range s.MatchCh {
 		value := map[string]string{
-			"id": match.FirebaseUID,
+			"id": match.UserID.Hex(),
 		}
 
 		// fire user-match-entry-created event to the stream

@@ -15,117 +15,113 @@ var mongoManager = db.NewMongoManager("mongodb://username:password@localhost:270
 
 func TestMatchesRepo_InsertNewRawMatchInfo(t *testing.T) {
 	rawUser := models.MatchInfo{
-		FirebaseUID: "firebaseUID",
-		Name:        "name",
-		Gender:      "male",
-		Major:       "student",
-		Native:      "vietnamese",
-		Country:     "vn",
-		Learnings:   []string{},
-		Interests:   []string{},
-		UserID:      primitive.ObjectID{},
-		Age:         0,
+		UserID:    primitive.NewObjectID(),
+		Name:      "name",
+		Gender:    "male",
+		Major:     "student",
+		Native:    "vietnamese",
+		Country:   "vn",
+		Learnings: []string{},
+		Interests: []string{},
+		Age:       0,
 	}
 	r := mongoManager.Matches
 	usr, err := r.InsertNewRawMatchInfo(rawUser)
 	assert.Nil(t, err)
 	assert.Equal(t, rawUser, usr)
 
-	gotWithFirebaseUID, err := r.GetMatchInfoByFirebaseUID(rawUser.FirebaseUID)
+	gotWithUserID, err := r.GetMatchInfoByUserID(rawUser.UserID.Hex())
 	assert.Nil(t, err)
-	assert.Equal(t, rawUser, gotWithFirebaseUID)
+	assert.Equal(t, rawUser, gotWithUserID)
 
-	deleted, err := r.DropUserWithFirebaseUID(rawUser.FirebaseUID)
+	deleted, err := r.DropUserWithUserID(rawUser.UserID.Hex())
 	assert.Nil(t, err)
 	assert.Equal(t, rawUser, deleted)
 }
 
 func TestMatchesRepo_GetMatchInfoByFirebaseUID(t *testing.T) {
 	rawUser := models.MatchInfo{
-		FirebaseUID: "firebaseUID",
-		Name:        "name",
-		Gender:      "male",
-		Major:       "student",
-		Native:      "vietnamese",
-		Country:     "vn",
-		Learnings:   []string{},
-		Interests:   []string{},
-		UserID:      primitive.ObjectID{},
-		Age:         0,
+		UserID:    primitive.NewObjectID(),
+		Name:      "name",
+		Gender:    "male",
+		Major:     "student",
+		Native:    "vietnamese",
+		Country:   "vn",
+		Learnings: []string{},
+		Interests: []string{},
+		Age:       0,
 	}
 	r := mongoManager.Matches
 	usr, err := r.InsertNewRawMatchInfo(rawUser)
 	assert.Nil(t, err)
 	assert.Equal(t, rawUser, usr)
 
-	gotWithFirebaseUID, err := r.GetMatchInfoByFirebaseUID(rawUser.FirebaseUID)
+	gotWithUserID, err := r.GetMatchInfoByUserID(rawUser.UserID.Hex())
 	assert.Nil(t, err)
-	assert.Equal(t, rawUser, gotWithFirebaseUID)
+	assert.Equal(t, rawUser, gotWithUserID)
 
-	deleted, err := r.DropUserWithFirebaseUID(rawUser.FirebaseUID)
+	deleted, err := r.DropUserWithUserID(rawUser.UserID.Hex())
 	assert.Nil(t, err)
 	assert.Equal(t, rawUser, deleted)
 
-	gotFailed, err := r.GetMatchInfoByFirebaseUID(rawUser.FirebaseUID)
+	gotFailed, err := r.GetMatchInfoByUserID(rawUser.UserID.Hex())
 	assert.NotNil(t, err)
 	assert.Equal(t, models.MatchInfo{}, gotFailed)
 }
 
 func TestMatchesRepo_GetMatchInfoByUserID(t *testing.T) {
 	rawUser := models.MatchInfo{
-		FirebaseUID: "firebaseUID",
-		Name:        "name",
-		Gender:      "male",
-		Major:       "student",
-		Native:      "vietnamese",
-		Country:     "vn",
-		Learnings:   []string{},
-		Interests:   []string{},
-		UserID:      primitive.ObjectID{},
-		Age:         0,
+		UserID:    primitive.NewObjectID(),
+		Name:      "name",
+		Gender:    "male",
+		Major:     "student",
+		Native:    "vietnamese",
+		Country:   "vn",
+		Learnings: []string{},
+		Interests: []string{},
+		Age:       0,
 	}
 	r := mongoManager.Matches
 	usr, err := r.InsertNewRawMatchInfo(rawUser)
 	assert.Nil(t, err)
 	assert.Equal(t, rawUser, usr)
 
-	gotWithFirebaseUID, err := r.GetMatchInfoByUserID(rawUser.UserID)
+	gotWithUserID, err := r.GetMatchInfoByUserID(rawUser.UserID.Hex())
 	assert.Nil(t, err)
-	assert.Equal(t, rawUser, gotWithFirebaseUID)
+	assert.Equal(t, rawUser, gotWithUserID)
 
-	deleted, err := r.DropUserWithFirebaseUID(rawUser.FirebaseUID)
+	deleted, err := r.DropUserWithUserID(rawUser.UserID.Hex())
 	assert.Nil(t, err)
 	assert.Equal(t, rawUser, deleted)
 
-	gotFailed, err := r.GetMatchInfoByUserID(rawUser.UserID)
+	gotFailed, err := r.GetMatchInfoByUserID(rawUser.UserID.Hex())
 	assert.NotNil(t, err)
 	assert.Equal(t, models.MatchInfo{}, gotFailed)
 }
 
 func TestMatchesRepo_GetUsersByLanguage(t *testing.T) {
 	rawUser := models.MatchInfo{
-		FirebaseUID: "firebaseUID",
-		Name:        "name",
-		Gender:      "male",
-		Major:       "student",
-		Native:      "vietnamese",
-		Country:     "vn",
-		Learnings:   []string{"english"},
-		Interests:   []string{},
-		UserID:      primitive.ObjectID{},
-		Age:         0,
+		UserID:    primitive.NewObjectID(),
+		Name:      "name",
+		Gender:    "male",
+		Major:     "student",
+		Native:    "vietnamese",
+		Country:   "vn",
+		Learnings: []string{"english"},
+		Interests: []string{},
+		Age:       0,
 	}
 	numReturn := uint32(10)
 	r := mongoManager.Matches
 
-	usr, err := r.DropUserWithFirebaseUID(rawUser.FirebaseUID)
+	usr, err := r.DropUserWithUserID(rawUser.UserID.Hex())
 	if err != nil {
 		assert.Equal(t, models.MatchInfo{}, usr)
 	} else {
 		assert.NotEmpty(t, usr)
 	}
 
-	failedGot, err := r.GetUsersByLanguage(rawUser.FirebaseUID, 10)
+	failedGot, err := r.GetUsersByLanguage(rawUser.UserID.Hex(), 10)
 	assert.NotNil(t, err)
 	assert.Len(t, failedGot, 0)
 
@@ -133,14 +129,14 @@ func TestMatchesRepo_GetUsersByLanguage(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, rawUser, usr)
 
-	got, err := r.GetUsersByLanguage(rawUser.FirebaseUID, numReturn)
+	got, err := r.GetUsersByLanguage(rawUser.UserID.Hex(), numReturn)
 	assert.Nil(t, err)
 
 	assert.GreaterOrEqual(t, uint32(len(got)), numReturn)
 
 candidateLoop:
 	for _, id := range got {
-		candidate, err := r.GetMatchInfoByFirebaseUID(id)
+		candidate, err := r.GetMatchInfoByUserID(id)
 		assert.Nil(t, err)
 		assert.NotNil(t, candidate)
 		// at here, candidate must be learning same language with curr user or natively speak the language that current
@@ -154,34 +150,33 @@ candidateLoop:
 		assert.Contains(t, usr.Learnings, candidate.Native)
 		assert.Contains(t, candidate.Learnings, usr.Native)
 	}
-	usr, err = r.DropUserWithFirebaseUID(rawUser.FirebaseUID)
+	usr, err = r.DropUserWithUserID(rawUser.UserID.Hex())
 	assert.Nil(t, err)
 	assert.Equal(t, rawUser, usr)
 }
 
 func TestMatchesRepo_DropUserWithFirebaseUID(t *testing.T) {
 	rawUser := models.MatchInfo{
-		FirebaseUID: "testID",
-		Name:        "name",
-		Gender:      "male",
-		Major:       "student",
-		Native:      "vietnamese",
-		Country:     "vn",
-		Learnings:   []string{},
-		Interests:   []string{},
-		UserID:      primitive.NewObjectID(),
-		Age:         0,
+		UserID:    primitive.NewObjectID(),
+		Name:      "name",
+		Gender:    "male",
+		Major:     "student",
+		Native:    "vietnamese",
+		Country:   "vn",
+		Learnings: []string{},
+		Interests: []string{},
+		Age:       0,
 	}
 	r := mongoManager.Matches
 	usr, err := r.InsertNewRawMatchInfo(rawUser)
 	assert.Nil(t, err)
 	assert.Equal(t, rawUser, usr)
 
-	deleted, err := r.DropUserWithFirebaseUID(usr.FirebaseUID)
+	deleted, err := r.DropUserWithUserID(usr.UserID.Hex())
 	assert.Nil(t, err)
 	assert.Equal(t, rawUser, deleted)
 
-	failed, err := r.DropUserWithFirebaseUID(usr.FirebaseUID)
+	failed, err := r.DropUserWithUserID(usr.UserID.Hex())
 	assert.NotNil(t, err)
 	assert.Equal(t, models.MatchInfo{}, failed)
 }

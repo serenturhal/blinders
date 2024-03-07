@@ -1,11 +1,12 @@
-from blinders.explore_core.main import Explore
-from blinders.explore_core.embedder import Embedder
-from redis.client import Redis
-import pymongo
-import os
-from dotenv import load_dotenv
 import json
+import os
 
+import pymongo
+from dotenv import load_dotenv
+from redis.client import Redis
+
+from blinders.explore_core.embedder import Embedder
+from blinders.explore_core.main import Explore
 
 load_dotenv()
 

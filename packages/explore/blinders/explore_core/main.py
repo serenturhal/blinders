@@ -1,13 +1,15 @@
-from blinders.explore_core.embedder import Embedder
-from blinders.explore_core.types import MatchInfo
-from blinders.explore_core.utils import create_redis_match_key
+from bson.objectid import ObjectId
+from pymongo.collection import Collection
+from redis.client import Redis
 from redis.commands.search.field import (
     TextField,
     VectorField,
 )
-from redis.client import Redis
 from redis.commands.search.indexDefinition import IndexDefinition, IndexType
-from pymongo.collection import Collection
+
+from blinders.explore_core.embedder import Embedder
+from blinders.explore_core.types import MatchInfo
+from blinders.explore_core.utils import create_redis_match_key
 
 
 class Explore(object):
@@ -17,10 +19,10 @@ class Explore(object):
     vector_dimension = 384
 
     def __init__(
-        self,
-        redis_client: Redis,
-        embedder: Embedder,
-        match_col: Collection,
+            self,
+            redis_client: Redis,
+            embedder: Embedder,
+            match_col: Collection,
     ) -> None:
         if not redis_client.ping():
             raise Exception("cannot ping to redis")
@@ -61,16 +63,16 @@ class Explore(object):
         document then add to vector database.
         :param info: blinders.explore_core.types.MatchInfo
         """
-        doc = self.match_col.find({"firebaseUID": info.firebaseUID})
+        doc = self.match_col.find({"userID": ObjectId(info.userID)})
         if doc is None:
             raise Exception("user not existed")
 
         embed = self.embedder.embed(info)
         self.redis_client.json().set(
-            create_redis_match_key(info.firebaseUID),
+            create_redis_match_key(info.userID),
             "$",
             {
                 "embed": embed,
-                "id": info.firebaseUID,
+                "id": info.userID,
             },
         )

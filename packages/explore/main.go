@@ -14,7 +14,7 @@ import (
 
 type Explorer interface {
 	// Suggest returns list of users that maybe match with given user
-	Suggest(id string) ([]models.MatchInfo, error)
+	Suggest(userID string) ([]models.MatchInfo, error)
 	// AddUserMatchInformation adds user match information to the database. A new user-created event must be fired for the embed worker to embed the recently added user.
 	AddUserMatchInformation(info models.MatchInfo) (models.MatchInfo, error)
 }
@@ -41,18 +41,18 @@ or users who are currently learning the same language as the current user.
 
 We will then use KNN-search in the filtered space to identify 5 users that may match with the current user.
 */
-func (m *MongoExplorer) Suggest(fromID string) ([]models.MatchInfo, error) {
+func (m *MongoExplorer) Suggest(userID string) ([]models.MatchInfo, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
 	// Get 1000 users that maybe match with current user (user that speak and learn language)
-	user, err := m.Db.Users.GetUserByFirebaseUID(fromID)
+	user, err := m.Db.Users.GetUserByUserID(userID)
 	if err != nil {
 		return nil, err
 	}
 
 	// JSONGet return value wrapped in an array.
-	jsonStr, _ := m.RedisClient.JSONGet(ctx, CreateMatchKeyWithUserID(fromID), "$.embed").Result()
+	jsonStr, _ := m.RedisClient.JSONGet(ctx, CreateMatchKeyWithUserID(userID), "$.embed").Result()
 	var embedArr []EmbeddingVector
 	if err := json.Unmarshal([]byte(jsonStr), &embedArr); err != nil {
 		return nil, err
@@ -61,14 +61,14 @@ func (m *MongoExplorer) Suggest(fromID string) ([]models.MatchInfo, error) {
 
 	// exclude friends of current user
 	// TODO: Need to optimize
-	excludeFilter := fromID
-	for _, friendID := range user.FriendsFirebaseUID {
+	excludeFilter := userID
+	for _, friendID := range user.FriendsUserID {
 		excludeFilter += " | " + friendID
 	}
 	excludeFilter = fmt.Sprintf("-@id:(%s)", excludeFilter)
 
 	// get 1000 candidates
-	candidates, err := m.Db.Matches.GetUsersByLanguage(user.FirebaseUID, 1000)
+	candidates, err := m.Db.Matches.GetUsersByLanguage(user.ID.Hex(), 1000)
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +102,7 @@ func (m *MongoExplorer) Suggest(fromID string) ([]models.MatchInfo, error) {
 	var res []models.MatchInfo
 	for _, doc := range cmd.Val().(map[any]any)["results"].([]any) {
 		userID := doc.(map[any]any)["extra_attributes"].(map[any]any)["id"].(string)
-		user, err := m.Db.Matches.GetMatchInfoByFirebaseUID(userID)
+		user, err := m.Db.Matches.GetMatchInfoByUserID(userID)
 		if err != nil {
 			return nil, err
 		}
@@ -123,11 +123,10 @@ to notify that a new user has been created. This allows the embedding service to
 in the vector database.
 */
 func (m *MongoExplorer) AddUserMatchInformation(info models.MatchInfo) (models.MatchInfo, error) {
-	user, err := m.Db.Users.GetUserByFirebaseUID(info.FirebaseUID)
+	_, err := m.Db.Users.GetUserByPrimitiveID(info.UserID)
 	if err != nil {
 		return models.MatchInfo{}, err
 	}
-	info.UserID = user.ID
 
 	// duplicated match information will be handled by the repository since we have already indexed the collection with firebaseUID.
 	matchInfo, err := m.Db.Matches.InsertNewRawMatchInfo(info)

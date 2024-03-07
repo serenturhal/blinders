@@ -1,14 +1,15 @@
 # load mock/json file to mongodb
 import datetime
+import json
+import os
 
-from blinders.explore_core.main import Explore, MatchInfo
-from blinders.explore_core.embedder import Embedder
-from redis.client import Redis
+import dotenv
 import pymongo
 from bson.objectid import ObjectId
-import os
-import dotenv
-import json
+from redis.client import Redis
+
+from blinders.explore_core.embedder import Embedder
+from blinders.explore_core.main import Explore, MatchInfo
 
 matchColName = "matches"
 userColName = "users"
@@ -49,7 +50,7 @@ if __name__ == "__main__":
             match_col.insert_one(match)
             try:
                 matchInfo = MatchInfo(
-                    match.get("firebaseUID"),
+                    str(match.get("userID")),
                     match.get("name"),
                     match.get("gender"),
                     match.get("major"),
@@ -57,7 +58,6 @@ if __name__ == "__main__":
                     match.get("country"),
                     match.get("learnings"),
                     match.get("interests"),
-                    match.get("userID"),
                     match.get("age"),
                 )
                 explore.add_user_embed(matchInfo)

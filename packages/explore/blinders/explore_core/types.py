@@ -3,7 +3,8 @@ import dataclasses
 
 @dataclasses.dataclass
 class MatchInfo:
-    firebaseUID: str
+    userID: str
+    "hex string of objectID"
     name: str
     gender: str
     major: str
@@ -11,7 +12,6 @@ class MatchInfo:
     country: str
     learnings: list[str]
     interests: list[str]
-    userID: str
     age: int
 
     def __str__(self) -> str:

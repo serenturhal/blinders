@@ -1,10 +1,11 @@
-from blinders.explore_core.main import Explore
-from blinders.explore_core.embedder import Embedder
+import os
+
+import dotenv
 import pymongo
 import redis
-import os
-import dotenv
 
+from blinders.explore_core.embedder import Embedder
+from blinders.explore_core.main import Explore
 from blinders.explore_service.core.main import ServiceWorker
 
 matchColName = "matches"

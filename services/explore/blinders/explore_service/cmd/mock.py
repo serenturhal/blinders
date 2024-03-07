@@ -1,13 +1,11 @@
 import datetime
+import os
 import random
 import string
-# migrate migrate users from firestore collection to mongo db.
-import datetime
-from firebase_admin import firestore, credentials, initialize_app
+
+import dotenv
 from pymongo import MongoClient
 from redis.client import Redis
-import os
-import dotenv
 
 from blinders.explore_core.main import Explore, Embedder, MatchInfo
 
@@ -71,21 +69,22 @@ countries = [
     "fr",
     "jp",
 ]
-matchCol = "matches"
-userCol = "users"
+
+userColName = "users"
+matchColName = "matches"
 
 
-def random_user(idx: int) -> dict:
+def random_user(index: int) -> dict:
     time_now = datetime.datetime.now()
     return {
         "firebaseUID": "".join(
-            random.choices(string.ascii_lowercase + string.digits, k=10) + [str(idx)]
+            random.choices(string.ascii_lowercase + string.digits, k=10) + [str(index)]
         ),
         "imageURL": "".join(
-            random.choices(string.ascii_lowercase + string.digits, k=10) + [str(idx)]
+            random.choices(string.ascii_lowercase + string.digits, k=10) + [str(index)]
         ),
         "name": "".join(
-            random.choices(string.ascii_lowercase + string.digits, k=10) + [str(idx)]
+            random.choices(string.ascii_lowercase + string.digits, k=10) + [str(index)]
         ),
         "friends": [],
         "createdAt": time_now,
@@ -93,7 +92,7 @@ def random_user(idx: int) -> dict:
     }
 
 
-def random_match_profile(user_id: str, name: str, mongo_user_id: str) -> MatchInfo:
+def random_match_profile(user_id: str, name: str) -> MatchInfo:
     return MatchInfo(
         user_id,
         name,
@@ -103,12 +102,9 @@ def random_match_profile(user_id: str, name: str, mongo_user_id: str) -> MatchIn
         countries[random.randint(0, len(countries) - 1)],
         random.sample(langs, k=random.randint(1, 5)),
         random.sample(interests, k=random.randint(1, 5)),
-        mongo_user_id,
         random.randint(10, 50),
     )
 
-userColName = "users"
-matchColName ="matches"
 
 if __name__ == "__main__":
     dotenv.load_dotenv()
@@ -120,6 +116,7 @@ if __name__ == "__main__":
             os.getenv("MONGO_PORT"),
             os.getenv("MONGO_DATABASE"),
         )
+        print("connecting to ", mongoURL)
         mongo_client = MongoClient(mongoURL)
         db = mongo_client[os.getenv("MONGO_DATABASE", "Default")]
         match_col = db[matchColName]
@@ -131,8 +128,18 @@ if __name__ == "__main__":
         for idx in range(num_Mock):
             doc = random_user(idx)
             mongoUser = db[userColName].insert_one(doc)
-            info = random_match_profile(doc.get("firebaseUID"), doc.get("name"), mongoUser.inserted_id)
-            match_col.insert_one(info.__dict__)
+            info = random_match_profile(str(mongoUser.inserted_id), doc.get("name"))
+            match_col.insert_one({
+                "userID": mongoUser.inserted_id,
+                "name": info.name,
+                "gender": info.gender,
+                "learnings": info.learnings,
+                "major": info.major,
+                "native": info.native,
+                "country": info.country,
+                "interests": info.interests,
+                "age": info.age,
+            })
             explore.add_user_embed(info)
     except Exception as e:
         raise e
