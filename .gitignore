@@ -33,3 +33,9 @@ node_modules
 auth.*.json
 volumes
 .idea
+
+#goenv dependency
+.go-version
+
+#qodana
+qodana.yaml
