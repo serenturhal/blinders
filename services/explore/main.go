@@ -11,15 +11,17 @@ import (
 	"blinders/packages/db"
 	"blinders/packages/explore"
 	"blinders/packages/utils"
+	exploreapi "blinders/services/explore/api"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
 	"github.com/redis/go-redis/v9"
-
-	exploreapi "blinders/services/explore/api"
 )
 
-var service *exploreapi.Service
+var (
+	service *exploreapi.Service
+	manager *exploreapi.Manager
+)
 
 func init() {
 	if err := godotenv.Load(".env"); err != nil {
@@ -57,20 +59,21 @@ func init() {
 	}
 
 	adminJSON, _ := utils.GetFile("firebase.admin.json")
-	authManager, err := auth.NewFirebaseManager(adminJSON, mongoManager.Users)
+	authManager, err := auth.NewFirebaseManager(adminJSON)
 	if err != nil {
 		panic(err)
 	}
 
 	core := explore.NewMongoExplorer(mongoManager, redisClient)
 
-	service = exploreapi.NewService(app, authManager, core, redisClient)
-	service.InitRoute()
+	service = exploreapi.NewService(core, redisClient)
+	manager = exploreapi.NewManager(app, authManager, mongoManager, service)
+	manager.InitRoute()
 }
 
 func main() {
 	port := os.Getenv("EXPLORE_SERVICE_PORT")
 	go service.Loop()
 	fmt.Println("listening on: ", port)
-	log.Panic(service.App.Listen(":" + port))
+	log.Panic(manager.App.Listen(":" + port))
 }

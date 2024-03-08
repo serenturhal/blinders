@@ -22,7 +22,7 @@ var AuthCommand = cli.Command{
 		env := ctx.String("env")
 		adminJSON, _ := utils.GetFile(fmt.Sprintf("firebase.admin.%v.json", env))
 
-		a, err := auth.NewFirebaseManager(adminJSON, nil)
+		a, err := auth.NewFirebaseManager(adminJSON)
 		if err != nil {
 			return err
 		}

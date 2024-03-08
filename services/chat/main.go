@@ -6,7 +6,6 @@ import (
 	"os"
 
 	"blinders/packages/auth"
-	"blinders/packages/db"
 	"blinders/packages/utils"
 	chatapi "blinders/services/chat/api"
 
@@ -19,18 +18,8 @@ var service chatapi.Service
 func init() {
 	app := fiber.New()
 	adminJSON, _ := utils.GetFile("firebase.admin.development.json")
-	url := fmt.Sprintf(
-		db.MongoURLTemplate,
-		os.Getenv("MONGO_USERNAME"),
-		os.Getenv("MONGO_PASSWORD"),
-		os.Getenv("MONGO_HOST"),
-		os.Getenv("MONGO_PORT"),
-		os.Getenv("MONGO_DATABASE"),
-	)
 
-	mongoManager := db.NewMongoManager(url, os.Getenv("MONGO_DATABASE"))
-
-	authManager, _ := auth.NewFirebaseManager(adminJSON, mongoManager.Users)
+	authManager, _ := auth.NewFirebaseManager(adminJSON)
 	service = chatapi.Service{App: app, Auth: authManager}
 	service.InitRoute()
 	if err := godotenv.Load(".env.development"); err != nil {

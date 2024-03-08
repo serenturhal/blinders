@@ -31,23 +31,16 @@ func (m FirebaseManager) Verify(jwt string) (*UserAuth, error) {
 		return nil, fmt.Errorf("firebaseMangager: userRepo must not be nil")
 	}
 
-	user, err := m.UserRepo.GetUserByFirebaseUID(firebaseUID)
-	if err != nil {
-		fmt.Println(err)
-		return nil, err
-	}
-
 	userAuth := UserAuth{
 		Email:  email,
 		Name:   name,
 		AuthID: firebaseUID,
-		ID:     user.ID.Hex(),
 	}
 
 	return &userAuth, nil
 }
 
-func NewFirebaseManager(adminConfig []byte, userRepo *repo.UsersRepo) (*FirebaseManager, error) {
+func NewFirebaseManager(adminConfig []byte) (*FirebaseManager, error) {
 	manager := FirebaseManager{}
 	opt := option.WithCredentialsJSON(adminConfig)
 	newApp, err := firebase.NewApp(context.Background(), nil, opt)
@@ -61,8 +54,6 @@ func NewFirebaseManager(adminConfig []byte, userRepo *repo.UsersRepo) (*Firebase
 		return nil, err
 	}
 	manager.Client = newClient
-
-	manager.UserRepo = userRepo
 
 	return &manager, nil
 }
