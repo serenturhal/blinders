@@ -45,7 +45,7 @@ func init() {
 		log.Fatal(err)
 	}
 
-	authManager, err = auth.NewFirebaseManager(database.Users, adminConfig)
+	authManager, err = auth.NewFirebaseManager(adminConfig, database.Users)
 	if err != nil {
 		log.Fatal(err)
 	}

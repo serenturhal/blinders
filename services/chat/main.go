@@ -30,9 +30,8 @@ func init() {
 
 	mongoManager := db.NewMongoManager(url, os.Getenv("MONGO_DATABASE"))
 
-	fmt.Println("Connect to mongo url", url)
-	auth, _ := auth.NewFirebaseManager(mongoManager.Users, adminJSON)
-	service = chatapi.Service{App: app, Auth: auth}
+	authManager, _ := auth.NewFirebaseManager(adminJSON, mongoManager.Users)
+	service = chatapi.Service{App: app, Auth: authManager}
 	service.InitRoute()
 	if err := godotenv.Load(".env.development"); err != nil {
 		log.Fatal("failed to load env", err)

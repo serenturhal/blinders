@@ -57,7 +57,7 @@ func init() {
 	}
 
 	adminJSON, _ := utils.GetFile("firebase.admin.json")
-	authManager, err := auth.NewFirebaseManager(mongoManager.Users, adminJSON)
+	authManager, err := auth.NewFirebaseManager(adminJSON, mongoManager.Users)
 	if err != nil {
 		panic(err)
 	}

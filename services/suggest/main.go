@@ -36,7 +36,7 @@ func init() {
 	mongoManager := db.NewMongoManager(url, os.Getenv("MONGO_DATABASE"))
 	fmt.Println("Connect to mongo url", url)
 
-	authManager, _ := auth.NewFirebaseManager(mongoManager.Users, adminJSON)
+	authManager, _ := auth.NewFirebaseManager(adminJSON, mongoManager.Users)
 
 	openaiKey := os.Getenv("OPENAI_API_KEY")
 	client := openai.NewClient(openaiKey)

@@ -37,7 +37,7 @@ func init() {
 	}
 
 	adminJSON, _ := utils.GetFile("firebase.admin.development.json")
-	authManger, _ := auth.NewFirebaseManager(dbManager.Users, adminJSON)
+	authManger, _ := auth.NewFirebaseManager(adminJSON, dbManager.Users)
 
 	apiManager = *restapi.NewManager(app, authManger, dbManager)
 	_ = apiManager.InitRoute(restapi.InitOptions{})
