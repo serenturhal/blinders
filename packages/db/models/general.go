@@ -7,7 +7,7 @@ type User struct {
 	Conversations []EmbeddedConversation `bson:"conversations" json:"conversations"`
 	FirebaseUID   string                 `bson:"firebaseUID"   json:"firebaseUID"`
 	ImageURL      string                 `bson:"imageURL"      json:"imageURL"`
-	FriendsUserID []string               `bson:"friends"       json:"friends"`
+	FriendIDs     []string               `bson:"friends"       json:"friends"`
 	CreatedAt     primitive.DateTime     `bson:"createdAt"     json:"createdAt"`
 	UpdatedAt     primitive.DateTime     `bson:"updatedAt"     json:"updatedAt"`
 }

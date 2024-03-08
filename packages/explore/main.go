@@ -62,7 +62,7 @@ func (m *MongoExplorer) Suggest(userID string) ([]models.MatchInfo, error) {
 	// exclude friends of current user
 	// TODO: Need to optimize
 	excludeFilter := userID
-	for _, friendID := range user.FriendsUserID {
+	for _, friendID := range user.FriendIDs {
 		excludeFilter += " | " + friendID
 	}
 	excludeFilter = fmt.Sprintf("-@id:(%s)", excludeFilter)
