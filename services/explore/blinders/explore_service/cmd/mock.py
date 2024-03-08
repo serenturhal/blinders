@@ -130,7 +130,7 @@ if __name__ == "__main__":
             mongoUser = db[userColName].insert_one(doc)
             info = random_match_profile(str(mongoUser.inserted_id), doc.get("name"))
             match_col.insert_one({
-                "userID": mongoUser.inserted_id,
+                "userId": mongoUser.inserted_id,
                 "name": info.name,
                 "gender": info.gender,
                 "learnings": info.learnings,

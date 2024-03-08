@@ -45,12 +45,12 @@ if __name__ == "__main__":
     with open("mock/matches.json", "r") as f:
         matches = json.load(f)
         for match in matches:
-            match["userID"] = ObjectId(match["userID"])
+            match["userId"] = ObjectId(match["userId"])
             match["_id"] = ObjectId(match["_id"])
             match_col.insert_one(match)
             try:
                 matchInfo = MatchInfo(
-                    str(match.get("userID")),
+                    str(match.get("userId")),
                     match.get("name"),
                     match.get("gender"),
                     match.get("major"),

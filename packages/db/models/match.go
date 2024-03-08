@@ -3,7 +3,7 @@ package models
 import "go.mongodb.org/mongo-driver/bson/primitive"
 
 type MatchInfo struct {
-	UserID    primitive.ObjectID `json:"userID" bson:"userID,omiempty"`
+	UserID    primitive.ObjectID `json:"userId" bson:"userId,omiempty"`
 	Name      string             `json:"name" bson:"name,omiempty"`
 	Gender    string             `json:"gender" bson:"gender,omiempty"`
 	Major     string             `json:"major" bson:"major,omiempty"`

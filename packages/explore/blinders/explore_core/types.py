@@ -3,7 +3,7 @@ import dataclasses
 
 @dataclasses.dataclass
 class MatchInfo:
-    userID: str
+    userId: str
     "hex string of objectID"
     name: str
     gender: str

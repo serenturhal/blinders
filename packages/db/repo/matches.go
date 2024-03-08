@@ -22,10 +22,10 @@ func NewMatchesRepo(col *mongo.Collection) *MatchesRepo {
 	defer cal()
 
 	if _, err := col.Indexes().CreateOne(ctx, mongo.IndexModel{
-		Keys:    bson.M{"userID": 1},
+		Keys:    bson.M{"userId": 1},
 		Options: options.Index().SetUnique(true),
 	}); err != nil {
-		log.Println("can not create index for userID:", err)
+		log.Println("can not create index for userId:", err)
 		return nil
 	}
 
@@ -53,7 +53,7 @@ func (r *MatchesRepo) GetMatchInfoByUserID(userID string) (models.MatchInfo, err
 	defer cal()
 
 	var doc models.MatchInfo
-	err = r.Col.FindOne(ctx, bson.M{"userID": oid}).Decode(&doc)
+	err = r.Col.FindOne(ctx, bson.M{"userId": oid}).Decode(&doc)
 
 	return doc, err
 }
@@ -69,7 +69,7 @@ func (r *MatchesRepo) GetUsersByLanguage(userID string, limit uint32) ([]string,
 	defer cancel()
 	stages := []bson.M{
 		{"$match": bson.M{
-			"userID": bson.M{"$ne": user.UserID},
+			"userId": bson.M{"$ne": user.UserID},
 			"$or": []bson.M{
 				{
 					"native":    bson.M{"$in": user.Learnings},        // Users must speak at least one language of `learnings`.
@@ -85,7 +85,7 @@ func (r *MatchesRepo) GetUsersByLanguage(userID string, limit uint32) ([]string,
 		{
 			"$sample": bson.M{"size": limit},
 		},
-		{"$project": bson.M{"_id": 0, "userID": 1}},
+		{"$project": bson.M{"_id": 0, "userId": 1}},
 	}
 
 	cur, err := r.Col.Aggregate(ctx, stages)
@@ -99,7 +99,7 @@ func (r *MatchesRepo) GetUsersByLanguage(userID string, limit uint32) ([]string,
 	}()
 
 	type ReturnType struct {
-		UserID primitive.ObjectID `bson:"userID"`
+		UserID primitive.ObjectID `bson:"userId"`
 	}
 
 	var ids []string
@@ -120,7 +120,7 @@ func (r *MatchesRepo) DropUserWithUserID(userID string) (models.MatchInfo, error
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
-	filter := bson.M{"userID": oid}
+	filter := bson.M{"userId": oid}
 	res := r.Col.FindOneAndDelete(ctx, filter)
 	if err := res.Err(); err != nil {
 		return models.MatchInfo{}, err

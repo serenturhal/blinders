@@ -1,5 +1,7 @@
-import redis
 import os
+
+import redis
+
 from blinders.explore_core.main import Explore
 from blinders.explore_core.types import MatchInfo
 
@@ -53,7 +55,7 @@ class ServiceWorker(object):
                 return
 
             info = MatchInfo(
-                firebaseUID=user_id,
+                userId=doc.get("userId"),
                 name=doc.get("name"),
                 gender=doc.get("gender"),
                 major=doc.get("major"),
@@ -61,7 +63,6 @@ class ServiceWorker(object):
                 country=doc.get("country"),
                 learnings=doc.get("learnings"),
                 interests=doc.get("interests"),
-                userID=doc.get("userID"),
                 age=doc.get("age"),
             )
             self.core.add_user_embed(info)

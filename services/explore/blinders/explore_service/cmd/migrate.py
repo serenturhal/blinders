@@ -7,9 +7,8 @@ from firebase_admin import firestore, credentials, initialize_app
 from pymongo import MongoClient
 from redis.client import Redis
 
-from blinders.explore_service.cmd.mock import random_match_profile
 from blinders.explore_core.main import Explore, Embedder
-
+from blinders.explore_service.cmd.mock import random_match_profile
 
 userColName = "users"
 matchColName = "matches"
@@ -67,7 +66,7 @@ if __name__ == "__main__":
 
             info = random_match_profile(str(mongo_user.inserted_id), name)
             match_col.insert_one({
-                "userID": mongo_user.inserted_id,
+                "userId": mongo_user.inserted_id,
                 "name": info.name,
                 "gender": info.gender,
                 "learnings": info.learnings,
@@ -78,7 +77,6 @@ if __name__ == "__main__":
                 "age": info.age,
             })
             explore.add_user_embed(info)
-
 
     except Exception as e:
         raise e

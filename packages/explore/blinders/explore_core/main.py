@@ -63,16 +63,16 @@ class Explore(object):
         document then add to vector database.
         :param info: blinders.explore_core.types.MatchInfo
         """
-        doc = self.match_col.find({"userID": ObjectId(info.userID)})
+        doc = self.match_col.find({"userId": ObjectId(info.userId)})
         if doc is None:
             raise Exception("user not existed")
 
         embed = self.embedder.embed(info)
         self.redis_client.json().set(
-            create_redis_match_key(info.userID),
+            create_redis_match_key(info.userId),
             "$",
             {
                 "embed": embed,
-                "id": info.userID,
+                "id": info.userId,
             },
         )
