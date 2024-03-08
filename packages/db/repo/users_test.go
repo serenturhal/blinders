@@ -10,7 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-var manager = db.NewMongoManager("mongodb://username:password@localhost:27017", "blinders")
+var manager = db.NewMongoManager("mongodb://localhost:27017", "blinders")
 
 func TestInsertUser(t *testing.T) {
 	user := models.User{
@@ -61,7 +61,7 @@ func TestGetUserByFirebaseUIDNotFound(t *testing.T) {
 	assert.NotNil(t, err)
 }
 
-func TestUsersRepo_DeleteUserByUserID(t *testing.T) {
+func TestDeleteUserByUserID(t *testing.T) {
 	user := models.User{
 		FirebaseUID: primitive.NewObjectID().String(),
 	}

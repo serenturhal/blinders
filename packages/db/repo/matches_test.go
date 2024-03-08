@@ -10,7 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func TestMatchesRepo_InsertNewRawMatchInfo(t *testing.T) {
+func TestInsertNewRawMatchInfo(t *testing.T) {
 	rawUser := models.MatchInfo{
 		UserID:    primitive.NewObjectID(),
 		Name:      "name",
@@ -36,37 +36,7 @@ func TestMatchesRepo_InsertNewRawMatchInfo(t *testing.T) {
 	assert.Equal(t, rawUser, deleted)
 }
 
-func TestMatchesRepo_GetMatchInfoByFirebaseUID(t *testing.T) {
-	rawUser := models.MatchInfo{
-		UserID:    primitive.NewObjectID(),
-		Name:      "name",
-		Gender:    "male",
-		Major:     "student",
-		Native:    "vietnamese",
-		Country:   "vn",
-		Learnings: []string{},
-		Interests: []string{},
-		Age:       0,
-	}
-	r := manager.Matches
-	usr, err := r.InsertNewRawMatchInfo(rawUser)
-	assert.Nil(t, err)
-	assert.Equal(t, rawUser, usr)
-
-	gotWithUserID, err := r.GetMatchInfoByUserID(rawUser.UserID)
-	assert.Nil(t, err)
-	assert.Equal(t, rawUser, gotWithUserID)
-
-	deleted, err := r.DropMatchInfoByUserID(rawUser.UserID)
-	assert.Nil(t, err)
-	assert.Equal(t, rawUser, deleted)
-
-	gotFailed, err := r.GetMatchInfoByUserID(rawUser.UserID)
-	assert.NotNil(t, err)
-	assert.Equal(t, models.MatchInfo{}, gotFailed)
-}
-
-func TestMatchesRepo_GetMatchInfoByUserID(t *testing.T) {
+func TestGetMatchInfoByFirebaseUID(t *testing.T) {
 	rawUser := models.MatchInfo{
 		UserID:    primitive.NewObjectID(),
 		Name:      "name",
@@ -96,7 +66,37 @@ func TestMatchesRepo_GetMatchInfoByUserID(t *testing.T) {
 	assert.Equal(t, models.MatchInfo{}, gotFailed)
 }
 
-func TestMatchesRepo_GetUsersByLanguage(t *testing.T) {
+func TestGetMatchInfoByUserID(t *testing.T) {
+	rawUser := models.MatchInfo{
+		UserID:    primitive.NewObjectID(),
+		Name:      "name",
+		Gender:    "male",
+		Major:     "student",
+		Native:    "vietnamese",
+		Country:   "vn",
+		Learnings: []string{},
+		Interests: []string{},
+		Age:       0,
+	}
+	r := manager.Matches
+	usr, err := r.InsertNewRawMatchInfo(rawUser)
+	assert.Nil(t, err)
+	assert.Equal(t, rawUser, usr)
+
+	gotWithUserID, err := r.GetMatchInfoByUserID(rawUser.UserID)
+	assert.Nil(t, err)
+	assert.Equal(t, rawUser, gotWithUserID)
+
+	deleted, err := r.DropMatchInfoByUserID(rawUser.UserID)
+	assert.Nil(t, err)
+	assert.Equal(t, rawUser, deleted)
+
+	gotFailed, err := r.GetMatchInfoByUserID(rawUser.UserID)
+	assert.NotNil(t, err)
+	assert.Equal(t, models.MatchInfo{}, gotFailed)
+}
+
+func TestGetUsersByLanguage(t *testing.T) {
 	rawUser := models.MatchInfo{
 		UserID:    primitive.NewObjectID(),
 		Name:      "name",
@@ -156,7 +156,7 @@ candidateLoop:
 	assert.Equal(t, rawUser, usr)
 }
 
-func TestMatchesRepo_DropUserWithFirebaseUID(t *testing.T) {
+func TestDropUserWithFirebaseUID(t *testing.T) {
 	rawUser := models.MatchInfo{
 		UserID:    primitive.NewObjectID(),
 		Name:      "name",
