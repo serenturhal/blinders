@@ -10,6 +10,7 @@ import (
 	"blinders/packages/db/models"
 
 	"github.com/redis/go-redis/v9"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type Explorer interface {
@@ -45,8 +46,12 @@ func (m *MongoExplorer) Suggest(userID string) ([]models.MatchInfo, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
-	// Get 1000 users that maybe match with current user (user that speak and learn language)
-	user, err := m.Db.Users.GetUserByUserID(userID)
+	oid, err := primitive.ObjectIDFromHex(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	user, err := m.Db.Users.GetUserByID(oid)
 	if err != nil {
 		return nil, err
 	}
@@ -60,15 +65,13 @@ func (m *MongoExplorer) Suggest(userID string) ([]models.MatchInfo, error) {
 	embed := embedArr[0]
 
 	// exclude friends of current user
-	// TODO: Need to optimize
 	excludeFilter := userID
 	for _, friendID := range user.FriendIDs {
 		excludeFilter += " | " + friendID
 	}
 	excludeFilter = fmt.Sprintf("-@id:(%s)", excludeFilter)
 
-	// get 1000 candidates
-	candidates, err := m.Db.Matches.GetUsersByLanguage(user.ID.Hex(), 1000)
+	candidates, err := m.Db.Matches.GetUsersByLanguage(user.ID, 1000)
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +105,11 @@ func (m *MongoExplorer) Suggest(userID string) ([]models.MatchInfo, error) {
 	var res []models.MatchInfo
 	for _, doc := range cmd.Val().(map[any]any)["results"].([]any) {
 		userID := doc.(map[any]any)["extra_attributes"].(map[any]any)["id"].(string)
-		user, err := m.Db.Matches.GetMatchInfoByUserID(userID)
+		oid, err := primitive.ObjectIDFromHex(userID)
+		if err != nil {
+			return nil, err
+		}
+		user, err := m.Db.Matches.GetMatchInfoByUserID(oid)
 		if err != nil {
 			return nil, err
 		}
@@ -123,7 +130,7 @@ to notify that a new user has been created. This allows the embedding service to
 in the vector database.
 */
 func (m *MongoExplorer) AddUserMatchInformation(info models.MatchInfo) (models.MatchInfo, error) {
-	_, err := m.Db.Users.GetUserByPrimitiveID(info.UserID)
+	_, err := m.Db.Users.GetUserByID(info.UserID)
 	if err != nil {
 		return models.MatchInfo{}, err
 	}

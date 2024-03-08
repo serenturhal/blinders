@@ -30,7 +30,7 @@ func (s UsersService) GetUserByID(ctx *fiber.Ctx) error {
 		})
 	}
 
-	user, err := s.Repo.GetUserByPrimitiveID(oid)
+	user, err := s.Repo.GetUserByID(oid)
 	if err != nil {
 		log.Println("can not get conversation:", err)
 		return ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{

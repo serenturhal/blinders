@@ -4,14 +4,11 @@ import (
 	"slices"
 	"testing"
 
-	"blinders/packages/db"
 	"blinders/packages/db/models"
 
 	"github.com/stretchr/testify/assert"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
-
-var mongoManager = db.NewMongoManager("mongodb://username:password@localhost:27017/peakee", "peakee")
 
 func TestMatchesRepo_InsertNewRawMatchInfo(t *testing.T) {
 	rawUser := models.MatchInfo{
@@ -25,16 +22,16 @@ func TestMatchesRepo_InsertNewRawMatchInfo(t *testing.T) {
 		Interests: []string{},
 		Age:       0,
 	}
-	r := mongoManager.Matches
+	r := manager.Matches
 	usr, err := r.InsertNewRawMatchInfo(rawUser)
 	assert.Nil(t, err)
 	assert.Equal(t, rawUser, usr)
 
-	gotWithUserID, err := r.GetMatchInfoByUserID(rawUser.UserID.Hex())
+	gotWithUserID, err := r.GetMatchInfoByUserID(rawUser.UserID)
 	assert.Nil(t, err)
 	assert.Equal(t, rawUser, gotWithUserID)
 
-	deleted, err := r.DropUserWithUserID(rawUser.UserID.Hex())
+	deleted, err := r.DropMatchInfoByUserID(rawUser.UserID)
 	assert.Nil(t, err)
 	assert.Equal(t, rawUser, deleted)
 }
@@ -51,20 +48,20 @@ func TestMatchesRepo_GetMatchInfoByFirebaseUID(t *testing.T) {
 		Interests: []string{},
 		Age:       0,
 	}
-	r := mongoManager.Matches
+	r := manager.Matches
 	usr, err := r.InsertNewRawMatchInfo(rawUser)
 	assert.Nil(t, err)
 	assert.Equal(t, rawUser, usr)
 
-	gotWithUserID, err := r.GetMatchInfoByUserID(rawUser.UserID.Hex())
+	gotWithUserID, err := r.GetMatchInfoByUserID(rawUser.UserID)
 	assert.Nil(t, err)
 	assert.Equal(t, rawUser, gotWithUserID)
 
-	deleted, err := r.DropUserWithUserID(rawUser.UserID.Hex())
+	deleted, err := r.DropMatchInfoByUserID(rawUser.UserID)
 	assert.Nil(t, err)
 	assert.Equal(t, rawUser, deleted)
 
-	gotFailed, err := r.GetMatchInfoByUserID(rawUser.UserID.Hex())
+	gotFailed, err := r.GetMatchInfoByUserID(rawUser.UserID)
 	assert.NotNil(t, err)
 	assert.Equal(t, models.MatchInfo{}, gotFailed)
 }
@@ -81,20 +78,20 @@ func TestMatchesRepo_GetMatchInfoByUserID(t *testing.T) {
 		Interests: []string{},
 		Age:       0,
 	}
-	r := mongoManager.Matches
+	r := manager.Matches
 	usr, err := r.InsertNewRawMatchInfo(rawUser)
 	assert.Nil(t, err)
 	assert.Equal(t, rawUser, usr)
 
-	gotWithUserID, err := r.GetMatchInfoByUserID(rawUser.UserID.Hex())
+	gotWithUserID, err := r.GetMatchInfoByUserID(rawUser.UserID)
 	assert.Nil(t, err)
 	assert.Equal(t, rawUser, gotWithUserID)
 
-	deleted, err := r.DropUserWithUserID(rawUser.UserID.Hex())
+	deleted, err := r.DropMatchInfoByUserID(rawUser.UserID)
 	assert.Nil(t, err)
 	assert.Equal(t, rawUser, deleted)
 
-	gotFailed, err := r.GetMatchInfoByUserID(rawUser.UserID.Hex())
+	gotFailed, err := r.GetMatchInfoByUserID(rawUser.UserID)
 	assert.NotNil(t, err)
 	assert.Equal(t, models.MatchInfo{}, gotFailed)
 }
@@ -112,16 +109,16 @@ func TestMatchesRepo_GetUsersByLanguage(t *testing.T) {
 		Age:       0,
 	}
 	numReturn := uint32(10)
-	r := mongoManager.Matches
+	r := manager.Matches
 
-	usr, err := r.DropUserWithUserID(rawUser.UserID.Hex())
+	usr, err := r.DropMatchInfoByUserID(rawUser.UserID)
 	if err != nil {
 		assert.Equal(t, models.MatchInfo{}, usr)
 	} else {
 		assert.NotEmpty(t, usr)
 	}
 
-	failedGot, err := r.GetUsersByLanguage(rawUser.UserID.Hex(), 10)
+	failedGot, err := r.GetUsersByLanguage(rawUser.UserID, 10)
 	assert.NotNil(t, err)
 	assert.Len(t, failedGot, 0)
 
@@ -129,14 +126,18 @@ func TestMatchesRepo_GetUsersByLanguage(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, rawUser, usr)
 
-	got, err := r.GetUsersByLanguage(rawUser.UserID.Hex(), numReturn)
+	got, err := r.GetUsersByLanguage(rawUser.UserID, numReturn)
 	assert.Nil(t, err)
 
-	assert.GreaterOrEqual(t, uint32(len(got)), numReturn)
+	assert.GreaterOrEqual(t, numReturn, uint32(len(got)))
 
 candidateLoop:
 	for _, id := range got {
-		candidate, err := r.GetMatchInfoByUserID(id)
+		oid, err := primitive.ObjectIDFromHex(id)
+		assert.Nil(t, err)
+		assert.False(t, oid.IsZero())
+
+		candidate, err := r.GetMatchInfoByUserID(oid)
 		assert.Nil(t, err)
 		assert.NotNil(t, candidate)
 		// at here, candidate must be learning same language with curr user or natively speak the language that current
@@ -150,7 +151,7 @@ candidateLoop:
 		assert.Contains(t, usr.Learnings, candidate.Native)
 		assert.Contains(t, candidate.Learnings, usr.Native)
 	}
-	usr, err = r.DropUserWithUserID(rawUser.UserID.Hex())
+	usr, err = r.DropMatchInfoByUserID(rawUser.UserID)
 	assert.Nil(t, err)
 	assert.Equal(t, rawUser, usr)
 }
@@ -167,16 +168,16 @@ func TestMatchesRepo_DropUserWithFirebaseUID(t *testing.T) {
 		Interests: []string{},
 		Age:       0,
 	}
-	r := mongoManager.Matches
+	r := manager.Matches
 	usr, err := r.InsertNewRawMatchInfo(rawUser)
 	assert.Nil(t, err)
 	assert.Equal(t, rawUser, usr)
 
-	deleted, err := r.DropUserWithUserID(usr.UserID.Hex())
+	deleted, err := r.DropMatchInfoByUserID(usr.UserID)
 	assert.Nil(t, err)
 	assert.Equal(t, rawUser, deleted)
 
-	failed, err := r.DropUserWithUserID(usr.UserID.Hex())
+	failed, err := r.DropMatchInfoByUserID(usr.UserID)
 	assert.NotNil(t, err)
 	assert.Equal(t, models.MatchInfo{}, failed)
 }

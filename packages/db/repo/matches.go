@@ -43,23 +43,17 @@ func (r *MatchesRepo) InsertNewRawMatchInfo(doc models.MatchInfo) (models.MatchI
 	return doc, err
 }
 
-func (r *MatchesRepo) GetMatchInfoByUserID(userID string) (models.MatchInfo, error) {
-	oid, err := primitive.ObjectIDFromHex(userID)
-	if err != nil {
-		return models.MatchInfo{}, err
-	}
-
+func (r *MatchesRepo) GetMatchInfoByUserID(userID primitive.ObjectID) (models.MatchInfo, error) {
 	ctx, cal := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cal()
 
 	var doc models.MatchInfo
-	err = r.Col.FindOne(ctx, bson.M{"userId": oid}).Decode(&doc)
-
+	err := r.Col.FindOne(ctx, bson.M{"userId": userID}).Decode(&doc)
 	return doc, err
 }
 
 // GetUsersByLanguage returns `limit` ID of users that speak one language of `learnings` and are currently learning `native` or are currently learning same language as user.
-func (r *MatchesRepo) GetUsersByLanguage(userID string, limit uint32) ([]string, error) {
+func (r *MatchesRepo) GetUsersByLanguage(userID primitive.ObjectID, limit uint32) ([]string, error) {
 	user, err := r.GetMatchInfoByUserID(userID)
 	if err != nil {
 		return nil, err
@@ -113,14 +107,11 @@ func (r *MatchesRepo) GetUsersByLanguage(userID string, limit uint32) ([]string,
 	return ids, nil
 }
 
-func (r *MatchesRepo) DropUserWithUserID(userID string) (models.MatchInfo, error) {
-	oid, err := primitive.ObjectIDFromHex(userID)
-	if err != nil {
-		return models.MatchInfo{}, err
-	}
+func (r *MatchesRepo) DropMatchInfoByUserID(userID primitive.ObjectID) (models.MatchInfo, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
-	filter := bson.M{"userId": oid}
+
+	filter := bson.M{"userId": userID}
 	res := r.Col.FindOneAndDelete(ctx, filter)
 	if err := res.Err(); err != nil {
 		return models.MatchInfo{}, err

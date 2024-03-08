@@ -50,7 +50,7 @@ func (r *UsersRepo) InsertNewRawUser(u models.User) (models.User, error) {
 	return u, err
 }
 
-func (r *UsersRepo) GetUserByPrimitiveID(id primitive.ObjectID) (models.User, error) {
+func (r *UsersRepo) GetUserByID(id primitive.ObjectID) (models.User, error) {
 	ctx, cal := context.WithTimeout(context.Background(), time.Second)
 	defer cal()
 
@@ -58,14 +58,6 @@ func (r *UsersRepo) GetUserByPrimitiveID(id primitive.ObjectID) (models.User, er
 	err := r.Col.FindOne(ctx, bson.M{"_id": id}).Decode(&user)
 
 	return user, err
-}
-
-func (r *UsersRepo) GetUserByUserID(userID string) (models.User, error) {
-	oid, err := primitive.ObjectIDFromHex(userID)
-	if err != nil {
-		return models.User{}, err
-	}
-	return r.GetUserByPrimitiveID(oid)
 }
 
 func (r *UsersRepo) GetUserByFirebaseUID(uid string) (models.User, error) {
@@ -78,15 +70,11 @@ func (r *UsersRepo) GetUserByFirebaseUID(uid string) (models.User, error) {
 	return user, err
 }
 
-func (r *UsersRepo) DropUserByUserID(userID string) (models.User, error) {
-	oid, err := primitive.ObjectIDFromHex(userID)
-	if err != nil {
-		return models.User{}, err
-	}
+func (r *UsersRepo) DeleteUserByID(userID primitive.ObjectID) (models.User, error) {
 	ctx, cal := context.WithTimeout(context.Background(), time.Second)
 	defer cal()
 
 	usr := models.User{}
-	err = r.Col.FindOneAndDelete(ctx, bson.M{"_id": oid}).Decode(&usr)
+	err := r.Col.FindOneAndDelete(ctx, bson.M{"_id": userID}).Decode(&usr)
 	return usr, err
 }
