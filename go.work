@@ -22,7 +22,7 @@ use (
 	./packages/utils
 	./services/chat
 	./services/explore
-	./services/suggest
 	./services/rest
+	./services/suggest
 	./tests
 )
