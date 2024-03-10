@@ -18,6 +18,7 @@ const (
 	UserCollection         = "users"
 	ConversationCollection = "conversations"
 	MessageCollection      = "messages"
+	MatchCollection        = "matches"
 )
 
 type MongoManager struct {
@@ -26,6 +27,7 @@ type MongoManager struct {
 	Users         *repo.UsersRepo
 	Conversations *repo.ConversationsRepo
 	Messages      *repo.MessagesRepo
+	Matches       *repo.MatchesRepo
 }
 
 func NewMongoManager(url string, name string) *MongoManager {
@@ -38,11 +40,17 @@ func NewMongoManager(url string, name string) *MongoManager {
 		return nil
 	}
 
+	if err := client.Ping(ctx, nil); err != nil {
+		log.Println("cannot ping to the server", err)
+		return nil
+	}
+
 	return &MongoManager{
 		Client:        client,
 		Database:      name,
 		Users:         repo.NewUsersRepo(client.Database(name).Collection(UserCollection)),
 		Conversations: repo.NewConversationsRepo(client.Database(name).Collection(ConversationCollection)),
 		Messages:      repo.NewMessagesRepo(client.Database(name).Collection(MessageCollection)),
+		Matches:       repo.NewMatchesRepo(client.Database(name).Collection(MatchCollection)),
 	}
 }

@@ -69,3 +69,12 @@ func (r *UsersRepo) GetUserByFirebaseUID(uid string) (models.User, error) {
 
 	return user, err
 }
+
+func (r *UsersRepo) DeleteUserByID(userID primitive.ObjectID) (models.User, error) {
+	ctx, cal := context.WithTimeout(context.Background(), time.Second)
+	defer cal()
+
+	usr := models.User{}
+	err := r.Col.FindOneAndDelete(ctx, bson.M{"_id": userID}).Decode(&usr)
+	return usr, err
+}

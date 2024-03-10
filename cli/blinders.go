@@ -30,7 +30,6 @@ func main() {
 			if godotenv.Load(envFile) != nil {
 				log.Fatal("Error loading .env file ", envFile)
 			}
-
 			return nil
 		},
 	}

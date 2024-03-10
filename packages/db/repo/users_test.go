@@ -60,3 +60,22 @@ func TestGetUserByFirebaseUIDNotFound(t *testing.T) {
 	_, err := manager.Users.GetUserByFirebaseUID(primitive.NewObjectID().String())
 	assert.NotNil(t, err)
 }
+
+func TestDeleteUserByUserID(t *testing.T) {
+	user := models.User{
+		FirebaseUID: primitive.NewObjectID().String(),
+	}
+	user, _ = manager.Users.InsertNewRawUser(user)
+
+	queriedUser, err := manager.Users.GetUserByID(user.ID)
+	assert.Nil(t, err)
+	assert.Equal(t, user, queriedUser)
+
+	deleted, err := manager.Users.DeleteUserByID(user.ID)
+	assert.Nil(t, err)
+	assert.Equal(t, user, deleted)
+
+	failedDelete, err := manager.Users.DeleteUserByID(user.ID)
+	assert.NotNil(t, err)
+	assert.Equal(t, models.User{}, failedDelete)
+}

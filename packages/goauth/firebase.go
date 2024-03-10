@@ -2,6 +2,9 @@ package auth
 
 import (
 	"context"
+	"fmt"
+
+	"blinders/packages/db/repo"
 
 	firebase "firebase.google.com/go"
 	"firebase.google.com/go/auth"
@@ -9,8 +12,9 @@ import (
 )
 
 type FirebaseManager struct {
-	App    *firebase.App
-	Client *auth.Client
+	App      *firebase.App
+	Client   *auth.Client
+	UserRepo *repo.UsersRepo
 }
 
 func (m FirebaseManager) Verify(jwt string) (*UserAuth, error) {
@@ -23,13 +27,17 @@ func (m FirebaseManager) Verify(jwt string) (*UserAuth, error) {
 	email := authToken.Claims["email"].(string)
 	name := authToken.Claims["name"].(string)
 
-	user := UserAuth{
+	if m.UserRepo == nil {
+		return nil, fmt.Errorf("firebaseMangager: userRepo must not be nil")
+	}
+
+	userAuth := UserAuth{
 		Email:  email,
 		Name:   name,
 		AuthID: firebaseUID,
 	}
 
-	return &user, nil
+	return &userAuth, nil
 }
 
 func NewFirebaseManager(adminConfig []byte) (*FirebaseManager, error) {

@@ -18,8 +18,9 @@ var service chatapi.Service
 func init() {
 	app := fiber.New()
 	adminJSON, _ := utils.GetFile("firebase.admin.development.json")
-	auth, _ := auth.NewFirebaseManager(adminJSON)
-	service = chatapi.Service{App: app, Auth: auth}
+
+	authManager, _ := auth.NewFirebaseManager(adminJSON)
+	service = chatapi.Service{App: app, Auth: authManager}
 	service.InitRoute()
 	if err := godotenv.Load(".env.development"); err != nil {
 		log.Fatal("failed to load env", err)

@@ -6,7 +6,6 @@ import (
 	"net/url"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/service/apigatewaymanagementapi"
 	agm "github.com/aws/aws-sdk-go-v2/service/apigatewaymanagementapi"
 	smithyendpoints "github.com/aws/smithy-go/endpoints"
 )
@@ -15,7 +14,7 @@ type CustomEndpointResolve struct {
 	Domain, Stage string
 }
 
-func (c CustomEndpointResolve) ResolveEndpoint(_ context.Context, _ apigatewaymanagementapi.EndpointParameters) (
+func (c CustomEndpointResolve) ResolveEndpoint(_ context.Context, _ agm.EndpointParameters) (
 	smithyendpoints.Endpoint, error,
 ) {
 	var endpoint url.URL
@@ -32,13 +31,13 @@ func (c CustomEndpointResolve) ResolveEndpoint(_ context.Context, _ apigatewayma
 // NewAPIGatewayManagementClient creates a new API Gateway Management Client instance
 // from the provided parameters. The new client will have a custom endpoint
 // that resolves to the application's deployed API.
-func NewAPIGatewayManagementClient(cfg *aws.Config, domain, stage string) *apigatewaymanagementapi.Client {
+func NewAPIGatewayManagementClient(cfg *aws.Config, domain, stage string) *agm.Client {
 	cer := CustomEndpointResolve{
 		Domain: domain,
 		Stage:  stage,
 	}
-	return apigatewaymanagementapi.NewFromConfig(*cfg,
-		apigatewaymanagementapi.WithEndpointResolverV2(cer))
+	return agm.NewFromConfig(*cfg,
+		agm.WithEndpointResolverV2(cer))
 }
 
 func Publish(ctx context.Context, id string, data []byte) error {

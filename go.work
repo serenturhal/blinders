@@ -5,7 +5,6 @@ use (
 	./functions/chat
 	./functions/collecting
 	./functions/grammar
-	./functions/matching
 	./functions/practice
 	./functions/suggest
 	./functions/translate
@@ -14,6 +13,7 @@ use (
 	./functions/websocket
 	./packages/common
 	./packages/db
+	./packages/explore
 	./packages/goauth
 	./packages/interfaces
 	./packages/session
@@ -21,6 +21,7 @@ use (
 	./packages/translate
 	./packages/utils
 	./services/chat
+	./services/explore
 	./services/rest
 	./services/suggest
 	./tests

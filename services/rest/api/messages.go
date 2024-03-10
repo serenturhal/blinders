@@ -22,7 +22,7 @@ func NewMessagesService(repo *repo.MessagesRepo) *MessagesService {
 
 func (s MessagesService) GetMessageByID(ctx *fiber.Ctx) error {
 	id := ctx.Params("id")
-	oid, err := primitive.ObjectIDFromHex((id))
+	oid, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		log.Println("invalid id:", err)
 		return ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{

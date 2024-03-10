@@ -26,16 +26,6 @@ var (
 )
 
 func init() {
-	adminConfig, err := utils.GetFile("firebase.admin.json")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	authManager, err = auth.NewFirebaseManager(adminConfig)
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	url := fmt.Sprintf(
 		db.MongoURLTemplate,
 		os.Getenv("MONGO_USERNAME"),
@@ -48,6 +38,15 @@ func init() {
 	database = db.NewMongoManager(url, os.Getenv("MONGO_DATABASE"))
 	if database == nil {
 		log.Fatal("cannot create database manager")
+	}
+	adminConfig, err := utils.GetFile("firebase.admin.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	authManager, err = auth.NewFirebaseManager(adminConfig)
+	if err != nil {
+		log.Fatal(err)
 	}
 }
 

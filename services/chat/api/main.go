@@ -17,6 +17,6 @@ func (s Service) InitRoute() {
 		return c.SendString("hello from chat service")
 	})
 
-	authorized := chat.Group("/", auth.FiberAuthMiddleware(s.Auth))
+	authorized := chat.Group("/", auth.FiberAuthMiddleware(s.Auth, nil))
 	authorized.Post("/message", handlePostMessage)
 }
