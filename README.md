@@ -65,6 +65,19 @@ Run help command for more details
 blinders --help
 ```
 
+To work with `auth` commands:
+
+```
+# get jwt of a user
+blinders auth load-user --uid <user_uid>
+```
+
+```
+# generate wscat command to connect as a client
+# default endpoint ws.peakee.co/v1
+blinders auth gen-wscat --endpoint <endpoint> --uid <user_uid>
+```
+
 ### Refs
 
 - AWS Websocket API Gateway [https://github.com/aws-samples/apigateway-websockets-golang](https://github.com/aws-samples/apigateway-websockets-golang)

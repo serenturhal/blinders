@@ -20,7 +20,11 @@ var AuthCommand = cli.Command{
 	Subcommands: []*cli.Command{&loadAuthCommand, &genWSCatCommand},
 	Before: func(ctx *cli.Context) error {
 		env := ctx.String("env")
-		adminJSON, _ := utils.GetFile(fmt.Sprintf("firebase.admin.%v.json", env))
+		adminJSON, err := utils.GetFile(fmt.Sprintf("firebase.admin.%v.json", env))
+		if err != nil {
+			return err
+		}
+
 		a, err := auth.NewFirebaseManager(adminJSON)
 		if err != nil {
 			return err
@@ -62,7 +66,7 @@ var loadAuthCommand = cli.Command{
 			cacheFile,
 		)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to load firebase auth: %v", err)
 		}
 
 		fmt.Printf("JWT of %v: %v\n", authToken.Firebase.Identities["email"], idToken)
@@ -108,10 +112,10 @@ var genWSCatCommand = cli.Command{
 			cacheFile,
 		)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to load firebase auth: %v", err)
 		}
 
-		fmt.Printf("wscat -H \"Authorization: Bearer %v\" -c wss://%v\n", idToken, endpoint)
+		fmt.Printf("wscat -c \"wss://%v?token=%v\"\n", endpoint, idToken)
 
 		return nil
 	},
