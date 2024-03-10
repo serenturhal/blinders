@@ -39,3 +39,5 @@ volumes
 
 #qodana
 qodana.yaml
+
+tmp

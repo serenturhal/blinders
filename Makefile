@@ -9,3 +9,6 @@ dev-container-down:
 
 setup-cli:
 	go install ./cli/blinders.go
+
+rest:
+	air -c ./tools/.air.rest.toml
