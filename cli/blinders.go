@@ -28,7 +28,7 @@ func main() {
 
 			envFile := fmt.Sprintf(".env.%s", ctx.String("env"))
 			if godotenv.Load(envFile) != nil {
-				log.Fatal("Error loading .env file", envFile)
+				log.Fatal("Error loading .env file ", envFile)
 			}
 			return nil
 		},

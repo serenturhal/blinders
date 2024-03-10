@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strings"
 
 	"blinders/packages/auth"
 	"blinders/packages/db"
@@ -55,13 +54,7 @@ func HandleRequest(
 	_ context.Context,
 	request APIGatewayWebsocketProxyRequest,
 ) (events.APIGatewayCustomAuthorizerResponse, error) {
-	authorization := request.Headers["Authorization"]
-	if !strings.Contains(authorization, "Bearer ") {
-		// TODO: need to response with unauthorized response code
-		// (it's currently 500 as default)
-		return events.APIGatewayCustomAuthorizerResponse{}, fmt.Errorf("[authorizer] invalid token")
-	}
-	jwt := strings.Split(authorization, " ")[1]
+	jwt := request.QueryStringParameters["token"]
 	authUser, err := authManager.Verify(jwt)
 	if err != nil {
 		return events.APIGatewayCustomAuthorizerResponse{}, err
