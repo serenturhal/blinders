@@ -41,8 +41,19 @@ func (m Manager) InitRoute(options InitOptions) error {
 		return c.SendString("hello from Peakee Rest API")
 	})
 
+	authorizedWithoutUser := rootRoute.Group(
+		"/users/self",
+		auth.FiberAuthMiddleware(m.Auth, m.DB.Users,
+			auth.MiddlewareOptions{
+				CheckUser: false,
+			}),
+	)
+	authorizedWithoutUser.Get("/", m.Users.GetSelfFromAuth)
+	authorizedWithoutUser.Post("/", m.Users.CreateNewUserBySelf)
+
 	authorized := rootRoute.Group("/", auth.FiberAuthMiddleware(m.Auth, m.DB.Users))
-	authorized.Get("/users/:id", m.Users.GetUserByID)
+	users := authorized.Group("/users")
+	users.Get("/:id", m.Users.GetUserByID)
 	authorized.Get("/conversations/:id", m.Messages.GetMessageByID)
 	authorized.Get("/messages/:id", m.Messages.GetMessageByID)
 
