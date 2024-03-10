@@ -41,7 +41,7 @@ resource "aws_apigatewayv2_authorizer" "websocket_authorizer" {
   api_id           = aws_apigatewayv2_api.websocket_api.id
   authorizer_type  = "REQUEST"
   authorizer_uri   = aws_lambda_function.ws_authorizer.invoke_arn
-  identity_sources = ["route.request.header.Authorization"]
+  identity_sources = ["route.request.querystring.token"]
 }
 
 output "http-api-endpoint" {
