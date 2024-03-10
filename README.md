@@ -81,3 +81,4 @@ blinders auth gen-wscat --endpoint <endpoint> --uid <user_uid>
 ### Refs
 
 - AWS Websocket API Gateway [https://github.com/aws-samples/apigateway-websockets-golang](https://github.com/aws-samples/apigateway-websockets-golang)
+- [https://github.com/aws-samples/websocket-chat-application](https://github.com/aws-samples/websocket-chat-application)
