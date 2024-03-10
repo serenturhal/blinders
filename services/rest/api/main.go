@@ -28,16 +28,16 @@ func NewManager(app *fiber.App, auth auth.Manager, db *db.MongoManager) *Manager
 }
 
 type InitOptions struct {
-	prefix string
+	Prefix string
 }
 
 func (m Manager) InitRoute(options InitOptions) error {
-	if options.prefix == "" {
-		options.prefix = "/"
+	if options.Prefix == "" {
+		options.Prefix = "/"
 	}
 
-	rootRoute := m.App.Group(options.prefix)
-	rootRoute.Get("/ping", func(c *fiber.Ctx) error {
+	rootRoute := m.App.Group(options.Prefix)
+	rootRoute.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("hello from Peakee Rest API")
 	})
 

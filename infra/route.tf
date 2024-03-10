@@ -126,3 +126,29 @@ resource "aws_lambda_permission" "ws_authorizer" {
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_apigatewayv2_api.websocket_api.execution_arn}/*/*"
 }
+
+
+# rest api
+resource "aws_apigatewayv2_integration" "rest" {
+  api_id           = aws_apigatewayv2_api.http_api.id
+  integration_uri  = aws_lambda_function.rest.invoke_arn
+  integration_type = "AWS_PROXY"
+}
+
+resource "aws_lambda_permission" "rest" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.rest.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_apigatewayv2_api.http_api.execution_arn}/*/*"
+}
+
+resource "aws_apigatewayv2_route" "rest" {
+  api_id    = aws_apigatewayv2_api.http_api.id
+  route_key = "ANY /{proxy+}"
+  target    = "integrations/${aws_apigatewayv2_integration.rest.id}"
+}
+
+output "rest_api" {
+  value = "https://${aws_apigatewayv2_api_mapping.http_api_v1.domain_name}/${aws_apigatewayv2_api_mapping.http_api_v1.api_mapping_key}/<users|...>"
+}
