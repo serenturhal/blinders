@@ -15,6 +15,7 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 	fiberadapter "github.com/awslabs/aws-lambda-go-api-proxy/fiber"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 )
 
 var fiberLambda *fiberadapter.FiberLambda
@@ -47,6 +48,7 @@ func init() {
 	}
 
 	api := restapi.NewManager(app, authManager, database)
+	api.App.Use(logger.New())
 	err = api.InitRoute(restapi.InitOptions{})
 	if err != nil {
 		panic(err)
@@ -59,8 +61,6 @@ func Handler(
 	ctx context.Context,
 	req events.APIGatewayV2HTTPRequest,
 ) (events.APIGatewayV2HTTPResponse, error) {
-	log.Println(req.RawPath)
-	log.Println(req)
 	return fiberLambda.ProxyWithContextV2(ctx, req)
 }
 
