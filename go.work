@@ -6,9 +6,9 @@ use (
 	./functions/collecting
 	./functions/grammar
 	./functions/practice
+	./functions/rest
 	./functions/suggest
 	./functions/translate
-	./functions/users
 	./functions/utils
 	./functions/websocket
 	./packages/common

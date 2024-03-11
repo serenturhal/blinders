@@ -137,3 +137,27 @@ resource "aws_lambda_function" "ws_chat" {
     variables = local.envs
   }
 }
+
+
+data "archive_file" "rest" {
+  depends_on = [null_resource.go_build]
+
+  type        = "zip"
+  source_dir  = "../dist/rest"
+  output_path = "../dist/rest.zip"
+}
+
+resource "aws_lambda_function" "rest" {
+  function_name    = "blinders-rest-api"
+  filename         = "../dist/rest.zip"
+  handler          = "bootstrap"
+  role             = aws_iam_role.lambda_role.arn
+  depends_on       = [aws_iam_role_policy_attachment.attach_iam_policy_to_iam_role]
+  runtime          = "provided.al2" # this runtime work with our built lambda (not provided.al2023)
+  architectures    = ["arm64"]
+  source_code_hash = data.archive_file.rest.output_base64sha256
+
+  environment {
+    variables = local.envs
+  }
+}

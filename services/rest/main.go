@@ -11,6 +11,7 @@ import (
 	restapi "blinders/services/rest/api"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/joho/godotenv"
 )
 
@@ -21,17 +22,13 @@ func init() {
 		log.Fatal("failed to load env", err)
 	}
 
+	log.Println("rest api running on environment:", os.Getenv("ENVIRONMENT"))
+
 	app := fiber.New()
 
-	url := fmt.Sprintf(
-		db.MongoURLTemplate,
-		os.Getenv("MONGO_USERNAME"),
-		os.Getenv("MONGO_PASSWORD"),
-		os.Getenv("MONGO_HOST"),
-		os.Getenv("MONGO_PORT"),
-		os.Getenv("MONGO_DATABASE"),
-	)
-	dbManager := db.NewMongoManager(url, os.Getenv("MONGO_DATABASE"))
+	dbName := os.Getenv("MONGO_DATABASE")
+	url := os.Getenv("MONGO_DATABASE_URL")
+	dbManager := db.NewMongoManager(url, dbName)
 	if dbManager == nil {
 		log.Fatal("cannot create database manager")
 	}
@@ -40,6 +37,7 @@ func init() {
 	auth, _ := auth.NewFirebaseManager(adminJSON)
 
 	apiManager = *restapi.NewManager(app, auth, dbManager)
+	apiManager.App.Use(logger.New())
 	_ = apiManager.InitRoute(restapi.InitOptions{})
 }
 

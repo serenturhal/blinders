@@ -3,7 +3,7 @@ package models
 import "go.mongodb.org/mongo-driver/bson/primitive"
 
 type Conversation struct {
-	ID        primitive.ObjectID   `bson:"_id"       json:"Id"`
+	ID        primitive.ObjectID   `bson:"_id"       json:"id"`
 	Members   []Member             `bson:"members"   json:"members"`
 	CreatedAt primitive.DateTime   `bson:"createdAt" json:"createdAt"`
 	UpdatedAt primitive.DateTime   `bson:"updatedAt" json:"updatedAt"`
@@ -16,7 +16,7 @@ type ConversationMetadata struct {
 }
 
 type Member struct {
-	ID                    primitive.ObjectID `bson:"_id"                   json:"Id"`
+	ID                    primitive.ObjectID `bson:"_id"                   json:"id"`
 	UserID                primitive.ObjectID `bson:"userId"                json:"userId"`
 	Nickname              string             `bson:"nickname"              json:"nickname"`
 	LatestViewedMessageID primitive.ObjectID `bson:"latestViewedMessageId" json:"latestViewedMessageId"`
@@ -34,7 +34,7 @@ const (
 )
 
 type Message struct {
-	ID             primitive.ObjectID `bson:"_id"            json:"Id"`
+	ID             primitive.ObjectID `bson:"_id"            json:"id"`
 	SenderID       primitive.ObjectID `bson:"senderId"       json:"senderId"`
 	ConversationID primitive.ObjectID `bson:"conversationId" json:"conversationId"`
 	ReplyTo        primitive.ObjectID `bson:"replyTo"        json:"replyTo"`

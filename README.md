@@ -18,6 +18,14 @@ Require Go version >= 1.21
 
 Using [golangci-lint](https://golangci-lint.run/) to manage all linter, formatter and setup ci, detail configs in `golangci.yml`. You should config `golangci-lint` in your code editor to pass all the linters
 
+### Live-reloading
+
+Install [air](https://github.com/cosmtrek/air) for live-reloading when working with Go
+
+```
+go install github.com/cosmtrek/air@latest
+```
+
 ## Python development setup
 
 ### Tools
@@ -76,6 +84,20 @@ blinders auth load-user --uid <user_uid>
 # generate wscat command to connect as a client
 # default endpoint ws.peakee.co/v1
 blinders auth gen-wscat --endpoint <endpoint> --uid <user_uid>
+```
+
+## Local development
+
+Run development docker compose to prepare development environment
+
+```
+make dev-container
+```
+
+Run REST api with Air
+
+```
+make rest
 ```
 
 ### Refs

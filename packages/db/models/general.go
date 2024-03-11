@@ -4,10 +4,12 @@ import "go.mongodb.org/mongo-driver/bson/primitive"
 
 type User struct {
 	ID            primitive.ObjectID     `bson:"_id"           json:"id"`
-	Conversations []EmbeddedConversation `bson:"conversations" json:"conversations"`
+	Name          string                 `bson:"name"          json:"name"`
+	Email         string                 `bson:"email"         json:"email"`
 	FirebaseUID   string                 `bson:"firebaseUID"   json:"firebaseUID"`
 	ImageURL      string                 `bson:"imageURL"      json:"imageURL"`
-	FriendIDs     []string               `bson:"friends"       json:"friends"`
+	FriendIDs     []primitive.ObjectID   `bson:"friends"       json:"friends"`
+	Conversations []EmbeddedConversation `bson:"conversations" json:"conversations"`
 	CreatedAt     primitive.DateTime     `bson:"createdAt"     json:"createdAt"`
 	UpdatedAt     primitive.DateTime     `bson:"updatedAt"     json:"updatedAt"`
 }
