@@ -83,13 +83,11 @@ func (r *ConversationsRepo) InsertIndividualConversation(
 				ID:   primitive.NewObjectID(),
 				Type: models.IndividualConversation,
 				Members: []models.Member{{
-					ID:        primitive.NewObjectID(),
 					UserID:    userID,
 					CreatedAt: now,
 					UpdatedAt: now,
 					JoinedAt:  now,
 				}, {
-					ID:        primitive.NewObjectID(),
 					UserID:    friendID,
 					CreatedAt: now,
 					UpdatedAt: now,

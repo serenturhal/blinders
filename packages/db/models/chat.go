@@ -27,7 +27,6 @@ type ConversationMetadata struct {
 }
 
 type Member struct {
-	ID                    primitive.ObjectID  `bson:"_id"                             json:"id"`
 	UserID                primitive.ObjectID  `bson:"userId"                          json:"userId"`
 	Nickname              string              `bson:"nickname,omitempty"              json:"nickname,omitempty"`
 	LatestViewedMessageID *primitive.ObjectID `bson:"latestViewedMessageId,omitempty" json:"latestViewedMessageId,omitempty"`
