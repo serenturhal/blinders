@@ -35,6 +35,15 @@ func NewUsersRepo(col *mongo.Collection) *UsersRepo {
 	}
 }
 
+func (r *UsersRepo) InsertNewUser(u models.User) (models.User, error) {
+	ctx, cal := context.WithTimeout(context.Background(), time.Second)
+	defer cal()
+
+	_, err := r.Col.InsertOne(ctx, u)
+
+	return u, err
+}
+
 // this function creates new ID and time and insert the document to database
 func (r *UsersRepo) InsertNewRawUser(u models.User) (models.User, error) {
 	ctx, cal := context.WithTimeout(context.Background(), time.Second)
