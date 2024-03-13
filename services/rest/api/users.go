@@ -88,12 +88,11 @@ func (s UsersService) CreateNewUserBySelf(ctx *fiber.Ctx) error {
 	}
 
 	user, err := s.Repo.InsertNewRawUser(models.User{
-		Name:          userDTO.Name,
-		Email:         userDTO.Email,
-		ImageURL:      userDTO.ImageURL,
-		FirebaseUID:   userAuth.AuthID,
-		Conversations: make([]models.EmbeddedConversation, 0),
-		FriendIDs:     make([]primitive.ObjectID, 0),
+		Name:        userDTO.Name,
+		Email:       userDTO.Email,
+		ImageURL:    userDTO.ImageURL,
+		FirebaseUID: userAuth.AuthID,
+		FriendIDs:   make([]primitive.ObjectID, 0),
 	})
 	if err != nil {
 		log.Println("can not create user:", err)
