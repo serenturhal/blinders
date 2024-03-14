@@ -21,7 +21,7 @@ func NewManager(app *fiber.App, auth auth.Manager, db *db.MongoManager) *Manager
 		App:           app,
 		Auth:          auth,
 		DB:            db,
-		Users:         NewUsersService(db.Users),
+		Users:         NewUsersService(db.Users, db.FriendRequests),
 		Conversations: NewConversationsService(db.Conversations, db.Users),
 		Messages:      NewMessagesService(db.Messages),
 	}
@@ -55,6 +55,9 @@ func (m Manager) InitRoute(options InitOptions) error {
 
 	users := authorized.Group("/users")
 	users.Get("/:id", m.Users.GetUserByID)
+	users.Get("/:id/friend-requests", m.Users.GetPendingFriendRequests)
+	users.Post("/:id/friend-requests", m.Users.CreateAddFriendRequest)
+	users.Put("/:id/friend-requests/:requestId", m.Users.RespondFriendRequest)
 
 	conversations := authorized.Group("/conversations")
 	conversations.Get("/:id", m.Conversations.GetConversationByID)

@@ -16,12 +16,14 @@ import (
 )
 
 type UsersService struct {
-	Repo *repo.UsersRepo
+	Repo               *repo.UsersRepo
+	FriendRequestsRepo *repo.FriendRequestsRepo
 }
 
-func NewUsersService(repo *repo.UsersRepo) *UsersService {
+func NewUsersService(repo *repo.UsersRepo, frRepo *repo.FriendRequestsRepo) *UsersService {
 	return &UsersService{
-		Repo: repo,
+		Repo:               repo,
+		FriendRequestsRepo: frRepo,
 	}
 }
 
