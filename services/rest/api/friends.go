@@ -135,6 +135,7 @@ func (s UsersService) RespondFriendRequest(ctx *fiber.Ctx) error {
 		})
 	}
 
+	// TODO: need to apply transaction
 	if payload.Action == AcceptAddFriend {
 		err = s.Repo.AddFriend(request.From, request.To)
 		if err != nil {
