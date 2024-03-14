@@ -95,11 +95,15 @@ func queryConversationOfUser(
 
 	for _, m := range conversation.Members {
 		if m.UserID == userID {
-			return &conversation, nil
+			return conversation, nil
 		}
 	}
 
-	return nil, fmt.Errorf("user %s is not a member of conversation %s", userID.Hex(), conversationID.Hex())
+	return nil, fmt.Errorf(
+		"user %s is not a member of conversation %s",
+		userID.Hex(),
+		conversationID.Hex(),
+	)
 }
 
 func checkValidReplyTo(replyTo primitive.ObjectID, conversationID primitive.ObjectID) error {

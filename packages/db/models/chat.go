@@ -2,27 +2,37 @@ package models
 
 import "go.mongodb.org/mongo-driver/bson/primitive"
 
+type ConversationType string
+
+const (
+	IndividualConversation ConversationType = "individual"
+	GroupConversation      ConversationType = "group"
+)
+
 type Conversation struct {
-	ID        primitive.ObjectID   `bson:"_id"       json:"id"`
-	Members   []Member             `bson:"members"   json:"members"`
-	CreatedAt primitive.DateTime   `bson:"createdAt" json:"createdAt"`
-	UpdatedAt primitive.DateTime   `bson:"updatedAt" json:"updatedAt"`
-	Metadata  ConversationMetadata `bson:"metadata"  json:"metadata"`
+	ID              primitive.ObjectID    `bson:"_id"                       json:"id"`
+	Type            ConversationType      `bson:"type"                      json:"type"`
+	Members         []Member              `bson:"members"                   json:"members"`
+	CreatedBy       primitive.ObjectID    `bson:"createdBy"                 json:"createdBy"`
+	CreatedAt       primitive.DateTime    `bson:"createdAt"                 json:"createdAt"`
+	UpdatedAt       primitive.DateTime    `bson:"updatedAt"                 json:"updatedAt"`
+	LatestMessage   *primitive.ObjectID   `bson:"latestMessage,omitempty"   json:"latestMessage,omitempty"`
+	LatestMessageAt primitive.DateTime    `bson:"latestMessageAt,omitempty" json:"latestMessageAt,omitempty"`
+	Metadata        *ConversationMetadata `bson:"metadata,omitempty"        json:"metadata,omitempty"`
 }
 
 type ConversationMetadata struct {
-	Name  string `omitempty:"true"`
-	Image string `omitempty:"true"`
+	Name  string `bson:"name,omitempty"  json:"name,omitempty"`
+	Image string `bson:"image,omitempty" json:"image,omitempty"`
 }
 
 type Member struct {
-	ID                    primitive.ObjectID `bson:"_id"                   json:"id"`
-	UserID                primitive.ObjectID `bson:"userId"                json:"userId"`
-	Nickname              string             `bson:"nickname"              json:"nickname"`
-	LatestViewedMessageID primitive.ObjectID `bson:"latestViewedMessageId" json:"latestViewedMessageId"`
-	CreatedAt             primitive.DateTime `bson:"createdAt"             json:"createdAt"`
-	UpdatedAt             primitive.DateTime `bson:"updatedAt"             json:"updatedAt"`
-	JoinedAt              primitive.DateTime `bson:"joinedAt"              json:"joinedAt"`
+	UserID                primitive.ObjectID  `bson:"userId"                          json:"userId"`
+	Nickname              string              `bson:"nickname,omitempty"              json:"nickname,omitempty"`
+	LatestViewedMessageID *primitive.ObjectID `bson:"latestViewedMessageId,omitempty" json:"latestViewedMessageId,omitempty"`
+	CreatedAt             primitive.DateTime  `bson:"createdAt"                       json:"createdAt"`
+	UpdatedAt             primitive.DateTime  `bson:"updatedAt"                       json:"updatedAt"`
+	JoinedAt              primitive.DateTime  `bson:"joinedAt"                        json:"joinedAt"`
 }
 
 type MessageStatus string

@@ -22,7 +22,7 @@ func NewManager(app *fiber.App, auth auth.Manager, db *db.MongoManager) *Manager
 		Auth:          auth,
 		DB:            db,
 		Users:         NewUsersService(db.Users),
-		Conversations: NewConversationsService(db.Conversations),
+		Conversations: NewConversationsService(db.Conversations, db.Users),
 		Messages:      NewMessagesService(db.Messages),
 	}
 }
@@ -52,9 +52,14 @@ func (m Manager) InitRoute(options InitOptions) error {
 	authorizedWithoutUser.Post("/", m.Users.CreateNewUserBySelf)
 
 	authorized := rootRoute.Group("/", auth.FiberAuthMiddleware(m.Auth, m.DB.Users))
+
 	users := authorized.Group("/users")
 	users.Get("/:id", m.Users.GetUserByID)
-	authorized.Get("/conversations/:id", m.Messages.GetMessageByID)
+
+	conversations := authorized.Group("/conversations")
+	conversations.Get("/:id", m.Conversations.GetConversationByID)
+	conversations.Post("/", m.Conversations.CreateNewIndividualConversation)
+
 	authorized.Get("/messages/:id", m.Messages.GetMessageByID)
 
 	return nil
