@@ -27,3 +27,20 @@ type User struct {
 // 		Notification bool `bson:"notification"   json:"notification"`
 // 	} `bson:"settings"       json:"settings"`
 // }
+
+type FriendRequestStatus string
+
+const (
+	FriendStatusPending  FriendRequestStatus = "pending"
+	FriendStatusAccepted FriendRequestStatus = "accepted"
+	FriendStatusDenied   FriendRequestStatus = "denied"
+)
+
+type FriendRequest struct {
+	ID        primitive.ObjectID  `bson:"_id"       json:"id"`
+	From      primitive.ObjectID  `bson:"from"      json:"from"`
+	To        primitive.ObjectID  `bson:"to"        json:"to"`
+	Status    FriendRequestStatus `bson:"status"    json:"status"`
+	CreatedAt primitive.DateTime  `bson:"createdAt" json:"createdAt"`
+	UpdatedAt primitive.DateTime  `bson:"updatedAt" json:"updatedAt"`
+}
