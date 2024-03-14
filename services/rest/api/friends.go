@@ -31,6 +31,9 @@ func (s UsersService) GetPendingFriendRequests(ctx *fiber.Ctx) error {
 		})
 	}
 
+	if len(requests) == 0 {
+		requests = make([]models.FriendRequest, 0)
+	}
 	return ctx.Status(http.StatusOK).JSON(requests)
 }
 
@@ -77,11 +80,11 @@ func (s UsersService) CreateAddFriendRequest(ctx *fiber.Ctx) error {
 		})
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
-			"error": "something went wrong",
+			"error": err.Error(),
 		})
 	}
 
-	return ctx.Status(http.StatusOK).JSON(r)
+	return ctx.Status(http.StatusCreated).JSON(r)
 }
 
 const (
@@ -94,6 +97,7 @@ type RespondFriendRequest struct {
 }
 
 func (s UsersService) RespondFriendRequest(ctx *fiber.Ctx) error {
+	userID, _ := primitive.ObjectIDFromHex(ctx.Params("id"))
 	requestID, err := primitive.ObjectIDFromHex(ctx.Params("requestId"))
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
@@ -122,11 +126,12 @@ func (s UsersService) RespondFriendRequest(ctx *fiber.Ctx) error {
 
 	request, err := s.FriendRequestsRepo.UpdateFriendRequestStatusByID(
 		requestID,
+		userID,
 		status,
 	)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
-			"error": "something went wrong",
+			"error": err.Error(),
 		})
 	}
 

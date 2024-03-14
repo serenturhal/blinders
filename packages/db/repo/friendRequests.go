@@ -19,28 +19,14 @@ type FriendRequestsRepo struct {
 }
 
 func NewFriendRequestsRepo(col *mongo.Collection) *FriendRequestsRepo {
-	ctx, cal := context.WithTimeout(context.Background(), time.Second)
-	defer cal()
-
-	_, err := col.Indexes().CreateOne(ctx, mongo.IndexModel{
-		Keys:    bson.M{"firebaseUID": 1},
-		Options: options.Index().SetUnique(true),
-	})
-	if err != nil {
-		log.Println("can not create index for firebaseUID:", err)
-		return nil
-	}
-
-	return &FriendRequestsRepo{
-		Col: col,
-	}
+	return &FriendRequestsRepo{Col: col}
 }
 
-// this function creates new ID and time and insert the document to database
 func (r *FriendRequestsRepo) InsertNewRawFriendRequest(
 	request models.FriendRequest,
 ) (*models.FriendRequest, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(
+		context.Background(), time.Second)
 	defer cancel()
 
 	request.ID = primitive.NewObjectID()
@@ -50,10 +36,7 @@ func (r *FriendRequestsRepo) InsertNewRawFriendRequest(
 
 	upsert := true
 	result, err := r.Col.UpdateOne(ctx,
-		bson.M{
-			"from": request.From,
-			"to":   request.To,
-		},
+		bson.M{"from": request.From, "to": request.To},
 		bson.M{"$setOnInsert": request},
 		&options.UpdateOptions{Upsert: &upsert})
 	if err != nil {
@@ -70,7 +53,8 @@ func (r *FriendRequestsRepo) GetFriendRequestByFrom(
 	from primitive.ObjectID,
 	status models.FriendRequestStatus,
 ) ([]models.FriendRequest, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(
+		context.Background(), time.Second)
 	defer cancel()
 
 	var filter bson.M
@@ -99,7 +83,8 @@ func (r *FriendRequestsRepo) GetFriendRequestByTo(
 	to primitive.ObjectID,
 	status models.FriendRequestStatus,
 ) ([]models.FriendRequest, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(
+		context.Background(), time.Second)
 	defer cancel()
 
 	var filter bson.M
@@ -144,19 +129,30 @@ func (r *FriendRequestsRepo) GetFriendRequestByID(
 
 func (r *FriendRequestsRepo) UpdateFriendRequestStatusByID(
 	id primitive.ObjectID,
+	userID primitive.ObjectID,
 	status models.FriendRequestStatus,
 ) (*models.FriendRequest, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(
+		context.Background(), time.Second)
 	defer cancel()
 
-	var request models.FriendRequest
-	result, err := r.Col.UpdateByID(ctx, id, bson.M{"$set": bson.M{"status": status}})
+	result, err := r.Col.UpdateOne(
+		ctx,
+		bson.M{"_id": id, "to": userID, "status": models.FriendStatusPending},
+		bson.M{"$set": bson.M{"status": status}},
+	)
 	if err != nil {
 		log.Println("can not update friend request:", err)
-		return nil, fmt.Errorf("something went wrong when update friend request")
+		return nil, fmt.Errorf("can not update friend request")
 	}
 	if result.MatchedCount == 0 {
 		return nil, fmt.Errorf("not found this friend request")
+	}
+	var request models.FriendRequest
+	err = r.Col.FindOne(ctx, bson.M{"_id": id}).Decode(&request)
+	if err != nil {
+		log.Println("can not get friend request:", err)
+		return nil, fmt.Errorf("something went wrong")
 	}
 
 	return &request, nil

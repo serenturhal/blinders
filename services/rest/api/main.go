@@ -55,9 +55,9 @@ func (m Manager) InitRoute(options InitOptions) error {
 
 	users := authorized.Group("/users")
 	users.Get("/:id", m.Users.GetUserByID)
-	users.Get("/:id/friend-requests", m.Users.GetPendingFriendRequests)
-	users.Post("/:id/friend-requests", m.Users.CreateAddFriendRequest)
-	users.Put("/:id/friend-requests/:requestId", m.Users.RespondFriendRequest)
+	users.Get("/:id/friend-requests", ValidateUserIDParam, m.Users.GetPendingFriendRequests)
+	users.Post("/:id/friend-requests", ValidateUserIDParam, m.Users.CreateAddFriendRequest)
+	users.Put("/:id/friend-requests/:requestId", ValidateUserIDParam, m.Users.RespondFriendRequest)
 
 	conversations := authorized.Group("/conversations")
 	conversations.Get("/:id", m.Conversations.GetConversationByID)
