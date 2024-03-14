@@ -8,6 +8,7 @@ import (
 
 	"blinders/packages/auth"
 	"blinders/packages/db"
+	"blinders/packages/transport"
 	"blinders/packages/utils"
 	restapi "blinders/services/rest/api"
 
@@ -47,7 +48,13 @@ func init() {
 		log.Fatal(err)
 	}
 
-	api := restapi.NewManager(app, authManager, database)
+	api := restapi.NewManager(
+		app, authManager, database,
+		transport.NewLambdaTransport(),
+		transport.ConsumerMap{
+			transport.Notification: os.Getenv("NOTIFICATION_FUNCTION_NAME"),
+		},
+	)
 	api.App.Use(logger.New())
 	err = api.InitRoute(restapi.InitOptions{})
 	if err != nil {

@@ -32,3 +32,6 @@ GOOS=linux GOARCH=arm64 CGO_ENABLED=0 GOFLAGS=-trimpath go build -tags lambda.no
 echo "build rest api lambda function completed"
 cp ./firebase.admin.json ./dist/rest
 echo "copied firebase.admin.json to rest api"
+
+GOOS=linux GOARCH=arm64 CGO_ENABLED=0 GOFLAGS=-trimpath go build -tags lambda.norpc -mod=readonly -ldflags='-s -w' -o ./dist/notification/bootstrap ./functions/websocket/notification
+echo "build notification function completed"
