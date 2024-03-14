@@ -135,5 +135,14 @@ func (s UsersService) RespondFriendRequest(ctx *fiber.Ctx) error {
 		})
 	}
 
+	if payload.Action == AcceptAddFriend {
+		err = s.Repo.AddFriend(request.From, request.To)
+		if err != nil {
+			return ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
+				"error": err.Error(),
+			})
+		}
+	}
+
 	return ctx.Status(http.StatusAccepted).JSON(request)
 }
