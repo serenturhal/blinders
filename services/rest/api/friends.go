@@ -2,10 +2,12 @@ package restapi
 
 import (
 	"context"
+	"encoding/json"
 	"log"
 	"net/http"
 
 	"blinders/packages/db/models"
+	"blinders/packages/transport"
 	"blinders/packages/utils"
 
 	"github.com/gofiber/fiber/v2"
@@ -84,6 +86,22 @@ func (s UsersService) CreateAddFriendRequest(ctx *fiber.Ctx) error {
 		})
 	}
 
+	event := transport.AddFriendEvent{
+		Event:              transport.Event{Type: transport.AddFriend},
+		UserID:             friendID.Hex(),
+		AddFriendRequestID: r.ID.Hex(),
+		Action:             transport.InitFriendRequest,
+	}
+	notiPayload, _ := json.Marshal(event)
+	err = s.Transporter.Push(
+		context.Background(),
+		s.ConsumerMap[transport.Notification],
+		notiPayload,
+	)
+	if err != nil {
+		log.Println("failed to push notification", err)
+	}
+
 	return ctx.Status(http.StatusCreated).JSON(r)
 }
 
@@ -135,14 +153,35 @@ func (s UsersService) RespondFriendRequest(ctx *fiber.Ctx) error {
 		})
 	}
 
-	// TODO: need to apply transaction
-	if payload.Action == AcceptAddFriend {
+	var action transport.AddFriendAction
+	switch payload.Action {
+	case AcceptAddFriend:
+		// TODO: need to apply transaction
 		err = s.Repo.AddFriend(request.From, request.To)
 		if err != nil {
 			return ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
 				"error": err.Error(),
 			})
 		}
+		action = transport.AcceptFriendRequest
+	case DenyAddFriend:
+		action = transport.DenyFriendRequest
+	}
+
+	event := transport.AddFriendEvent{
+		Event:              transport.Event{Type: transport.AddFriend},
+		UserID:             request.From.Hex(),
+		AddFriendRequestID: requestID.Hex(),
+		Action:             action,
+	}
+	notiPayload, _ := json.Marshal(event)
+	err = s.Transporter.Push(
+		context.Background(),
+		s.ConsumerMap[transport.Notification],
+		notiPayload,
+	)
+	if err != nil {
+		log.Println("failed to push notification", err)
 	}
 
 	return ctx.Status(http.StatusAccepted).JSON(request)

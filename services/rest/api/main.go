@@ -3,6 +3,7 @@ package restapi
 import (
 	"blinders/packages/auth"
 	"blinders/packages/db"
+	"blinders/packages/transport"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -16,12 +17,18 @@ type Manager struct {
 	Messages      *MessagesService
 }
 
-func NewManager(app *fiber.App, auth auth.Manager, db *db.MongoManager) *Manager {
+func NewManager(
+	app *fiber.App,
+	auth auth.Manager,
+	db *db.MongoManager,
+	transporter transport.Transport,
+	consumerMap transport.ConsumerMap,
+) *Manager {
 	return &Manager{
 		App:           app,
 		Auth:          auth,
 		DB:            db,
-		Users:         NewUsersService(db.Users, db.FriendRequests),
+		Users:         NewUsersService(db.Users, db.FriendRequests, transporter, consumerMap),
 		Conversations: NewConversationsService(db.Conversations, db.Users),
 		Messages:      NewMessagesService(db.Messages),
 	}
