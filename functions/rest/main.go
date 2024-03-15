@@ -68,6 +68,7 @@ func Handler(
 	ctx context.Context,
 	req events.APIGatewayV2HTTPRequest,
 ) (events.APIGatewayV2HTTPResponse, error) {
+	req.RequestContext.HTTP.Path = req.PathParameters["proxy"]
 	return fiberLambda.ProxyWithContextV2(ctx, req)
 }
 
