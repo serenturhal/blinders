@@ -5,9 +5,11 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
+	"strings"
 	"sync"
 
 	"blinders/packages/apigateway"
@@ -43,8 +45,13 @@ func init() {
 	}))
 }
 
-func HandleRequest(_ context.Context, payload []byte) error {
-	event, err := utils.ParseJSON[transport.Event](payload)
+func HandleRequest(ctx context.Context, payload any) error {
+	bytes, err := json.Marshal(payload)
+	if err != nil {
+		log.Println("can not marshal payload:", err)
+		return err
+	}
+	event, err := utils.ParseJSON[transport.Event](bytes)
 	if err != nil {
 		log.Println("can not parse request payload, require type in payload:", err)
 		return err
@@ -54,24 +61,28 @@ func HandleRequest(_ context.Context, payload []byte) error {
 
 	switch event.Type {
 	case transport.AddFriend:
-		event, err := utils.ParseJSON[transport.AddFriendEvent](payload)
+		event, err := utils.ParseJSON[transport.AddFriendEvent](bytes)
 		if err != nil {
 			log.Println("can not parse request payload:", err)
 			return err
 		}
-		userConID, err := SessionManager.GetSessions(event.UserID)
+		userConIDs, err := SessionManager.GetSessions(event.UserID)
 		if err != nil {
 			log.Println("can not get session:", err)
 			return err
 		}
 
 		wg := sync.WaitGroup{}
-		for _, conID := range userConID {
+		for _, conID := range userConIDs {
 			wg.Add(1)
 			go func(conID string, payload []byte) {
-				_ = APIGatewayClient.Publish(context.Background(), conID, payload)
+				conID = strings.Split(conID, ":")[1]
+				err = APIGatewayClient.Publish(ctx, conID, payload)
+				if err != nil {
+					log.Println("failed to publish:", err)
+				}
 				wg.Done()
-			}(conID, payload)
+			}(conID, bytes)
 		}
 		wg.Wait()
 	default:
@@ -82,6 +93,5 @@ func HandleRequest(_ context.Context, payload []byte) error {
 }
 
 func main() {
-	log.Println(APIGatewayClient)
 	lambda.Start(HandleRequest)
 }
