@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/lambda"
 	"github.com/aws/aws-sdk-go-v2/service/lambda/types"
 )
@@ -12,8 +13,8 @@ type LambdaTransport struct {
 	*lambda.Client
 }
 
-func NewLambdaTransport() *LambdaTransport {
-	return &LambdaTransport{}
+func NewLambdaTransport(cfg aws.Config) *LambdaTransport {
+	return &LambdaTransport{lambda.NewFromConfig(cfg)}
 }
 
 func (t LambdaTransport) Request(

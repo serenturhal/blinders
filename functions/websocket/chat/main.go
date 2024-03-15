@@ -17,6 +17,7 @@ import (
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/aws/aws-sdk-go-v2/config"
 
 	"github.com/redis/go-redis/v9"
 )
@@ -47,13 +48,15 @@ func init() {
 
 	wschat.InitApp(sessionManager, database)
 
-	APIGatewayClient = apigateway.NewClient(
-		context.Background(),
-		apigateway.CustomEndpointResolve{
-			Domain:     os.Getenv("API_GATEWAY_DOMAIN"),
-			PathPrefix: os.Getenv("API_GATEWAY_PATH_PREFIX"),
-		},
-	)
+	cfg, err := config.LoadDefaultConfig(context.Background())
+	if err != nil {
+		log.Fatal("failed to load aws config", err)
+	}
+	cer := apigateway.CustomEndpointResolve{
+		Domain:     os.Getenv("API_GATEWAY_DOMAIN"),
+		PathPrefix: os.Getenv("API_GATEWAY_PATH_PREFIX"),
+	}
+	APIGatewayClient = apigateway.NewClient(context.Background(), cfg, cer)
 }
 
 func HandleRequest(

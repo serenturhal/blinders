@@ -2,11 +2,10 @@ package apigateway
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"net/url"
 
-	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/aws"
 	agm "github.com/aws/aws-sdk-go-v2/service/apigatewaymanagementapi"
 	smithyendpoints "github.com/aws/smithy-go/endpoints"
 )
@@ -18,12 +17,7 @@ type Client struct {
 // NewClient creates a new API Gateway Management Client instance
 // from the provided parameters. The new client will have a custom endpoint
 // that resolves to the application's deployed API.
-func NewClient(ctx context.Context, cer CustomEndpointResolve) *Client {
-	cfg, err := config.LoadDefaultConfig(ctx)
-	if err != nil {
-		log.Fatal("failed to load aws config", err)
-	}
-
+func NewClient(ctx context.Context, cfg aws.Config, cer CustomEndpointResolve) *Client {
 	return &Client{*agm.NewFromConfig(cfg, agm.WithEndpointResolverV2(cer))}
 }
 
