@@ -19,6 +19,8 @@ type FriendRequestsRepo struct {
 }
 
 func NewFriendRequestsRepo(col *mongo.Collection) *FriendRequestsRepo {
+	// TODO: need to add index for `to` and `status` for optimization,
+	// mostly querying pending requests to someone
 	return &FriendRequestsRepo{Col: col}
 }
 
