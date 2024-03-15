@@ -17,7 +17,7 @@ type Client struct {
 // NewClient creates a new API Gateway Management Client instance
 // from the provided parameters. The new client will have a custom endpoint
 // that resolves to the application's deployed API.
-func NewClient(ctx context.Context, cfg aws.Config, cer CustomEndpointResolve) *Client {
+func NewClient(_ context.Context, cfg aws.Config, cer CustomEndpointResolve) *Client {
 	return &Client{*agm.NewFromConfig(cfg, agm.WithEndpointResolverV2(cer))}
 }
 
