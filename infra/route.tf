@@ -149,6 +149,13 @@ resource "aws_apigatewayv2_route" "rest" {
   target    = "integrations/${aws_apigatewayv2_integration.rest.id}"
 }
 
+
+resource "aws_apigatewayv2_route" "root" {
+  api_id    = aws_apigatewayv2_api.http_api.id
+  route_key = "$default"
+  target    = "integrations/${aws_apigatewayv2_integration.rest.id}"
+}
+
 output "rest_api" {
   value = "https://${aws_apigatewayv2_api_mapping.http_api_v1.domain_name}/${aws_apigatewayv2_api_mapping.http_api_v1.api_mapping_key}/<users|...>"
 }
