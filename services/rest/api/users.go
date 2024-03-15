@@ -8,6 +8,7 @@ import (
 	"blinders/packages/auth"
 	"blinders/packages/db/models"
 	"blinders/packages/db/repo"
+	"blinders/packages/transport"
 	"blinders/packages/utils"
 
 	"github.com/gofiber/fiber/v2"
@@ -16,12 +17,23 @@ import (
 )
 
 type UsersService struct {
-	Repo *repo.UsersRepo
+	Repo               *repo.UsersRepo
+	FriendRequestsRepo *repo.FriendRequestsRepo
+	Transporter        transport.Transport
+	ConsumerMap        transport.ConsumerMap
 }
 
-func NewUsersService(repo *repo.UsersRepo) *UsersService {
+func NewUsersService(
+	repo *repo.UsersRepo,
+	frRepo *repo.FriendRequestsRepo,
+	transporter transport.Transport,
+	consumerMap transport.ConsumerMap,
+) *UsersService {
 	return &UsersService{
-		Repo: repo,
+		Repo:               repo,
+		FriendRequestsRepo: frRepo,
+		Transporter:        transporter,
+		ConsumerMap:        consumerMap,
 	}
 }
 

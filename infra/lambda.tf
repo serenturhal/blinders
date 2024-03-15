@@ -150,12 +150,39 @@ data "archive_file" "rest" {
 resource "aws_lambda_function" "rest" {
   function_name    = "blinders-rest-api"
   filename         = "../dist/rest.zip"
-  handler          = "bootstrap"
+  handler          = "bootstrap" # default for provided.al2
   role             = aws_iam_role.lambda_role.arn
   depends_on       = [aws_iam_role_policy_attachment.attach_iam_policy_to_iam_role]
   runtime          = "provided.al2" # this runtime work with our built lambda (not provided.al2023)
   architectures    = ["arm64"]
   source_code_hash = data.archive_file.rest.output_base64sha256
+
+  environment {
+    variables = merge(local.envs, { NOTIFICATION_FUNCTION_NAME : aws_lambda_function.notification.function_name })
+  }
+}
+
+
+# notification
+data "archive_file" "notification" {
+  depends_on = [null_resource.go_build]
+
+  type        = "zip"
+  source_dir  = "../dist/notification"
+  output_path = "../dist/notification.zip"
+}
+
+resource "aws_lambda_function" "notification" {
+  function_name = "blinders-notification"
+  filename      = "../dist/notification.zip"
+  handler       = "bootstrap" # default for provided.al2
+  role          = aws_iam_role.lambda_role.arn
+  # temporily disable to prevent cycles
+  # depends_on       = [aws_iam_role_policy_attachment.attach_iam_policy_to_iam_role]
+  runtime          = "provided.al2" # this runtime work with our built lambda (not provided.al2023)
+  architectures    = ["arm64"]
+  source_code_hash = data.archive_file.notification.output_base64sha256
+
 
   environment {
     variables = local.envs

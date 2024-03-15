@@ -2,6 +2,7 @@ package repo
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"time"
 
@@ -86,4 +87,30 @@ func (r *UsersRepo) DeleteUserByID(userID primitive.ObjectID) (models.User, erro
 	usr := models.User{}
 	err := r.Col.FindOneAndDelete(ctx, bson.M{"_id": userID}).Decode(&usr)
 	return usr, err
+}
+
+func (r *UsersRepo) AddFriend(user1ID primitive.ObjectID, user2ID primitive.ObjectID) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	result, err := r.Col.BulkWrite(
+		ctx,
+		[]mongo.WriteModel{
+			mongo.NewUpdateOneModel().
+				SetFilter(bson.M{"_id": user1ID}).
+				SetUpdate(bson.M{"$addToSet": bson.M{"friends": user2ID}}),
+			mongo.NewUpdateOneModel().
+				SetFilter(bson.M{"_id": user2ID}).
+				SetUpdate(bson.M{"$addToSet": bson.M{"friends": user1ID}}),
+		},
+	)
+	if err != nil {
+		log.Println("can not add friend:", err)
+		return fmt.Errorf("something went wrong")
+	} else if result.ModifiedCount != 2 {
+		log.Println("wrong updated count when add friend")
+		return fmt.Errorf("update friend failed, wrong updated count")
+	}
+
+	return nil
 }
