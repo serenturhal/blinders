@@ -72,6 +72,12 @@ func HandleRequest(
 	}
 
 	switch genericEvent.Type {
+	case wschat.UserPing:
+		data := []byte("pong")
+		err = APIGatewayClient.Publish(ctx, req.RequestContext.ConnectionID, data)
+		if err != nil {
+			log.Println("can not publish message", err)
+		}
 	case wschat.UserSendMessage:
 		payload, err := utils.ParseJSON[wschat.UserSendMessagePayload]([]byte(req.Body))
 		if err != nil {
